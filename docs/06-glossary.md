@@ -5,8 +5,10 @@ add it here and link to it.
 
 | Term | Definition |
 | --- | --- |
-| **StudHub** | The product. A school-internal chat + cross-program resource exchange. |
-| **Program** | A degree program (e.g. BSCS, BSIT, BSECE). One per row in `programs`. |
+| **StudHub** | The product. A school-internal chat + cross-program resource exchange built for SEAIT. |
+| **SEAIT** | South East Asian Institute of Technology, Inc. — the school StudHub is being built for. Tupi, South Cotabato. |
+| **College** | A SEAIT-level grouping above programs (e.g. CICT, DCE, CBGG, CTE, CAF, CCJE). |
+| **Program** | A degree program (e.g. BSIT, BSCE, BSBA-MM, BSEd-Math). One per row in `programs`. Belongs to a college. |
 | **Year level** | Student's year within a program (1–5). |
 | **Program chat** | The single group chat for an entire program. |
 | **Year sub-channel** | A sub-room within a program chat scoped to one year level. |
