@@ -1,0 +1,113 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint (Pint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: mbstring, intl, bcmath, zip, gd, pdo_mysql, redis
+          coverage: none
+          tools: composer:v2
+
+      - name: Cache composer
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.composer/cache
+            vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install composer dependencies
+        run: composer install --no-progress --no-interaction --prefer-dist
+
+      - name: Run Pint (check only)
+        run: composer lint:check
+
+  analyse:
+    name: Static analysis (PHPStan / Larastan)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: mbstring, intl, bcmath, zip, gd, pdo_mysql, redis
+          coverage: none
+          tools: composer:v2
+
+      - name: Cache composer
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.composer/cache
+            vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install composer dependencies
+        run: composer install --no-progress --no-interaction --prefer-dist
+
+      - name: Run PHPStan
+        run: composer analyse
+
+  test:
+    name: Tests (Pest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: mbstring, intl, bcmath, zip, gd, pdo_mysql, redis, sqlite3
+          coverage: none
+          tools: composer:v2
+
+      - name: Cache composer
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.composer/cache
+            vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install composer dependencies
+        run: composer install --no-progress --no-interaction --prefer-dist
+
+      - name: Copy .env and generate APP_KEY
+        run: |
+          cp .env.example .env
+          # Force tests to use sqlite in-memory so CI doesn't need MySQL.
+          sed -i 's/^DB_CONNECTION=.*/DB_CONNECTION=sqlite/' .env
+          sed -i 's/^DB_DATABASE=.*/DB_DATABASE=:memory:/' .env
+          sed -i 's/^CACHE_STORE=.*/CACHE_STORE=array/' .env
+          sed -i 's/^QUEUE_CONNECTION=.*/QUEUE_CONNECTION=sync/' .env
+          sed -i 's/^SESSION_DRIVER=.*/SESSION_DRIVER=array/' .env
+          php artisan key:generate
+
+      - name: Run Pest
+        run: composer test

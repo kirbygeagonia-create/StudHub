@@ -9,8 +9,10 @@
 > e-modules, reviewers, and past exams **across programs and across
 > colleges** — not just inside their own bubble.
 
-This repository currently holds the **planning and design phase** of the
-project. Code will follow once the design is locked in.
+This repository now contains the **Laravel 11 skeleton** for StudHub.
+No product features are implemented yet — see
+[`docs/05-roadmap.md`](docs/05-roadmap.md) for the week-by-week
+build plan.
 
 ---
 
@@ -41,8 +43,54 @@ StudHub fixes this by combining three things:
 
 ## Status
 
-**Planning phase.** No application code yet — just design documents,
-schema sketches, and a build roadmap.
+**Week 1 — Project skeleton.** Laravel 11 app, Docker compose dev
+stack, Pint + PHPStan/Larastan + Pest, GitHub Actions CI, empty
+domain folders. No business logic yet.
+
+---
+
+## Quickstart (dev)
+
+With Docker:
+
+```bash
+cp .env.example .env
+make up                       # boots app + nginx + mysql + redis + mailpit
+make sh                       # shell into the php container
+# inside the container:
+composer install
+php artisan key:generate
+php artisan migrate
+exit
+# back on the host:
+open http://localhost:8080    # Laravel welcome page
+open http://localhost:8025    # Mailpit web UI
+```
+
+Without Docker (host PHP 8.3 + Composer + a local MySQL or sqlite):
+
+```bash
+cp .env.example .env
+composer install
+php artisan key:generate
+php artisan migrate
+php artisan serve
+```
+
+## Dev commands
+
+| Command           | What it does                                   |
+| ----------------- | ---------------------------------------------- |
+| `composer lint`   | Apply Pint code style fixes                    |
+| `composer lint:check` | Check style without writing (used in CI)   |
+| `composer analyse`| Run PHPStan / Larastan                         |
+| `composer test`   | Run Pest test suite                            |
+| `composer ci`     | Lint check + analyse + test (full local CI)    |
+| `make ci`         | Same as `composer ci`                          |
+
+---
+
+## Planning docs (still relevant)
 
 | Doc | Purpose |
 | --- | --- |
@@ -61,8 +109,9 @@ schema sketches, and a build roadmap.
 
 ## Project at a glance
 
-- **Stack (planned):** PHP 8.3, Laravel 11, Laravel Reverb (real-time),
-  MySQL/MariaDB, Livewire + Alpine.js + Tailwind, S3-compatible storage.
+- **Stack:** PHP 8.3, Laravel 11, Laravel Reverb (real-time, lands in
+  Week 3), MySQL 8 / MariaDB 11, Redis 7, Livewire 3 + Alpine.js +
+  Tailwind, S3-compatible storage.
 - **Audience:** SEAIT students (CHED programs in v1; K–12 / TESDA
   programs in v1.5). Multi-school multi-tenancy is not a goal.
 - **Colleges covered in MVP:** CICT, DCE, CBGG, CTE, CAF, CCJE — see
@@ -72,6 +121,29 @@ schema sketches, and a build roadmap.
 
 ---
 
+## Repository layout
+
+```
+app/                Laravel application code
+  Domain/           Domain modules (Identity, Chat, Catalog, ...)
+bootstrap/          Laravel bootstrap
+config/             Laravel config
+database/           Migrations, factories, seeders
+docker/             Dev-stack Dockerfile + nginx config
+docs/               Stable design documents (treat as contract)
+planning/           Live working artifacts (edit freely)
+public/             HTTP entry point
+resources/          Blade views, Tailwind sources
+routes/             web.php, console.php
+tests/              Pest test suite
+.github/workflows/  GitHub Actions CI
+docker-compose.yml  Local dev stack
+Makefile            Common dev commands
+```
+
+---
+
 ## License
 
-To be decided before any code is committed.
+To be decided before v1 ships. Until then, treat this code as **all
+rights reserved**.
