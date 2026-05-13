@@ -125,6 +125,12 @@ Rate-limited to one cross-post per program per hour to prevent abuse.
 
 ## 7. Worked example
 
+> The program codes below (`BSCS`, `BSECE`, `BSMath`, `BSIT`) are
+> **illustrative**, not literal SEAIT programs. SEAIT's real program
+> codes are listed in [07-seait-context.md](07-seait-context.md) §3.
+> The math works the same; substitute in any SEAIT program tuple
+> when reading this section.
+
 A 2nd-year BSECE student requests a Discrete Math reviewer.
 
 1. **Alias resolution:** input `"Discrete Math"` → `subject_id = 42`
@@ -232,7 +238,35 @@ function route_request(Request $r): RoutingResult {
 }
 ```
 
-## 10. Future improvements (v2+)
+## 10. SEAIT-specific worked example (sanity check)
+
+Real SEAIT scenario: a **3rd-year BSCE (DCE)** student needs a
+*Calculus 2* reviewer. The subject `Calculus 2` lives in the
+curricula of:
+
+| Program | College | Typical year | `program_subjects.weight` (initial) |
+| --- | --- | --- | --- |
+| BSCE | DCE | 1–2 | 0.95 (requester's own program — penalty applies) |
+| BSIT | CICT | 1 | 0.85 |
+| BSIT-BAST | CICT | 1 | 0.85 |
+| BSEd-Math | CTE | 1–2 | 0.90 |
+| BSAIS | CBGG | 1 | 0.60 |
+
+Applying the formula in §3 (default weights, normal urgency):
+
+- BSEd-Math → highest score (strong edge, dedicated math majors
+  likely have rich reviewers); top of the routing list.
+- BSIT / BSIT-BAST → also routed, slightly lower than BSEd-Math.
+- BSAIS → routed if it clears `PROGRAM_THRESHOLD` (0.35), else
+  dropped.
+- BSCE (requester's own program) → still notified, but with the
+  self-program penalty so it's not at the top.
+
+This worked example will be re-run with **actual SEAIT curriculum
+data** during seeding in Week 4 and the weights tuned before the
+Week 11 pilot.
+
+## 11. Future improvements (v2+)
 
 - **Learned weights.** Replace the hand-tuned constants with a logistic
   regression trained on (route → fulfillment) outcomes.

@@ -292,14 +292,31 @@ Append-only; never updated or deleted.
 
 ## 4. Seeding strategy
 
-1. One row in `schools` for the pilot school.
-2. Programs seeded from a CSV the school provides (BSCS, BSIT, BSECE,
-   BSED, etc.).
-3. Subjects seeded from each program's curriculum, with
-   `program_subjects.typical_year_level` filled in.
-4. `subject_aliases` seeded with common shorthand (`DSA`, `OOP`,
-   `Calc 2`, etc.).
-5. One admin user created via `php artisan studhub:create-admin`.
+SEAIT-specific seed plan. See
+[07-seait-context.md](07-seait-context.md) for the canonical college
++ program list.
+
+1. One row in `schools` for SEAIT (`name = "South East Asian
+   Institute of Technology, Inc."`, `timezone = "Asia/Manila"`).
+2. One row in a new `colleges` table per SEAIT college (CICT, DCE,
+   CBGG, CTE, CAF, CCJE). *(See §6 — add a `colleges` table in the
+   first migration round.)*
+3. `programs` seeded from `docs/07-seait-context.md` §3 (BSIT,
+   BSIT-BAST, ACT, BSCE, BSBA-MM, BSAIS, BSHM, BSTM, AHM, BPA, BEEd,
+   BECEd, BSEd-Eng/Math/SS/Fil/Sci, BTLEd-ICT, BSAgri-PBG/Horti/AS/CS,
+   BSF, BSAT, BSCrim, BSSW). Each program references its college.
+4. Subjects seeded from each program's published curriculum on
+   <https://www.seait.edu.ph/> course-detail pages. Start with the
+   shared GE core (`GE 114 Mathematics in the Modern World`,
+   `GE 115 Purposive Communication`, NSTP, PE) because those subjects
+   exercise cross-college routing on day one.
+5. `subject_aliases` seeded with SEAIT subject codes
+   (`ITCC111`, `IT 121`, `GE 114`, etc.) plus common student
+   shorthand (`DSA`, `OOP`, `Calc 2`, `MMW`).
+6. `program_subjects` populated with `typical_year_level` from the
+   official curriculum; `weight = 1.0` for in-curriculum entries.
+7. One admin user created via `php artisan studhub:create-admin`,
+   handed over to the CICT department head (academic sponsor).
 
 ## 5. Migration order
 
@@ -315,10 +332,16 @@ Append-only; never updated or deleted.
 
 ## 6. Open schema questions
 
-- Should `users` carry an optional `student_number` for the school's
-  records? (Possibly — defer until the school asks.)
+- **Add `colleges` table?** Yes — SEAIT's 6 colleges (CICT, DCE,
+  CBGG, CTE, CAF, CCJE) are a natural grouping above `programs`,
+  used for admin views and cross-college analytics. Plan to add this
+  in the very first migration round.
+- Should `users` carry an optional `student_number` for SEAIT's
+  records? Likely yes — confirm with registrar before pilot.
 - Do we need versioned resources (re-uploading a fixed PDF)? Likely
   yes for e-modules; will add `resource_revisions` in v1.1.
 - Do we track per-user "subjects I've taken" so we can route requests
   to *individuals*, not just programs? Yes, planned as
   `user_subjects` in v1.1.
+- Should TESDA short programs and K–12 levels reuse `programs` with
+  a `level` enum, or live in separate tables? Defer until v1.5.

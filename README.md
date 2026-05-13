@@ -1,9 +1,13 @@
 # StudHub
 
-> A school-wide chat + cross-program resource exchange.
-> Each degree program gets its own group chat, and a smart resource layer lets
-> students discover, request, and lend textbooks, e-modules, reviewers, and
-> past exams **across programs** — not just inside their own bubble.
+> A school-wide chat + cross-program resource exchange, built for
+> **SEAIT** (South East Asian Institute of Technology, Tupi, South
+> Cotabato).
+>
+> Each SEAIT degree program gets its own group chat, and a smart
+> resource layer lets students discover, request, and lend textbooks,
+> e-modules, reviewers, and past exams **across programs and across
+> colleges** — not just inside their own bubble.
 
 This repository currently holds the **planning and design phase** of the
 project. Code will follow once the design is locked in.
@@ -12,8 +16,9 @@ project. Code will follow once the design is locked in.
 
 ## What problem does StudHub solve?
 
-Today, when a 2nd-year ECE student needs the Discrete Math reviewer that a
-3rd-year CS student already has, they:
+Today at SEAIT, when a 2nd-year BSCE student needs the *Mathematics in
+the Modern World* reviewer that a 3rd-year BSIT student already has,
+they:
 
 1. Post in a random Facebook group and hope.
 2. Scroll Messenger chat history.
@@ -48,6 +53,7 @@ schema sketches, and a build roadmap.
 | [docs/04-request-routing.md](docs/04-request-routing.md) | Cross-program auto-routing algorithm |
 | [docs/05-roadmap.md](docs/05-roadmap.md) | Week-by-week build plan |
 | [docs/06-glossary.md](docs/06-glossary.md) | Shared vocabulary |
+| [docs/07-seait-context.md](docs/07-seait-context.md) | SEAIT-specific facts: colleges, programs, auth strategy, pilot plan |
 | [planning/checklist.md](planning/checklist.md) | Working checklist for the team |
 | [planning/risks.md](planning/risks.md) | Known risks and mitigations |
 
@@ -57,8 +63,10 @@ schema sketches, and a build roadmap.
 
 - **Stack (planned):** PHP 8.3, Laravel 11, Laravel Reverb (real-time),
   MySQL/MariaDB, Livewire + Alpine.js + Tailwind, S3-compatible storage.
-- **Audience:** Students and faculty of a single school (multi-tenant
-  comes later, if ever).
+- **Audience:** SEAIT students (CHED programs in v1; K–12 / TESDA
+  programs in v1.5). Multi-school multi-tenancy is not a goal.
+- **Colleges covered in MVP:** CICT, DCE, CBGG, CTE, CAF, CCJE — see
+  [docs/07-seait-context.md](docs/07-seait-context.md).
 - **Primary innovation:** Cross-program resource routing via a subject
   graph — *not* "yet another chat app."
 
