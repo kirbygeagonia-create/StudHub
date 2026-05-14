@@ -54,4 +54,12 @@ class Program extends Model
     {
         return $this->hasMany(User::class);
     }
+
+    /**
+     * @return HasMany<ChatRoom, $this>
+     */
+    public function chatRooms(): HasMany
+    {
+        return $this->hasMany(ChatRoom::class);
+    }
 }
