@@ -44,6 +44,9 @@ it('seeds the full SEAIT program list across all six colleges', function () {
     $bsce = Program::where('code', 'BSCE')->first();
     expect($bsce->default_year_levels)->toBe(5);
     expect($bsce->college->code)->toBe('DCE');
+
+    $bssw = Program::where('code', 'BSSW')->first();
+    expect($bssw->college->code)->toBe('CBGG');
 });
 
 it('is idempotent — running seeders twice does not duplicate rows', function () {

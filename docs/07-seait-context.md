@@ -64,7 +64,8 @@ seed production data — there are likely small naming differences.
 - Associate in Computer Technology — **ACT** *(short program)*
 
 ### 3.2 Department of Civil Engineering (DCE)
-- Bachelor of Science in Civil Engineering — **BSCE**
+- Bachelor of Science in Civil Engineering, specialized in Structural
+  Engineering — **BSCE**
 
 ### 3.3 College of Business and Good Governance (CBGG)
 - Bachelor of Science in Business Administration major in Marketing
@@ -73,33 +74,34 @@ seed production data — there are likely small naming differences.
 - Bachelor of Science in Hospitality Management — **BSHM**
 - Bachelor of Science in Tourism Management — **BSTM**
 - Associate in Hospitality Management — **AHM** *(short program)*
-- Bachelor of Science in Public Administration — **BPA**
+- Bachelor of Public Administration — **BPA**
+- Bachelor of Science in Social Work — **BSSW**
+  *(moved here from CCJE per SEAIT pre-registration page, 2025)*
 
 ### 3.4 College of Teacher Education (CTE)
-- Bachelor in Elementary Education — **BEEd**
-- Bachelor in Early Childhood Education — **BECEd**
-- Bachelor in Secondary Education, English — **BSEd-Eng**
-- Bachelor in Secondary Education, Mathematics — **BSEd-Math**
-- Bachelor in Secondary Education, Social Studies — **BSEd-SS**
-- Bachelor in Secondary Education, Filipino — **BSEd-Fil**
-- Bachelor in Secondary Education, General Science — **BSEd-Sci**
+- Bachelor of Elementary Education — **BEEd**
+- Bachelor of Early Childhood Education — **BECEd**
+- Bachelor of Secondary Education major in English — **BSEd-Eng**
+- Bachelor of Secondary Education major in Mathematics — **BSEd-Math**
+- Bachelor of Secondary Education major in Social Studies — **BSEd-SS**
+- Bachelor of Secondary Education major in Filipino — **BSEd-Fil**
+- Bachelor of Secondary Education major in Science — **BSEd-Sci**
 - Bachelor of Technology and Livelihood Education major in ICT —
   **BTLEd-ICT** *(added 2023)*
 
 ### 3.5 College of Agriculture and Fisheries (CAF)
-- Bachelor of Science in Agriculture, Plant Breeding and Genetics —
-  **BSAgri-PBG**
-- Bachelor of Science in Agriculture, Horticulture — **BSAgri-Horti**
-- Bachelor of Science in Agriculture, Animal Science — **BSAgri-AS**
+- BS Agriculture major in Plant Breeding and Genetics — **BSAgri-PBG**
+- BS Agriculture major in Horticulture — **BSAgri-Horti**
+- BS Agriculture major in Animal Science — **BSAgri-AS**
   *(added 2022)*
-- Bachelor of Science in Agriculture, Crop Science — **BSAgri-CS**
+- BS Agriculture major in Crop Science — **BSAgri-CS**
   *(added 2022)*
 - Bachelor of Science in Fisheries — **BSF**
 - Bachelor of Science in Agricultural Technology — **BSAT**
+  *(needs registrar confirmation — not visible in 2025 pre-registration dropdown)*
 
 ### 3.6 College of Criminal Justice Education (CCJE)
 - Bachelor of Science in Criminology — **BSCrim**
-- Bachelor of Science in Social Work — **BSSW**
 
 ### 3.7 K–12 Programs *(v1.5+, not in MVP)*
 - Senior High School (Grades 11–12)
