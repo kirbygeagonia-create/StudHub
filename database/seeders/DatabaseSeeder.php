@@ -12,6 +12,7 @@ class DatabaseSeeder extends Seeder
             SeaitSchoolSeeder::class,
             SeaitCollegesSeeder::class,
             SeaitProgramsSeeder::class,
+            SeaitSubjectsSeeder::class,
             ProvisionChatRoomsSeeder::class,
         ]);
     }

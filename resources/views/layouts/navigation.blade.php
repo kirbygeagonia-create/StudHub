@@ -18,6 +18,9 @@
                     <x-nav-link :href="route('chat.index')" :active="request()->routeIs('chat.*')">
                         {{ __('Chat') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('resources.index')" :active="request()->routeIs('resources.*')">
+                        {{ __('Resources') }}
+                    </x-nav-link>
                 </div>
             </div>
 

@@ -69,15 +69,25 @@ Messages and attachments persist.
 
 ## Week 4 — Subjects & resource catalog (read + create) 🟢
 
-- `subjects`, `subject_aliases`, `program_subjects`,
-  `resources` migrations.
-- Seeder for subjects + aliases for the pilot programs.
-- Resource create form (with file upload + watermarking job stub).
-- Resource listing page with filters (subject, type, program, year).
-- MySQL FULLTEXT search across `title` + `description`.
+- [x] `subjects`, `subject_aliases`, `program_subjects`,
+      `resources` migrations.
+- [x] `App\Models\LearningResource` (table `resources`) +
+      `Subject`, `SubjectAlias`, `ProgramSubject` models.
+- [x] `SeaitSubjectsSeeder` covering the GE core + BSIT / BSCE /
+      BSBA-MM pilot trio, with subject_aliases for student
+      shorthand (`DSA`, `MMW`, `Calc 2`, …).
+- [x] Livewire `ResourceForm` with file upload + `WatermarkResourceFile`
+      job stub (real PDF/image watermarking lands in Week 5).
+- [x] Resource listing page with filters (subject, type, program,
+      year, free-text search) and a resource detail page.
+- [x] MySQL FULLTEXT search across `title` + `description` (with a
+      LIKE fallback on SQLite/dev).
+- [x] 24 Pest tests under `tests/Feature/Catalog/*` covering seeder
+      idempotency, action validation, queue dispatch, search scopes,
+      and route auth.
 
 **Exit:** I can upload a resource, see it in search, filter by
-subject.
+subject. ✅
 
 ---
 

@@ -143,11 +143,17 @@ FULLTEXT: `(body)`.
 
 ### 2.10 `resources`
 
+Table name is `resources`; the Eloquent model is `App\Models\LearningResource`
+(renamed from `Resource` to avoid colliding with PHP's reserved `resource`
+type alias when running Larastan).
+
 | Column | Type | Notes |
 | --- | --- | --- |
 | `id` | `BIGINT UNSIGNED PK` | |
+| `school_id` | `FK schools.id` | Scopes search to the viewer's school. |
 | `owner_user_id` | `FK users.id` | |
 | `subject_id` | `FK subjects.id` | |
+| `program_id` | `FK programs.id NULL` | Owner's program at time of post. |
 | `type` | `ENUM('textbook','e_module','reviewer','past_exam','lab_manual','thesis_sample','lecture_notes','other')` | |
 | `title` | `VARCHAR(255)` | |
 | `description` | `TEXT NULL` | |
