@@ -1,0 +1,19 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    paths:
+        - app
+        - config
+        - database
+        - routes
+
+    # Tests are intentionally excluded — Pest's DSL is not understood
+    # by vanilla PHPStan and needs a dedicated plugin we'll add later.
+
+    level: 5
+
+    excludePaths:
+        - bootstrap/cache/*
+        - storage/*
+        - vendor/*
