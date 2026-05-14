@@ -8,16 +8,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Program extends Model
+class Subject extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'school_id',
-        'college_id',
         'code',
         'name',
-        'default_year_levels',
+        'domain',
+        'description',
         'is_active',
     ];
 
@@ -27,7 +27,6 @@ class Program extends Model
     protected function casts(): array
     {
         return [
-            'default_year_levels' => 'integer',
             'is_active' => 'boolean',
         ];
     }
@@ -41,35 +40,19 @@ class Program extends Model
     }
 
     /**
-     * @return BelongsTo<College, $this>
+     * @return HasMany<SubjectAlias, $this>
      */
-    public function college(): BelongsTo
+    public function aliases(): HasMany
     {
-        return $this->belongsTo(College::class);
+        return $this->hasMany(SubjectAlias::class);
     }
 
     /**
-     * @return HasMany<User, $this>
+     * @return BelongsToMany<Program, $this>
      */
-    public function users(): HasMany
+    public function programs(): BelongsToMany
     {
-        return $this->hasMany(User::class);
-    }
-
-    /**
-     * @return HasMany<ChatRoom, $this>
-     */
-    public function chatRooms(): HasMany
-    {
-        return $this->hasMany(ChatRoom::class);
-    }
-
-    /**
-     * @return BelongsToMany<Subject, $this>
-     */
-    public function subjects(): BelongsToMany
-    {
-        return $this->belongsToMany(Subject::class, 'program_subjects')
+        return $this->belongsToMany(Program::class, 'program_subjects')
             ->using(ProgramSubject::class)
             ->withPivot(['typical_year_level', 'weight'])
             ->withTimestamps();
