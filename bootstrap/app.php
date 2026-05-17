@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\EnsureHasRole;
+use App\Http\Middleware\EnsureNotSuspended;
 use App\Http\Middleware\EnsureUserIsOnboarded;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -15,6 +17,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'onboarded' => EnsureUserIsOnboarded::class,
+            'role' => EnsureHasRole::class,
+            'not_suspended' => EnsureNotSuspended::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

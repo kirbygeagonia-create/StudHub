@@ -119,7 +119,36 @@
                     </ul>
                 @endif
 
-                @if ($request->isOpen() && auth()->id() !== $request->requester_user_id)
+                @if ($request->status?->value === 'matched' && auth()->id() === $request->requester_user_id && $request->fulfilled_offer_id)
+    @php
+        $acceptedOffer = $request->offers->firstWhere('id', $request->fulfilled_offer_id);
+    @endphp
+    @if ($acceptedOffer && $acceptedOffer->resource_id)
+        <div class="border-t border-gray-100 pt-4 mt-4">
+            <h3 class="text-sm font-semibold text-gray-800 mb-3">Record as Lend</h3>
+            <p class="text-xs text-gray-500 mb-2">
+                The offer from <strong>{{ $acceptedOffer->offerer->display_name ?: $acceptedOffer->offerer->name }}</strong> has been accepted.
+                Record the resource "{{ $acceptedOffer->resource->title }}" as lent.
+            </p>
+            <form method="POST" action="{{ route('lends.record', [$request, $acceptedOffer]) }}" class="space-y-3">
+                @csrf
+                <div>
+                    <label for="return_by" class="block text-sm font-medium text-gray-700 mb-1">
+                        Expected return date
+                    </label>
+                    <input type="date" id="return_by" name="return_by"
+                           class="border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                </div>
+                <button type="submit"
+                        class="px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
+                    Record Lend
+                </button>
+            </form>
+        </div>
+    @endif
+@endif
+
+@if ($request->isOpen() && auth()->id() !== $request->requester_user_id)
                     <form method="POST" action="{{ route('requests.offers.store', $request) }}" class="mt-4 space-y-3 border-t border-gray-100 pt-4">
                         @csrf
 

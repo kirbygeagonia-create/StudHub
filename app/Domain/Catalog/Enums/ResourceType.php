@@ -34,4 +34,12 @@ enum ResourceType: string
     {
         return array_map(fn (self $c) => $c->value, self::cases());
     }
+
+    public function isPhysical(): bool
+    {
+        return match ($this) {
+            self::Textbook, self::LabManual, self::Other => true,
+            self::EModule, self::Reviewer, self::PastExam, self::ThesisSample, self::LectureNotes => false,
+        };
+    }
 }

@@ -21,6 +21,22 @@
                     <x-nav-link :href="route('resources.index')" :active="request()->routeIs('resources.*')">
                         {{ __('Resources') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('leaderboard')" :active="request()->routeIs('leaderboard')">
+                        {{ __('Leaderboard') }}
+                    </x-nav-link>
+                    <x-nav-link :href="route('lends.index')" :active="request()->routeIs('lends.*')">
+                        {{ __('Lends') }}
+                    </x-nav-link>
+                    @if (Auth::user()?->isModerator() || Auth::user()?->isAdmin())
+                        <x-nav-link :href="route('moderation.dashboard')" :active="request()->routeIs('moderation.*')">
+                            {{ __('Moderation') }}
+                        </x-nav-link>
+                    @endif
+                    @if (Auth::user()?->isAdmin())
+                        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.*')">
+                            {{ __('Admin') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 

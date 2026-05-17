@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
+use App\Domain\Lends\Enums\LendCondition;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\DB;
 
 class Lend extends Model
 {
@@ -12,6 +15,8 @@ class Lend extends Model
 
     protected $fillable = [
         'resource_id',
+        'offer_id',
+        'request_id',
         'from_user_id',
         'to_user_id',
         'lent_at',
@@ -29,6 +34,7 @@ class Lend extends Model
             'lent_at' => 'datetime',
             'returned_at' => 'datetime',
             'return_by' => 'date',
+            'condition_on_return' => LendCondition::class,
         ];
     }
 
@@ -38,6 +44,22 @@ class Lend extends Model
     public function resource(): BelongsTo
     {
         return $this->belongsTo(LearningResource::class);
+    }
+
+    /**
+     * @return BelongsTo<Offer, $this>
+     */
+    public function offer(): BelongsTo
+    {
+        return $this->belongsTo(Offer::class);
+    }
+
+    /**
+     * @return BelongsTo<\App\Models\Request, $this>
+     */
+    public function request(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Request::class);
     }
 
     /**
@@ -54,5 +76,43 @@ class Lend extends Model
     public function toUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'to_user_id');
+    }
+
+    public function isReturned(): bool
+    {
+        return $this->returned_at !== null;
+    }
+
+    public function isOverdue(): bool
+    {
+        if ($this->isReturned() || $this->return_by === null) {
+            return false;
+        }
+
+        return now()->startOfDay()->gt($this->return_by);
+    }
+
+    public function isDueSoon(int $days = 2): bool
+    {
+        if ($this->isReturned() || $this->return_by === null) {
+            return false;
+        }
+
+        $dueIn = (int) now()->startOfDay()->diffInDays($this->return_by, false);
+
+        return $dueIn >= 0 && $dueIn <= $days;
+    }
+
+    /**
+     * Scope lends that need a return reminder (due within N days, not returned, has a return_by date).
+     */
+    public function scopeDueSoon(Builder $query, int $days = 2): Builder
+    {
+        $from = now()->startOfDay()->format('Y-m-d');
+        $to = now()->startOfDay()->addDays($days)->format('Y-m-d');
+
+        return $query->whereNull('returned_at')
+            ->whereNotNull('return_by')
+            ->whereBetween('return_by', [$from, $to]);
     }
 }

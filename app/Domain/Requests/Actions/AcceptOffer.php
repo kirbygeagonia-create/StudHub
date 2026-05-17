@@ -40,8 +40,10 @@ class AcceptOffer
                 ->where('status', OfferStatus::Pending)
                 ->update(['status' => OfferStatus::Rejected]);
 
+            $newStatus = $this->determineStatus($offer);
+
             $request->update([
-                'status' => RequestStatus::Matched,
+                'status' => $newStatus,
                 'fulfilled_offer_id' => $offer->id,
             ]);
 
@@ -50,5 +52,22 @@ class AcceptOffer
                 (new AwardKarma)->handle($offerer, KarmaEventReason::RequestFulfilled, $offer->id, 'Offer');
             }
         });
+    }
+
+    private function determineStatus(Offer $offer): RequestStatus
+    {
+        if ($offer->resource_id === null) {
+            return RequestStatus::Fulfilled;
+        }
+
+        $resource = $offer->resource;
+
+        if ($resource === null) {
+            return RequestStatus::Fulfilled;
+        }
+
+        return $resource->type->isPhysical()
+            ? RequestStatus::Matched
+            : RequestStatus::Fulfilled;
     }
 }

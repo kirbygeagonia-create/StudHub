@@ -98,6 +98,30 @@
                     <span>{{ $resource->lend_count }} lends</span>
                     <span>Posted {{ $resource->published_at?->diffForHumans() }}</span>
                 </div>
+
+                <div class="border-t border-gray-100 pt-3">
+                    <button type="button" onclick="document.getElementById('report-form-resource').classList.toggle('hidden')"
+                            class="text-xs text-red-400 hover:text-red-600">
+                        Report this resource
+                    </button>
+                    <form id="report-form-resource" method="POST" action="{{ route('reports.store') }}" class="hidden mt-2 space-y-2">
+                        @csrf
+                        <input type="hidden" name="reported_type" value="resource">
+                        <input type="hidden" name="reported_id" value="{{ $resource->id }}">
+                        <select name="reason" required class="text-xs border-gray-300 rounded-md shadow-sm">
+                            <option value="">Select reason</option>
+                            @foreach (\App\Domain\Moderation\Enums\ReportReason::cases() as $reason)
+                                <option value="{{ $reason->value }}">{{ $reason->label() }}</option>
+                            @endforeach
+                        </select>
+                        <input type="text" name="notes" maxlength="1000" placeholder="Optional note"
+                               class="text-xs border-gray-300 rounded-md shadow-sm w-full">
+                        <button type="submit"
+                                class="px-2 py-1 bg-red-500 border border-transparent rounded text-xs font-semibold text-white uppercase tracking-widest hover:bg-red-600">
+                            Submit Report
+                        </button>
+                    </form>
+                </div>
             </div>
 
             <div>

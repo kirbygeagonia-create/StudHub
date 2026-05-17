@@ -44,6 +44,36 @@ class ProfileController extends Controller
     }
 
     /**
+     * Display a public user profile (other than self, or self).
+     */
+    public function publicProfile(Request $request, User $user): View
+    {
+        $viewer = $request->user();
+        abort_unless($viewer !== null, 403);
+
+        if ($user->school_id !== $viewer->school_id) {
+            abort(404);
+        }
+
+        $user->loadMissing(['school', 'college', 'program']);
+
+        $karma = (int) ($user->karma ?? 0);
+        $badge = BadgeTier::fromKarmaOrNull($karma);
+
+        $resourceCount = LearningResource::where('owner_user_id', $user->id)->count();
+
+        $isSelf = $viewer->id === $user->id;
+
+        return view('profile.public', [
+            'user' => $user,
+            'karma' => $karma,
+            'badge' => $badge,
+            'resourceCount' => $resourceCount,
+            'isSelf' => $isSelf,
+        ]);
+    }
+
+    /**
      * Display the user's profile (read-only).
      */
     public function show(Request $request): View

@@ -19,7 +19,7 @@ beforeEach(function () {
     $this->seed(SeaitSubjectsSeeder::class);
 });
 
-it('accepts an offer and marks the request as matched', function () {
+it('accepts an offer and marks the request as fulfilled', function () {
     $requester = User::factory()->onboarded()->create();
     $offerer = User::factory()->onboarded()->create();
     /** @var Subject $subject */
@@ -40,7 +40,7 @@ it('accepts an offer and marks the request as matched', function () {
     (new AcceptOffer)->handle($requester, $request, $offer);
 
     expect($offer->refresh()->status)->toBe(OfferStatus::Accepted);
-    expect($request->refresh()->status)->toBe(RequestStatus::Matched);
+    expect($request->refresh()->status)->toBe(RequestStatus::Fulfilled);
     expect($request->refresh()->fulfilled_offer_id)->toBe($offer->id);
 });
 
@@ -134,5 +134,5 @@ it('accepts an offer via the accept route', function () {
         ->post(route('requests.offers.accept', [$request, $offer]))
         ->assertRedirect();
 
-    expect($request->refresh()->status)->toBe(RequestStatus::Matched);
+    expect($request->refresh()->status)->toBe(RequestStatus::Fulfilled);
 });

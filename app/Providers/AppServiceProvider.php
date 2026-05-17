@@ -19,6 +19,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        \Illuminate\Database\Eloquent\Relations\Relation::enforceMorphMap([
+            'resource' => \App\Models\LearningResource::class,
+            'message' => \App\Models\ChatMessage::class,
+            'user' => \App\Models\User::class,
+            'subject' => \App\Models\Subject::class,
+            'report' => \App\Models\Report::class,
+            'offer' => \App\Models\Offer::class,
+        ]);
     }
 }

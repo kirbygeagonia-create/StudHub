@@ -35,6 +35,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'karma',
         'last_seen_at',
         'onboarded_at',
+        'suspended_until',
     ];
 
     /**
@@ -54,6 +55,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'last_seen_at' => 'datetime',
             'onboarded_at' => 'datetime',
+            'suspended_until' => 'datetime',
             'password' => 'hashed',
             'role' => UserRole::class,
             'year_level' => 'integer',
@@ -152,5 +154,25 @@ class User extends Authenticatable implements MustVerifyEmail
     public function preferredDisplayName(): string
     {
         return $this->display_name ?: $this->name;
+    }
+
+    public function isStudent(): bool
+    {
+        return $this->role === UserRole::Student;
+    }
+
+    public function isModerator(): bool
+    {
+        return $this->role === UserRole::Moderator;
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === UserRole::Admin;
+    }
+
+    public function isSuspended(): bool
+    {
+        return $this->suspended_until !== null && $this->suspended_until->isFuture();
     }
 }

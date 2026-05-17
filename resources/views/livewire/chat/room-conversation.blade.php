@@ -17,6 +17,31 @@
                         </a>
                     </p>
                 @endif
+                <div class="mt-1">
+                    <button type="button" onclick="document.getElementById('report-form-msg-{{ $message->id }}').classList.toggle('hidden')"
+                            class="text-xs text-red-400 hover:text-red-600">
+                        Report
+                    </button>
+                    <form id="report-form-msg-{{ $message->id }}" method="POST" action="{{ route('reports.store') }}" class="hidden mt-1 space-y-1">
+                        @csrf
+                        <input type="hidden" name="reported_type" value="message">
+                        <input type="hidden" name="reported_id" value="{{ $message->id }}">
+                        <select name="reason" required class="text-xs border-gray-300 rounded-md shadow-sm">
+                            <option value="">Select reason</option>
+                            @foreach (\App\Domain\Moderation\Enums\ReportReason::cases() as $reason)
+                                <option value="{{ $reason->value }}">{{ $reason->label() }}</option>
+                            @endforeach
+                        </select>
+                        <div class="flex items-center gap-1">
+                            <input type="text" name="notes" maxlength="1000" placeholder="Optional note"
+                                   class="text-xs border-gray-300 rounded-md shadow-sm flex-1">
+                            <button type="submit"
+                                    class="px-2 py-1 bg-red-500 border border-transparent rounded text-xs font-semibold text-white uppercase tracking-widest hover:bg-red-600">
+                                Submit
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </article>
         @empty
             <p class="text-sm text-gray-500" data-testid="chat-empty-state">No messages yet — be the first to say hi.</p>
