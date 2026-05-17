@@ -6,6 +6,8 @@ use App\Domain\Catalog\Enums\ResourceAvailability;
 use App\Domain\Catalog\Enums\ResourceType;
 use App\Domain\Catalog\Enums\ResourceVisibility;
 use App\Domain\Catalog\Jobs\WatermarkResourceFile;
+use App\Domain\Reputation\Actions\AwardKarma;
+use App\Domain\Reputation\Enums\KarmaEventReason;
 use App\Models\LearningResource;
 use App\Models\Subject;
 use App\Models\User;
@@ -82,6 +84,8 @@ class CreateResource
             if ($filePayload['file_url'] !== null) {
                 WatermarkResourceFile::dispatch($resource->id);
             }
+
+            (new AwardKarma)->handle($owner, KarmaEventReason::ResourceUploaded, $resource->id, 'LearningResource');
 
             return $resource;
         });

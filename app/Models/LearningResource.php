@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 
@@ -36,6 +37,7 @@ class LearningResource extends Model
         'file_mime',
         'file_size',
         'is_watermarked',
+        'thumbnail_url',
         'save_count',
         'lend_count',
         'published_at',
@@ -101,6 +103,16 @@ class LearningResource extends Model
         }
 
         return (string) $value === ResourceVisibility::ProgramOnly->value;
+    }
+
+    /**
+     * @return BelongsToMany<Shelf, $this>
+     */
+    public function shelves(): BelongsToMany
+    {
+        return $this->belongsToMany(Shelf::class, 'shelf_items', 'resource_id', 'shelf_id')
+            ->withPivot(['note', 'created_at'])
+            ->withTimestamps();
     }
 
     /**

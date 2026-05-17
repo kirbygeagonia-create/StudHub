@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -100,6 +101,45 @@ class User extends Authenticatable implements MustVerifyEmail
     public function chatMessages(): HasMany
     {
         return $this->hasMany(ChatMessage::class, 'sender_id');
+    }
+
+    /**
+     * @return HasMany<Shelf, $this>
+     */
+    public function shelves(): HasMany
+    {
+        return $this->hasMany(Shelf::class);
+    }
+
+    /**
+     * @return HasMany<Request, $this>
+     */
+    public function requests(): HasMany
+    {
+        return $this->hasMany(Request::class, 'requester_user_id');
+    }
+
+    /**
+     * @return HasMany<Offer, $this>
+     */
+    public function offers(): HasMany
+    {
+        return $this->hasMany(Offer::class, 'offerer_user_id');
+    }
+
+    /**
+     * @return HasManyThrough<LearningResource, $this>
+     */
+    public function savedResources(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            LearningResource::class,
+            ShelfItem::class,
+            'shelf_id',
+            'id',
+            'id',
+            'resource_id'
+        );
     }
 
     public function hasCompletedOnboarding(): bool
