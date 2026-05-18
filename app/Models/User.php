@@ -130,7 +130,7 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * @return HasManyThrough<LearningResource, $this>
+     * @return HasManyThrough<LearningResource, ShelfItem, $this>
      */
     public function savedResources(): HasManyThrough
     {
@@ -173,6 +173,10 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function isSuspended(): bool
     {
-        return $this->suspended_until !== null && $this->suspended_until->isFuture();
+        if ($this->suspended_until === null) {
+            return false;
+        }
+
+        return now()->startOfDay()->lte($this->suspended_until);
     }
 }

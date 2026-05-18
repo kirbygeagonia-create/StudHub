@@ -2,6 +2,7 @@
 
 namespace App\Domain\Requests\Jobs;
 
+use App\Domain\Requests\Enums\RequestUrgency;
 use App\Models\Request;
 use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -53,7 +54,9 @@ class NotifyRoutedUsers implements ShouldQueue
                         'request_id' => $this->request->id,
                         'subject_name' => $this->request->subject?->name ?? 'Unknown subject',
                         'requester_name' => $this->request->requester?->preferredDisplayName() ?? 'Someone',
-                        'urgency' => $this->request->urgency?->value ?? 'normal',
+                        'urgency' => $this->request->urgency instanceof RequestUrgency
+                            ? $this->request->urgency->value
+                            : 'normal',
                         'message' => sprintf(
                             '%s needs help with "%s"',
                             $this->request->requester?->preferredDisplayName() ?? 'Someone',

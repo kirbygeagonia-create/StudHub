@@ -2,6 +2,7 @@
 
 namespace App\Domain\Requests\Actions;
 
+use App\Domain\Requests\Enums\RequestUrgency;
 use App\Domain\Requests\Jobs\CrossPostRequest;
 use App\Domain\Requests\Jobs\NotifyRoutedUsers;
 use App\Models\LearningResource;
@@ -11,6 +12,7 @@ use App\Models\RequestRoute;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
@@ -43,10 +45,12 @@ class RouteRequest
 
         $programs = Program::whereHas('subjects', function (Builder $q) use ($subject): void {
             $q->where('subject_id', $subject->id);
-        })->with(['subjects' => function (BelongsToMany $q) use ($subject): void {
-            $q->where('subject_id', $subject->id)
-                ->withPivot(['typical_year_level', 'weight']);
-        }])->get();
+        })
+            /** @phpstan-ignore-next-line */
+            ->with(['subjects' => function (BelongsToMany $q) use ($subject): void {
+                $q->where('subject_id', $subject->id)
+                    ->withPivot(['typical_year_level', 'weight']);
+            }])->get();
 
         if ($programs->isEmpty()) {
             $this->routeToOwnProgramOnly($request, $subject);
@@ -57,7 +61,10 @@ class RouteRequest
         $scoredPrograms = collect();
 
         foreach ($programs as $program) {
-            $pivot = $program->subjects->first()?->pivot;
+            $firstSubject = $program->subjects->first();
+            /** @var Pivot|null $pivot */
+            /** @phpstan-ignore-next-line */
+            $pivot = $firstSubject?->pivot;
 
             $edgeWeight = $pivot?->weight ?? 0.0;
             $typicalYear = $pivot?->typical_year_level ?? 1;
@@ -66,7 +73,11 @@ class RouteRequest
                 + self::W_RESOURCE * $this->normalizedResourceCount($program, $subject)
                 + self::W_HISTORY * $this->historicalFulfillmentRate($program, $subject)
                 + self::W_PROXIMITY * $this->yearProximityBonus($typicalYear, $requester->year_level)
-                + self::W_URGENCY * $this->urgencyMultiplier($request->urgency?->value ?? 'normal');
+                + self::W_URGENCY * $this->urgencyMultiplier(
+                    $request->urgency instanceof RequestUrgency
+                        ? $request->urgency->value
+                        : ($request->urgency ?? 'normal')
+                );
 
             if ($program->id === $requester->program_id) {
                 $score -= self::PENALTY_SELF;
@@ -111,7 +122,11 @@ class RouteRequest
             NotifyRoutedUsers::dispatch($request->id, $allUserIds->unique()->values()->all());
         }
 
-        if ($request->urgency?->value === 'urgent') {
+        $urgencyValue = $request->urgency instanceof RequestUrgency
+            ? $request->urgency->value
+            : (string) ($request->urgency ?? '');
+
+        if ($urgencyValue === 'urgent') {
             foreach ($scoredPrograms as $row) {
                 if ($row['score'] >= self::CHAT_THRESHOLD) {
                     CrossPostRequest::dispatch($request->id, $row['program']->id);

@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Domain\Identity\Enums\UserRole;
 use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
@@ -17,7 +18,11 @@ class EnsureHasRole
             abort(403);
         }
 
-        if (! in_array($user->role->value, $roles, true)) {
+        $roleValue = $user->role instanceof UserRole
+            ? $user->role->value
+            : (string) $user->role;
+
+        if (! in_array($roleValue, $roles, true)) {
             abort(403);
         }
 
