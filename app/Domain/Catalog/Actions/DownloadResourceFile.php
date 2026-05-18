@@ -4,7 +4,6 @@ namespace App\Domain\Catalog\Actions;
 
 use App\Models\LearningResource;
 use App\Models\User;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -55,6 +54,7 @@ class DownloadResourceFile
     private function watermarkedCachePath(User $user, LearningResource $resource): string
     {
         $hash = md5($resource->id . '_' . $user->id);
+
         return 'watermarked/' . $hash . '.pdf';
     }
 
@@ -138,12 +138,14 @@ class DownloadResourceFile
     private function countPdfPages(string $content): int
     {
         preg_match_all('/\/Type\s*\/Page[^s]/i', $content, $matches);
-        return max(1, count($matches[0] ?? []));
+
+        return max(1, count($matches[0]));
     }
 
     private function escapePdfString(string $value): string
     {
         $value = str_replace(['\\', '(', ')'], ['\\\\', '\\(', '\\)'], $value);
+
         return $value;
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Domain\Requests\Actions;
 
+use App\Domain\Catalog\Enums\ResourceType;
 use App\Domain\Reputation\Actions\AwardKarma;
 use App\Domain\Reputation\Enums\KarmaEventReason;
 use App\Domain\Requests\Enums\OfferStatus;
@@ -56,18 +57,21 @@ class AcceptOffer
 
     private function determineStatus(Offer $offer): RequestStatus
     {
-        if ($offer->resource_id === null) {
-            return RequestStatus::Fulfilled;
-        }
-
         $resource = $offer->resource;
 
         if ($resource === null) {
             return RequestStatus::Fulfilled;
         }
 
-        return $resource->type->isPhysical()
-            ? RequestStatus::Matched
-            : RequestStatus::Fulfilled;
+        /** @var ResourceType|string $resourceType */
+        $resourceType = $resource->type;
+
+        if ($resourceType instanceof ResourceType) {
+            return $resourceType->isPhysical()
+                ? RequestStatus::Matched
+                : RequestStatus::Fulfilled;
+        }
+
+        return RequestStatus::Fulfilled;
     }
 }

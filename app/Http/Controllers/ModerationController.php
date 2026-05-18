@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Domain\Moderation\Actions\CreateReport;
-use App\Domain\Moderation\Actions\LogAudit;
 use App\Domain\Moderation\Actions\ResolveReport;
 use App\Domain\Moderation\Actions\SuspendUser;
 use App\Domain\Moderation\Enums\ReportStatus;
+use App\Models\ChatMessage;
+use App\Models\LearningResource;
 use App\Models\Program;
 use App\Models\ProgramModerator;
 use App\Models\Report;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request as HttpRequest;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -46,6 +47,7 @@ class ModerationController extends Controller
                 }
 
                 if ($report->reported_type === 'message') {
+                    /** @var ChatMessage $entity */
                     $messageRoom = $entity->room;
                     if ($messageRoom === null) {
                         return false;
@@ -55,10 +57,12 @@ class ModerationController extends Controller
                 }
 
                 if ($report->reported_type === 'resource') {
+                    /** @var LearningResource $entity */
                     return $moderatedProgramIds->contains($entity->program_id);
                 }
 
                 if ($report->reported_type === 'user') {
+                    /** @var User $entity */
                     return $moderatedProgramIds->contains($entity->program_id);
                 }
 
@@ -69,12 +73,12 @@ class ModerationController extends Controller
         $programs = Program::whereIn('id', $moderatedProgramIds)->get(['id', 'code', 'name']);
 
         return view('moderation.dashboard', [
-            'reports' => new \Illuminate\Pagination\LengthAwarePaginator(
-                $reports->forPage(\Illuminate\Pagination\Paginator::resolveCurrentPage(), 15),
+            'reports' => new LengthAwarePaginator(
+                $reports->forPage(Paginator::resolveCurrentPage(), 15),
                 $reports->count(),
                 15,
-                \Illuminate\Pagination\Paginator::resolveCurrentPage(),
-                ['path' => \Illuminate\Pagination\Paginator::resolveCurrentPath()]
+                Paginator::resolveCurrentPage(),
+                ['path' => Paginator::resolveCurrentPath()]
             ),
             'programs' => $programs,
         ]);
@@ -117,7 +121,7 @@ class ModerationController extends Controller
             'reason' => ['nullable', 'string', 'max:500'],
         ]);
 
-        $target = \App\Models\User::findOrFail((int) $validated['user_id']);
+        $target = User::findOrFail((int) $validated['user_id']);
 
         try {
             $suspendUser->handle($user, $target, (int) $validated['days'], $validated['reason'] ?? null);
@@ -139,7 +143,7 @@ class ModerationController extends Controller
             'user_id' => ['required', 'integer', 'exists:users,id'],
         ]);
 
-        $target = \App\Models\User::findOrFail((int) $validated['user_id']);
+        $target = User::findOrFail((int) $validated['user_id']);
 
         try {
             $suspendUser->unsuspend($user, $target);

@@ -5,6 +5,8 @@ namespace App\Domain\Moderation\Actions;
 use App\Domain\Moderation\Enums\ReportStatus;
 use App\Domain\Reputation\Actions\AwardKarma;
 use App\Domain\Reputation\Enums\KarmaEventReason;
+use App\Models\ChatMessage;
+use App\Models\LearningResource;
 use App\Models\Report;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -59,9 +61,12 @@ class ResolveReport
 
     private function getReportedUser(Report $report): ?User
     {
+        /** @var ChatMessage|LearningResource|null $reported */
+        $reported = $report->reported;
+
         return match ($report->reported_type) {
-            'message' => $report->reported?->sender,
-            'resource' => $report->reported?->owner,
+            'message' => $reported?->sender,
+            'resource' => $reported?->owner,
             'user' => User::find($report->reported_id),
             default => null,
         };

@@ -4,6 +4,7 @@ use App\Domain\Catalog\Enums\ResourceType;
 use App\Domain\Requests\Actions\CreateRequest;
 use App\Domain\Requests\Enums\RequestUrgency;
 use App\Models\Request;
+use App\Models\School;
 use App\Models\Subject;
 use App\Models\User;
 use Database\Seeders\SeaitCollegesSeeder;
@@ -40,7 +41,7 @@ it('creates a request and stamps it with the requester', function () {
 
 it('refuses to create a request for a subject in another school', function () {
     $user = User::factory()->onboarded()->create();
-    $otherSchool = \App\Models\School::create([
+    $otherSchool = School::create([
         'code' => 'OTHER',
         'name' => 'Other School',
         'short_name' => 'OTHER',

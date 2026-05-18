@@ -8,11 +8,10 @@ use App\Domain\Moderation\Actions\SuspendUser;
 use App\Domain\Moderation\Enums\ReportStatus;
 use App\Models\AuditLog;
 use App\Models\ChatMessage;
+use App\Models\ChatRoom;
 use App\Models\LearningResource;
-use App\Models\Offer;
 use App\Models\ProgramModerator;
 use App\Models\Report;
-use App\Models\Request;
 use App\Models\Subject;
 use App\Models\User;
 use Database\Seeders\SeaitCollegesSeeder;
@@ -30,8 +29,8 @@ beforeEach(function () {
 it('creates a report on a resource', function () {
     $reporter = User::factory()->onboarded()->create();
     $owner = User::factory()->onboarded()->create();
-    /** @var \App\Models\Subject $subject */
-    $subject = \App\Models\Subject::where('code', 'IT 211')->firstOrFail();
+    /** @var Subject $subject */
+    $subject = Subject::where('code', 'IT 211')->firstOrFail();
     $resource = LearningResource::factory()->create([
         'owner_user_id' => $owner->id,
         'school_id' => $owner->school_id,
@@ -54,7 +53,7 @@ it('creates a report on a message', function () {
     $reporter = User::factory()->onboarded()->create();
     $sender = User::factory()->onboarded()->create();
 
-    $room = \App\Models\ChatRoom::create([
+    $room = ChatRoom::create([
         'program_id' => $sender->program_id,
         'school_id' => $sender->school_id,
         'kind' => 'program',
@@ -62,7 +61,7 @@ it('creates a report on a message', function () {
         'slug' => 'test-room',
     ]);
 
-    $message = \App\Models\ChatMessage::create([
+    $message = ChatMessage::create([
         'chat_room_id' => $room->id,
         'sender_id' => $sender->id,
         'body' => 'test message',
@@ -105,8 +104,8 @@ it('refuses to report a non-existent entity', function () {
 it('resolves a report as actioned and deducts karma', function () {
     $reporter = User::factory()->onboarded()->create();
     $owner = User::factory()->onboarded()->create();
-    /** @var \App\Models\Subject $subject */
-    $subject = \App\Models\Subject::where('code', 'IT 211')->firstOrFail();
+    /** @var Subject $subject */
+    $subject = Subject::where('code', 'IT 211')->firstOrFail();
     $resource = LearningResource::factory()->create([
         'owner_user_id' => $owner->id,
         'school_id' => $owner->school_id,
@@ -129,8 +128,8 @@ it('resolves a report as actioned and deducts karma', function () {
 it('resolves a report as dismissed without deducting karma', function () {
     $reporter = User::factory()->onboarded()->create();
     $owner = User::factory()->onboarded()->create();
-    /** @var \App\Models\Subject $subject */
-    $subject = \App\Models\Subject::where('code', 'IT 211')->firstOrFail();
+    /** @var Subject $subject */
+    $subject = Subject::where('code', 'IT 211')->firstOrFail();
     $resource = LearningResource::factory()->create([
         'owner_user_id' => $owner->id,
         'school_id' => $owner->school_id,
@@ -151,8 +150,8 @@ it('resolves a report as dismissed without deducting karma', function () {
 it('refuses to resolve an already-resolved report', function () {
     $reporter = User::factory()->onboarded()->create();
     $owner = User::factory()->onboarded()->create();
-    /** @var \App\Models\Subject $subject */
-    $subject = \App\Models\Subject::where('code', 'IT 211')->firstOrFail();
+    /** @var Subject $subject */
+    $subject = Subject::where('code', 'IT 211')->firstOrFail();
     $resource = LearningResource::factory()->create([
         'owner_user_id' => $owner->id,
         'school_id' => $owner->school_id,
@@ -219,8 +218,8 @@ it('creates an audit log entry', function () {
 it('stores a report via the HTTP route', function () {
     $reporter = User::factory()->onboarded()->create();
     $owner = User::factory()->onboarded()->create();
-    /** @var \App\Models\Subject $subject */
-    $subject = \App\Models\Subject::where('code', 'IT 211')->firstOrFail();
+    /** @var Subject $subject */
+    $subject = Subject::where('code', 'IT 211')->firstOrFail();
     $resource = LearningResource::factory()->create([
         'owner_user_id' => $owner->id,
         'school_id' => $owner->school_id,
@@ -341,8 +340,8 @@ it('moderator can resolve a report via HTTP', function () {
     $moderator = User::factory()->onboarded()->create(['role' => UserRole::Moderator]);
     $reporter = User::factory()->onboarded()->create();
     $owner = User::factory()->onboarded()->create();
-    /** @var \App\Models\Subject $subject */
-    $subject = \App\Models\Subject::where('code', 'IT 211')->firstOrFail();
+    /** @var Subject $subject */
+    $subject = Subject::where('code', 'IT 211')->firstOrFail();
     $resource = LearningResource::factory()->create([
         'owner_user_id' => $owner->id,
         'school_id' => $owner->school_id,

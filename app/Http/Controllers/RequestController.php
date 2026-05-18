@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\Catalog\Enums\ResourceType;
 use App\Domain\Requests\Actions\AcceptOffer;
 use App\Domain\Requests\Actions\CreateOffer;
 use App\Domain\Requests\Actions\CreateRequest;
 use App\Domain\Requests\Actions\RouteRequest;
-use App\Domain\Requests\Enums\OfferStatus;
 use App\Domain\Requests\Enums\RequestStatus;
 use App\Domain\Requests\Enums\RequestUrgency;
 use App\Models\LearningResource;
 use App\Models\Offer;
-use App\Models\Program;
 use App\Models\Request;
 use App\Models\Subject;
 use Illuminate\Http\RedirectResponse;
@@ -52,7 +51,7 @@ class RequestController extends Controller
             'requests' => $requests,
             'subjects' => $subjects,
             'urgencies' => RequestUrgency::cases(),
-            'types' => \App\Domain\Catalog\Enums\ResourceType::cases(),
+            'types' => ResourceType::cases(),
             'filters' => $httpRequest->only(['subject_id', 'urgency', 'type_wanted']),
         ]);
     }
@@ -70,7 +69,7 @@ class RequestController extends Controller
         return view('requests.create', [
             'subjects' => $subjects,
             'urgencies' => RequestUrgency::cases(),
-            'types' => \App\Domain\Catalog\Enums\ResourceType::cases(),
+            'types' => ResourceType::cases(),
         ]);
     }
 
@@ -81,7 +80,7 @@ class RequestController extends Controller
 
         $validated = $httpRequest->validate([
             'subject_id' => ['required', 'integer', 'exists:subjects,id'],
-            'type_wanted' => ['required', 'string', 'in:' . implode(',', \App\Domain\Catalog\Enums\ResourceType::values())],
+            'type_wanted' => ['required', 'string', 'in:' . implode(',', ResourceType::values())],
             'urgency' => ['required', 'string', 'in:' . implode(',', RequestUrgency::values())],
             'needed_by' => ['nullable', 'date', 'after_or_equal:today'],
             'description' => ['nullable', 'string', 'max:2000'],

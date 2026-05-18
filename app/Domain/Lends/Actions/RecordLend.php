@@ -4,8 +4,8 @@ namespace App\Domain\Lends\Actions;
 
 use App\Domain\Catalog\Enums\ResourceAvailability;
 use App\Domain\Requests\Enums\RequestStatus;
-use App\Models\Lend;
 use App\Models\LearningResource;
+use App\Models\Lend;
 use App\Models\Offer;
 use App\Models\Request;
 use App\Models\User;

@@ -2,6 +2,8 @@
 
 namespace App\Domain\Moderation\Actions;
 
+use App\Models\ChatMessage;
+use App\Models\LearningResource;
 use App\Models\Report;
 use App\Models\User;
 use RuntimeException;
@@ -39,9 +41,9 @@ class CreateReport
     private function resolveReported(string $type, int $id): mixed
     {
         return match ($type) {
-            'message' => \App\Models\ChatMessage::find($id),
-            'resource' => \App\Models\LearningResource::find($id),
-            'user' => \App\Models\User::find($id),
+            'message' => ChatMessage::find($id),
+            'resource' => LearningResource::find($id),
+            'user' => User::find($id),
             default => null,
         };
     }

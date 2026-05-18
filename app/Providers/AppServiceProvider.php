@@ -2,6 +2,13 @@
 
 namespace App\Providers;
 
+use App\Models\ChatMessage;
+use App\Models\LearningResource;
+use App\Models\Offer;
+use App\Models\Report;
+use App\Models\Subject;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,13 +26,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        \Illuminate\Database\Eloquent\Relations\Relation::enforceMorphMap([
-            'resource' => \App\Models\LearningResource::class,
-            'message' => \App\Models\ChatMessage::class,
-            'user' => \App\Models\User::class,
-            'subject' => \App\Models\Subject::class,
-            'report' => \App\Models\Report::class,
-            'offer' => \App\Models\Offer::class,
+        Relation::enforceMorphMap([
+            'resource' => LearningResource::class,
+            'message' => ChatMessage::class,
+            'user' => User::class,
+            'subject' => Subject::class,
+            'report' => Report::class,
+            'offer' => Offer::class,
         ]);
     }
 }

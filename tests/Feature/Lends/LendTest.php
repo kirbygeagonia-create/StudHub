@@ -6,9 +6,10 @@ use App\Domain\Lends\Actions\RecordLend;
 use App\Domain\Lends\Actions\ReturnResource;
 use App\Domain\Lends\Enums\LendCondition;
 use App\Domain\Lends\Jobs\SendReturnReminders;
+use App\Domain\Lends\Notifications\ReturnReminder;
 use App\Domain\Requests\Enums\RequestStatus;
-use App\Models\Lend;
 use App\Models\LearningResource;
+use App\Models\Lend;
 use App\Models\Offer;
 use App\Models\Request;
 use App\Models\Subject;
@@ -293,7 +294,7 @@ it('dispatches return reminder notification for lends due within 2 days', functi
 
     (new SendReturnReminders)->handle();
 
-    Notification::assertSentTo($borrower, \App\Domain\Lends\Notifications\ReturnReminder::class);
+    Notification::assertSentTo($borrower, ReturnReminder::class);
 });
 
 it('does not dispatch return reminder for already returned lends', function () {

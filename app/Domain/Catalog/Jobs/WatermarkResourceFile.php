@@ -92,7 +92,7 @@ class WatermarkResourceFile implements ShouldQueue
 
             $pageCount = 0;
             preg_match_all('/\/Type\s*\/Page[^s]/i', $pdfContent, $pageMatches);
-            $pageCount = max(1, count($pageMatches[0] ?? []));
+            $pageCount = max(1, count($pageMatches[0]));
 
             $thumbnailSvg = $this->generatePdfThumbnailSvg($resource->title, $pageCount);
 

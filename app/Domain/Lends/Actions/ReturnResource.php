@@ -28,7 +28,7 @@ class ReturnResource
             ]);
 
             $resource = $lend->resource;
-            if ($resource !== null && $resource->availability === ResourceAvailability::LentOut) {
+            if ($resource !== null && $resource->getAttribute('availability') === ResourceAvailability::LentOut) {
                 $resource->update(['availability' => ResourceAvailability::Available]);
             }
         });

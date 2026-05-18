@@ -1,8 +1,8 @@
 <?php
 
+use App\Domain\Moderation\Enums\ReportedType;
 use App\Domain\Moderation\Enums\ReportReason;
 use App\Domain\Moderation\Enums\ReportStatus;
-use App\Domain\Moderation\Enums\ReportedType;
 
 test('ReportStatus enum has expected cases', function () {
     expect(ReportStatus::cases())->toHaveCount(3);

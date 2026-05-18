@@ -8,7 +8,6 @@ use App\Domain\Catalog\Actions\ToggleShelfItem;
 use App\Domain\Catalog\Enums\ResourceType;
 use App\Models\LearningResource;
 use App\Models\Program;
-use App\Models\Shelf;
 use App\Models\Subject;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;

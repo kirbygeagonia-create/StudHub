@@ -3,7 +3,6 @@
 namespace App\Domain\Requests\Actions;
 
 use App\Domain\Requests\Enums\OfferStatus;
-use App\Domain\Requests\Enums\RequestStatus;
 use App\Models\LearningResource;
 use App\Models\Offer;
 use App\Models\Request;

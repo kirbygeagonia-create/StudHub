@@ -4,7 +4,6 @@ use App\Domain\Catalog\Enums\ResourceType;
 use App\Domain\Requests\Actions\RouteRequest;
 use App\Domain\Requests\Jobs\NotifyRoutedUsers;
 use App\Models\LearningResource;
-use App\Models\Program;
 use App\Models\Request;
 use App\Models\RequestRoute;
 use App\Models\Subject;

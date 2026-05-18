@@ -41,9 +41,6 @@ class Report extends Model
         return $this->belongsTo(User::class, 'reporter_user_id');
     }
 
-    /**
-     * @return MorphTo
-     */
     public function reported(): MorphTo
     {
         return $this->morphTo('reported');

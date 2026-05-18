@@ -2,6 +2,7 @@
 
 namespace App\Domain\Requests\Actions;
 
+use App\Domain\Requests\Jobs\CrossPostRequest;
 use App\Domain\Requests\Jobs\NotifyRoutedUsers;
 use App\Models\LearningResource;
 use App\Models\Program;
@@ -16,16 +17,23 @@ use Illuminate\Support\Facades\DB;
 class RouteRequest
 {
     private const W_EDGE = 0.40;
+
     private const W_RESOURCE = 0.25;
+
     private const W_HISTORY = 0.20;
+
     private const W_PROXIMITY = 0.10;
+
     private const W_URGENCY = 0.05;
+
     private const PENALTY_SELF = 0.05;
 
     private const PROGRAM_THRESHOLD = 0.35;
+
     private const CHAT_THRESHOLD = 0.65;
 
     private const MAX_USERS_PER_PROGRAM = 8;
+
     private const GLOBAL_USER_CAP = 25;
 
     public function handle(Request $request): void
@@ -42,6 +50,7 @@ class RouteRequest
 
         if ($programs->isEmpty()) {
             $this->routeToOwnProgramOnly($request, $subject);
+
             return;
         }
 
@@ -105,7 +114,7 @@ class RouteRequest
         if ($request->urgency?->value === 'urgent') {
             foreach ($scoredPrograms as $row) {
                 if ($row['score'] >= self::CHAT_THRESHOLD) {
-                    \App\Domain\Requests\Jobs\CrossPostRequest::dispatch($request->id, $row['program']->id);
+                    CrossPostRequest::dispatch($request->id, $row['program']->id);
                 }
             }
         }
@@ -218,7 +227,7 @@ class RouteRequest
         $subjectId = $subject->id;
         $typeWanted = $request->type_wanted;
 
-        $scored = $candidates->map(function (User $user) use ($subjectId, $typeWanted, $typicalYear, $request): array {
+        $scored = $candidates->map(function (User $user) use ($subjectId, $typeWanted, $typicalYear): array {
             $score = 0.0;
 
             if ($typicalYear !== null && $user->year_level !== null && $user->year_level < $typicalYear) {

@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\DB;
 
 class Lend extends Model
 {
@@ -55,11 +54,11 @@ class Lend extends Model
     }
 
     /**
-     * @return BelongsTo<\App\Models\Request, $this>
+     * @return BelongsTo<Request, $this>
      */
     public function request(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\Request::class);
+        return $this->belongsTo(Request::class);
     }
 
     /**

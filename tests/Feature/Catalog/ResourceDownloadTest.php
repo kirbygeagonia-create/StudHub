@@ -1,8 +1,6 @@
 <?php
 
 use App\Domain\Catalog\Actions\CreateResource;
-use App\Domain\Catalog\Actions\DownloadResourceFile;
-use App\Domain\Catalog\Actions\ToggleShelfItem;
 use App\Domain\Catalog\Enums\ResourceType;
 use App\Models\Subject;
 use App\Models\User;
