@@ -108,7 +108,7 @@ class AdminController extends Controller
         try {
             $suspendUser->handle($admin, $target, (int) $validated['days'], $validated['reason'] ?? null);
         } catch (\RuntimeException $e) {
-            return redirect()->back()->withErrors(['error' => 'Could not suspend the user.']);
+            return redirect()->back()->withErrors(['error' => $e->getMessage()]);
         }
 
         session()->flash('status', 'User suspended.');
@@ -130,7 +130,7 @@ class AdminController extends Controller
         try {
             $suspendUser->unsuspend($admin, $target);
         } catch (\RuntimeException $e) {
-            return redirect()->back()->withErrors(['error' => 'Could not unsuspend the user.']);
+            return redirect()->back()->withErrors(['error' => $e->getMessage()]);
         }
 
         session()->flash('status', 'User unsuspended.');

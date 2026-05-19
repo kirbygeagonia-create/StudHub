@@ -5,6 +5,7 @@ use App\Domain\Moderation\Actions\CreateReport;
 use App\Domain\Moderation\Actions\LogAudit;
 use App\Domain\Moderation\Actions\ResolveReport;
 use App\Domain\Moderation\Actions\SuspendUser;
+use App\Domain\Moderation\Enums\ReportedType;
 use App\Domain\Moderation\Enums\ReportStatus;
 use App\Models\AuditLog;
 use App\Models\ChatMessage;
@@ -38,7 +39,7 @@ it('creates a report on a resource', function () {
         'program_id' => $owner->program_id,
     ]);
 
-    $report = (new CreateReport)->handle($reporter, 'resource', $resource->id, 'spam', 'test notes');
+    $report = (new CreateReport)->handle($reporter, ReportedType::Resource, $resource->id, 'spam', 'test notes');
 
     expect($report)->toBeInstanceOf(Report::class);
     expect($report->reporter_user_id)->toBe($reporter->id);
@@ -67,7 +68,7 @@ it('creates a report on a message', function () {
         'body' => 'test message',
     ]);
 
-    $report = (new CreateReport)->handle($reporter, 'message', $message->id, 'harassment');
+    $report = (new CreateReport)->handle($reporter, ReportedType::Message, $message->id, 'harassment');
 
     expect($report)->toBeInstanceOf(Report::class);
     expect($report->reported_type)->toBe('message');
@@ -78,7 +79,7 @@ it('creates a report on a user', function () {
     $reporter = User::factory()->onboarded()->create();
     $target = User::factory()->onboarded()->create();
 
-    $report = (new CreateReport)->handle($reporter, 'user', $target->id, 'inappropriate');
+    $report = (new CreateReport)->handle($reporter, ReportedType::User, $target->id, 'inappropriate');
 
     expect($report->reported_type)->toBe('user');
     expect($report->reported_id)->toBe($target->id);
@@ -88,16 +89,16 @@ it('prevents duplicate reports from the same user', function () {
     $reporter = User::factory()->onboarded()->create();
     $target = User::factory()->onboarded()->create();
 
-    (new CreateReport)->handle($reporter, 'user', $target->id, 'spam');
+    (new CreateReport)->handle($reporter, ReportedType::User, $target->id, 'spam');
 
-    expect(fn () => (new CreateReport)->handle($reporter, 'user', $target->id, 'harassment'))
+    expect(fn () => (new CreateReport)->handle($reporter, ReportedType::User, $target->id, 'harassment'))
         ->toThrow(RuntimeException::class);
 });
 
 it('refuses to report a non-existent entity', function () {
     $reporter = User::factory()->onboarded()->create();
 
-    expect(fn () => (new CreateReport)->handle($reporter, 'resource', 99999, 'spam'))
+    expect(fn () => (new CreateReport)->handle($reporter, ReportedType::Resource, 99999, 'spam'))
         ->toThrow(RuntimeException::class);
 });
 
@@ -113,7 +114,7 @@ it('resolves a report as actioned and deducts karma', function () {
         'program_id' => $owner->program_id,
     ]);
 
-    $report = (new CreateReport)->handle($reporter, 'resource', $resource->id, 'spam');
+    $report = (new CreateReport)->handle($reporter, ReportedType::Resource, $resource->id, 'spam');
 
     $moderator = User::factory()->onboarded()->create(['role' => UserRole::Moderator]);
 
@@ -137,7 +138,7 @@ it('resolves a report as dismissed without deducting karma', function () {
         'program_id' => $owner->program_id,
     ]);
 
-    $report = (new CreateReport)->handle($reporter, 'resource', $resource->id, 'spam');
+    $report = (new CreateReport)->handle($reporter, ReportedType::Resource, $resource->id, 'spam');
 
     $moderator = User::factory()->onboarded()->create(['role' => UserRole::Moderator]);
 
@@ -159,7 +160,7 @@ it('refuses to resolve an already-resolved report', function () {
         'program_id' => $owner->program_id,
     ]);
 
-    $report = (new CreateReport)->handle($reporter, 'resource', $resource->id, 'spam');
+    $report = (new CreateReport)->handle($reporter, ReportedType::Resource, $resource->id, 'spam');
     $moderator = User::factory()->onboarded()->create(['role' => UserRole::Moderator]);
     (new ResolveReport)->handle($moderator, $report, ReportStatus::Dismissed);
 
@@ -349,7 +350,7 @@ it('moderator can resolve a report via HTTP', function () {
         'program_id' => $owner->program_id,
     ]);
 
-    $report = (new CreateReport)->handle($reporter, 'resource', $resource->id, 'spam');
+    $report = (new CreateReport)->handle($reporter, ReportedType::Resource, $resource->id, 'spam');
 
     $this->actingAs($moderator)
         ->post(route('moderation.resolve', $report), [

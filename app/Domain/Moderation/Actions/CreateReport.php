@@ -2,6 +2,7 @@
 
 namespace App\Domain\Moderation\Actions;
 
+use App\Domain\Moderation\Enums\ReportedType;
 use App\Models\ChatMessage;
 use App\Models\LearningResource;
 use App\Models\Report;
@@ -10,7 +11,7 @@ use RuntimeException;
 
 class CreateReport
 {
-    public function handle(User $reporter, string $reportedType, int $reportedId, string $reason, ?string $notes = null): Report
+    public function handle(User $reporter, ReportedType $reportedType, int $reportedId, string $reason, ?string $notes = null): Report
     {
         $resource = $this->resolveReported($reportedType, $reportedId);
 
@@ -19,7 +20,7 @@ class CreateReport
         }
 
         $existing = Report::where('reporter_user_id', $reporter->id)
-            ->where('reported_type', $reportedType)
+            ->where('reported_type', $reportedType->value)
             ->where('reported_id', $reportedId)
             ->where('status', 'open')
             ->exists();
@@ -30,7 +31,7 @@ class CreateReport
 
         return Report::create([
             'reporter_user_id' => $reporter->id,
-            'reported_type' => $reportedType,
+            'reported_type' => $reportedType->value,
             'reported_id' => $reportedId,
             'reason' => $reason,
             'notes' => $notes,
@@ -38,13 +39,12 @@ class CreateReport
         ]);
     }
 
-    private function resolveReported(string $type, int $id): mixed
+    private function resolveReported(ReportedType $type, int $id): ?object
     {
         return match ($type) {
-            'message' => ChatMessage::find($id),
-            'resource' => LearningResource::find($id),
-            'user' => User::find($id),
-            default => null,
+            ReportedType::Message => ChatMessage::find($id),
+            ReportedType::Resource => LearningResource::find($id),
+            ReportedType::User => User::find($id),
         };
     }
 }

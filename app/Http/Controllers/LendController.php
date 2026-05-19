@@ -49,7 +49,7 @@ class LendController extends Controller
         } catch (\RuntimeException $e) {
             return redirect()->back()
                 ->withInput()
-                ->withErrors(['error' => 'Could not record the lend. Please try again.']);
+                ->withErrors(['error' => $e->getMessage()]);
         }
 
         session()->flash('status', 'Lend recorded. The resource has been marked as lent out.');
@@ -74,7 +74,7 @@ class LendController extends Controller
             $returnResource->handle($user, $lend, $condition);
         } catch (\RuntimeException $e) {
             return redirect()->back()
-                ->withErrors(['error' => 'Could not return the resource. Please try again.']);
+                ->withErrors(['error' => $e->getMessage()]);
         }
 
         session()->flash('status', 'Resource returned. Thank you!');

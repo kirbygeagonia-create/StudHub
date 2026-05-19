@@ -18,9 +18,11 @@ class SuspendUser
             throw new RuntimeException('You cannot suspend an admin.');
         }
 
-        DB::transaction(function () use ($moderator, $target, $days, $reason): void {
+        $suspendedUntil = now()->addDays($days);
+
+        DB::transaction(function () use ($moderator, $target, $days, $reason, $suspendedUntil): void {
             $target->update([
-                'suspended_until' => now()->addDays($days),
+                'suspended_until' => $suspendedUntil,
             ]);
 
             (new LogAudit)->handle(
@@ -31,7 +33,7 @@ class SuspendUser
                 [
                     'days' => $days,
                     'reason' => $reason,
-                    'suspended_until' => now()->addDays($days)->toIso8601String(),
+                    'suspended_until' => $suspendedUntil->toIso8601String(),
                 ]
             );
         });

@@ -4,9 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Domain\Moderation\Actions\ResolveReport;
 use App\Domain\Moderation\Actions\SuspendUser;
+use App\Domain\Moderation\Enums\ReportedType;
 use App\Domain\Moderation\Enums\ReportStatus;
-use App\Models\ChatMessage;
-use App\Models\LearningResource;
 use App\Models\Program;
 use App\Models\ProgramModerator;
 use App\Models\Report;
@@ -27,48 +26,48 @@ class ModerationController extends Controller
         $moderatedProgramIds = ProgramModerator::where('user_id', $user->id)
             ->pluck('program_id');
 
-        $reports = Report::with(['reporter:id,display_name,name', 'reported.room'])
-            ->where('status', 'open')
-            ->orderByDesc('created_at')
-            ->get()
-            ->filter(function (Report $report) use ($user, $moderatedProgramIds) {
-                if ($user->isAdmin()) {
-                    return true;
-                }
-
-                if ($moderatedProgramIds->isEmpty()) {
-                    return false;
-                }
-
-                $entity = $report->reported;
-
-                if ($entity === null) {
-                    return false;
-                }
-
-                if ($report->reported_type === 'message') {
-                    /** @var ChatMessage $entity */
-                    $messageRoom = $entity->room;
-                    if ($messageRoom === null) {
-                        return false;
-                    }
-
-                    return $moderatedProgramIds->contains($messageRoom->program_id);
-                }
-
-                if ($report->reported_type === 'resource') {
-                    /** @var LearningResource $entity */
-                    return $moderatedProgramIds->contains($entity->program_id);
-                }
-
-                if ($report->reported_type === 'user') {
-                    /** @var User $entity */
-                    return $moderatedProgramIds->contains($entity->program_id);
-                }
-
-                return false;
-            })
-            ->values();
+        if ($user->isAdmin()) {
+            $reports = Report::with(['reporter:id,display_name,name', 'reported'])
+                ->where('status', 'open')
+                ->orderByDesc('created_at')
+                ->get();
+        } else {
+            $reports = Report::with(['reporter:id,display_name,name', 'reported'])
+                ->where('status', 'open')
+                ->where(function ($query) use ($moderatedProgramIds): void {
+                    $query->where(function ($q) use ($moderatedProgramIds): void {
+                        // Messages: chat_rooms.program_id IN (...)
+                        $q->where('reported_type', ReportedType::Message->value)
+                            ->whereExists(function ($sq) use ($moderatedProgramIds): void {
+                                $sq->selectRaw('1')
+                                    ->from('chat_messages')
+                                    ->join('chat_rooms', 'chat_rooms.id', '=', 'chat_messages.chat_room_id')
+                                    ->whereColumn('chat_messages.id', 'reports.reported_id')
+                                    ->whereIn('chat_rooms.program_id', $moderatedProgramIds);
+                            });
+                    })->orWhere(function ($q) use ($moderatedProgramIds): void {
+                        // Resources: resources.program_id IN (...)
+                        $q->where('reported_type', ReportedType::Resource->value)
+                            ->whereExists(function ($sq) use ($moderatedProgramIds): void {
+                                $sq->selectRaw('1')
+                                    ->from('resources')
+                                    ->whereColumn('resources.id', 'reports.reported_id')
+                                    ->whereIn('resources.program_id', $moderatedProgramIds);
+                            });
+                    })->orWhere(function ($q) use ($moderatedProgramIds): void {
+                        // Users: users.program_id IN (...)
+                        $q->where('reported_type', ReportedType::User->value)
+                            ->whereExists(function ($sq) use ($moderatedProgramIds): void {
+                                $sq->selectRaw('1')
+                                    ->from('users')
+                                    ->whereColumn('users.id', 'reports.reported_id')
+                                    ->whereIn('users.program_id', $moderatedProgramIds);
+                            });
+                    });
+                })
+                ->orderByDesc('created_at')
+                ->get();
+        }
 
         $programs = Program::whereIn('id', $moderatedProgramIds)->get(['id', 'code', 'name']);
 
@@ -102,7 +101,9 @@ class ModerationController extends Controller
                 $validated['resolution_note'] ?? null
             );
         } catch (\RuntimeException $e) {
-            return redirect()->back()->withErrors(['error' => 'Could not resolve the report.']);
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => $e->getMessage()]);
         }
 
         session()->flash('status', 'Report resolved.');
@@ -126,7 +127,9 @@ class ModerationController extends Controller
         try {
             $suspendUser->handle($user, $target, (int) $validated['days'], $validated['reason'] ?? null);
         } catch (\RuntimeException $e) {
-            return redirect()->back()->withErrors(['error' => 'Could not suspend the user.']);
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => $e->getMessage()]);
         }
 
         session()->flash('status', 'User suspended.');
@@ -148,7 +151,9 @@ class ModerationController extends Controller
         try {
             $suspendUser->unsuspend($user, $target);
         } catch (\RuntimeException $e) {
-            return redirect()->back()->withErrors(['error' => 'Could not unsuspend the user.']);
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => $e->getMessage()]);
         }
 
         session()->flash('status', 'User unsuspended.');

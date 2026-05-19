@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Domain\Moderation\Actions\CreateReport;
+use App\Domain\Moderation\Enums\ReportedType;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request as HttpRequest;
 
@@ -14,7 +15,7 @@ class ReportController extends Controller
         abort_unless($user !== null, 403);
 
         $validated = $httpRequest->validate([
-            'reported_type' => ['required', 'string', 'in:message,resource,user'],
+            'reported_type' => ['required', 'string', 'in:' . implode(',', ReportedType::values())],
             'reported_id' => ['required', 'integer'],
             'reason' => ['required', 'string', 'max:64'],
             'notes' => ['nullable', 'string', 'max:1000'],
@@ -23,7 +24,7 @@ class ReportController extends Controller
         try {
             $createReport->handle(
                 $user,
-                $validated['reported_type'],
+                ReportedType::from($validated['reported_type']),
                 (int) $validated['reported_id'],
                 $validated['reason'],
                 $validated['notes'] ?? null

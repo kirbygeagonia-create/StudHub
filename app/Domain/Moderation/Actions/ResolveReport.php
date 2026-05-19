@@ -2,6 +2,7 @@
 
 namespace App\Domain\Moderation\Actions;
 
+use App\Domain\Moderation\Enums\ReportedType;
 use App\Domain\Moderation\Enums\ReportStatus;
 use App\Domain\Reputation\Actions\AwardKarma;
 use App\Domain\Reputation\Enums\KarmaEventReason;
@@ -50,9 +51,11 @@ class ResolveReport
                     );
                 }
 
-                if ($report->reported_type === 'message') {
+                $reportedType = ReportedType::tryFrom($report->reported_type);
+
+                if ($reportedType === ReportedType::Message) {
                     $report->reported?->delete();
-                } elseif ($report->reported_type === 'resource') {
+                } elseif ($reportedType === ReportedType::Resource) {
                     $report->reported?->update(['availability' => 'archived']);
                 }
             }
@@ -63,12 +66,16 @@ class ResolveReport
     {
         /** @var ChatMessage|LearningResource|null $reported */
         $reported = $report->reported;
+        $reportedType = ReportedType::tryFrom($report->reported_type);
 
-        return match ($report->reported_type) {
-            'message' => $reported?->sender,
-            'resource' => $reported?->owner,
-            'user' => User::find($report->reported_id),
-            default => null,
+        if ($reportedType === null) {
+            return null;
+        }
+
+        return match ($reportedType) {
+            ReportedType::Message => $reported?->sender,
+            ReportedType::Resource => $reported?->owner,
+            ReportedType::User => User::find($report->reported_id),
         };
     }
 }
