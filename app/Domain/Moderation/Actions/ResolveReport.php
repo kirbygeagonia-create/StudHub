@@ -51,11 +51,35 @@ class ResolveReport
                     );
                 }
 
-                $reportedType = ReportedType::tryFrom($report->reported_type);
+                $reportedType = $report->reported_type instanceof ReportedType
+                    ? $report->reported_type
+                    : ReportedType::tryFrom($report->reported_type);
 
                 if ($reportedType === ReportedType::Message) {
+                    /** @var ChatMessage|null $reportedMessage */
+                    $reportedMessage = $report->reported;
+                    (new LogAudit)->handle(
+                        $moderator,
+                        'message.hide',
+                        'ChatMessage',
+                        $report->reported_id,
+                        [
+                            'preview' => mb_substr((string) ($reportedMessage?->body), 0, 200),
+                            'sender_id' => $reportedMessage?->sender_id,
+                            'room_id' => $reportedMessage?->chat_room_id ?? null,
+                        ]
+                    );
                     $report->reported?->delete();
                 } elseif ($reportedType === ReportedType::Resource) {
+                    /** @var LearningResource|null $reportedResource */
+                    $reportedResource = $report->reported;
+                    (new LogAudit)->handle(
+                        $moderator,
+                        'resource.archive',
+                        'LearningResource',
+                        $report->reported_id,
+                        ['title' => $reportedResource?->title]
+                    );
                     $report->reported?->update(['availability' => 'archived']);
                 }
             }
@@ -66,7 +90,9 @@ class ResolveReport
     {
         /** @var ChatMessage|LearningResource|null $reported */
         $reported = $report->reported;
-        $reportedType = ReportedType::tryFrom($report->reported_type);
+        $reportedType = $report->reported_type instanceof ReportedType
+            ? $report->reported_type
+            : ReportedType::tryFrom($report->reported_type);
 
         if ($reportedType === null) {
             return null;

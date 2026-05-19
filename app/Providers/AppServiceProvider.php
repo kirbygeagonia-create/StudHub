@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\ChatMessage;
 use App\Models\LearningResource;
+use App\Models\Lend;
 use App\Models\Offer;
 use App\Models\Report;
 use App\Models\Subject;
@@ -33,6 +34,7 @@ class AppServiceProvider extends ServiceProvider
             'subject' => Subject::class,
             'report' => Report::class,
             'offer' => Offer::class,
+            'lend' => Lend::class,
         ]);
     }
 }

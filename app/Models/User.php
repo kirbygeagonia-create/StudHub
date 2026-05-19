@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -177,6 +178,9 @@ class User extends Authenticatable implements MustVerifyEmail
             return false;
         }
 
-        return now()->startOfDay()->lte($this->suspended_until);
+        /** @var Carbon $date */
+        $date = $this->suspended_until;
+
+        return $date->isFuture();
     }
 }

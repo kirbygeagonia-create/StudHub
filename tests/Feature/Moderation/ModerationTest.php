@@ -43,7 +43,7 @@ it('creates a report on a resource', function () {
 
     expect($report)->toBeInstanceOf(Report::class);
     expect($report->reporter_user_id)->toBe($reporter->id);
-    expect($report->reported_type)->toBe('resource');
+    expect($report->reported_type)->toBe(ReportedType::Resource);
     expect($report->reported_id)->toBe($resource->id);
     expect($report->reason)->toBe('spam');
     expect($report->notes)->toBe('test notes');
@@ -71,7 +71,7 @@ it('creates a report on a message', function () {
     $report = (new CreateReport)->handle($reporter, ReportedType::Message, $message->id, 'harassment');
 
     expect($report)->toBeInstanceOf(Report::class);
-    expect($report->reported_type)->toBe('message');
+    expect($report->reported_type)->toBe(ReportedType::Message);
     expect($report->reported_id)->toBe($message->id);
 });
 
@@ -81,7 +81,7 @@ it('creates a report on a user', function () {
 
     $report = (new CreateReport)->handle($reporter, ReportedType::User, $target->id, 'inappropriate');
 
-    expect($report->reported_type)->toBe('user');
+    expect($report->reported_type)->toBe(ReportedType::User);
     expect($report->reported_id)->toBe($target->id);
 });
 

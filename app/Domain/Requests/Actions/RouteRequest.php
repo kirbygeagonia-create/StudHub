@@ -198,7 +198,34 @@ class RouteRequest
 
     private function historicalFulfillmentRate(Program $program, mixed $subject): float
     {
-        return 0.0;
+        static $cache = [];
+
+        $programId = $program->id;
+
+        if (array_key_exists($programId, $cache)) {
+            return $cache[$programId];
+        }
+
+        $totalRouted = DB::table('request_routes')
+            ->where('program_id', $programId)
+            ->count();
+
+        if ($totalRouted === 0) {
+            return $cache[$programId] = 0.0;
+        }
+
+        $fulfilled = DB::table('request_routes')
+            ->join('offers', function ($join) {
+                $join->on('offers.request_id', '=', 'request_routes.request_id')
+                    ->where('offers.status', '=', 'accepted');
+            })
+            ->join('users', 'users.id', '=', 'offers.offerer_user_id')
+            ->where('request_routes.program_id', $programId)
+            ->where('users.program_id', $programId)
+            ->distinct('request_routes.request_id')
+            ->count('request_routes.request_id');
+
+        return $cache[$programId] = $fulfilled / $totalRouted;
     }
 
     private function yearProximityBonus(int $typicalYear, ?int $requesterYearLevel): float

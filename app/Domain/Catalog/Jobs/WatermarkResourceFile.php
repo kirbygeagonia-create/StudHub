@@ -71,7 +71,7 @@ class WatermarkResourceFile implements ShouldQueue
     {
         $originalPath = Storage::disk('public')->path($storagePath);
         $thumbDir = Storage::disk('public')->path('thumbs');
-        $thumbPath = $thumbDir . '/' . $resource->id . '.jpg';
+        $thumbPath = $thumbDir . '/' . $resource->id . '.svg';
 
         if (! is_dir($thumbDir)) {
             mkdir($thumbDir, 0755, true);
@@ -101,7 +101,7 @@ class WatermarkResourceFile implements ShouldQueue
             Log::info('PDF thumbnail generated', [
                 'resource_id' => $resource->id,
                 'pages' => $pageCount,
-                'thumb_path' => 'thumbs/' . $resource->id . '.jpg',
+                'thumb_path' => 'thumbs/' . $resource->id . '.svg',
             ]);
         } catch (\Exception $e) {
             Log::warning('Could not generate PDF thumbnail', [

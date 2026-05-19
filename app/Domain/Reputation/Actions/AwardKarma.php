@@ -20,8 +20,7 @@ class AwardKarma
                 'related_id' => $relatedId,
             ]);
 
-            $user->karma = (int) KarmaEvent::where('user_id', $user->id)->sum('delta');
-            $user->save();
+            $user->increment('karma', $reason->delta());
         });
     }
 }

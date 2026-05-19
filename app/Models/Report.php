@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Domain\Moderation\Enums\ReportedType;
 use App\Domain\Moderation\Enums\ReportStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -30,6 +31,7 @@ class Report extends Model
     {
         return [
             'status' => ReportStatus::class,
+            'reported_type' => ReportedType::class,
         ];
     }
 

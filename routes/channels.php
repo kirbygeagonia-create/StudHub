@@ -9,6 +9,10 @@ Broadcast::channel('App.Models.User.{id}', function (User $user, int $id) {
 });
 
 Broadcast::channel('chat-room.{roomId}', function (User $user, int $roomId): array|bool {
+    if ($user->isSuspended()) {
+        return false;
+    }
+
     $room = ChatRoom::find($roomId);
 
     if (! $room) {

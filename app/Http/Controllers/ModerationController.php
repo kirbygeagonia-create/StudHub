@@ -4,16 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Domain\Moderation\Actions\ResolveReport;
 use App\Domain\Moderation\Actions\SuspendUser;
-use App\Domain\Moderation\Enums\ReportedType;
 use App\Domain\Moderation\Enums\ReportStatus;
+use App\Models\ChatMessage;
+use App\Models\LearningResource;
 use App\Models\Program;
 use App\Models\ProgramModerator;
 use App\Models\Report;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request as HttpRequest;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Pagination\Paginator;
 use Illuminate\View\View;
 
 class ModerationController extends Controller
@@ -26,59 +25,42 @@ class ModerationController extends Controller
         $moderatedProgramIds = ProgramModerator::where('user_id', $user->id)
             ->pluck('program_id');
 
-        if ($user->isAdmin()) {
-            $reports = Report::with(['reporter:id,display_name,name', 'reported'])
-                ->where('status', 'open')
-                ->orderByDesc('created_at')
-                ->get();
-        } else {
-            $reports = Report::with(['reporter:id,display_name,name', 'reported'])
-                ->where('status', 'open')
-                ->where(function ($query) use ($moderatedProgramIds): void {
-                    $query->where(function ($q) use ($moderatedProgramIds): void {
-                        // Messages: chat_rooms.program_id IN (...)
-                        $q->where('reported_type', ReportedType::Message->value)
-                            ->whereExists(function ($sq) use ($moderatedProgramIds): void {
-                                $sq->selectRaw('1')
-                                    ->from('chat_messages')
-                                    ->join('chat_rooms', 'chat_rooms.id', '=', 'chat_messages.chat_room_id')
-                                    ->whereColumn('chat_messages.id', 'reports.reported_id')
-                                    ->whereIn('chat_rooms.program_id', $moderatedProgramIds);
-                            });
-                    })->orWhere(function ($q) use ($moderatedProgramIds): void {
-                        // Resources: resources.program_id IN (...)
-                        $q->where('reported_type', ReportedType::Resource->value)
-                            ->whereExists(function ($sq) use ($moderatedProgramIds): void {
-                                $sq->selectRaw('1')
-                                    ->from('resources')
-                                    ->whereColumn('resources.id', 'reports.reported_id')
-                                    ->whereIn('resources.program_id', $moderatedProgramIds);
-                            });
-                    })->orWhere(function ($q) use ($moderatedProgramIds): void {
-                        // Users: users.program_id IN (...)
-                        $q->where('reported_type', ReportedType::User->value)
-                            ->whereExists(function ($sq) use ($moderatedProgramIds): void {
-                                $sq->selectRaw('1')
-                                    ->from('users')
-                                    ->whereColumn('users.id', 'reports.reported_id')
-                                    ->whereIn('users.program_id', $moderatedProgramIds);
-                            });
-                    });
-                })
-                ->orderByDesc('created_at')
-                ->get();
+        $query = Report::query()
+            ->with(['reporter:id,display_name,name', 'reported'])
+            ->where('status', 'open');
+
+        if (! $user->isAdmin()) {
+            if ($moderatedProgramIds->isEmpty()) {
+                $query->whereRaw('1 = 0');
+            } else {
+                $programIds = $moderatedProgramIds->all();
+
+                $query->where(function ($q) use ($programIds): void {
+                    $q->whereHasMorph(
+                        'reported',
+                        [ChatMessage::class],
+                        function ($qq) use ($programIds): void {
+                            $qq->whereHas(
+                                'room',
+                                fn ($r) => $r->whereIn('program_id', $programIds)
+                            );
+                        }
+                    )->orWhereHasMorph(
+                        'reported',
+                        [LearningResource::class, User::class],
+                        function ($qq) use ($programIds): void {
+                            $qq->whereIn('program_id', $programIds);
+                        }
+                    );
+                });
+            }
         }
 
+        $reports = $query->orderByDesc('created_at')->paginate(15);
         $programs = Program::whereIn('id', $moderatedProgramIds)->get(['id', 'code', 'name']);
 
         return view('moderation.dashboard', [
-            'reports' => new LengthAwarePaginator(
-                $reports->forPage(Paginator::resolveCurrentPage(), 15),
-                $reports->count(),
-                15,
-                Paginator::resolveCurrentPage(),
-                ['path' => Paginator::resolveCurrentPath()]
-            ),
+            'reports' => $reports,
             'programs' => $programs,
         ]);
     }
