@@ -72,7 +72,7 @@ app/Domain/{Domain}/
 | `codebase-audit-pre-push` | Pre-push audit |
 | `testing-studhub-chat` | Testing chat functionality |
 
-## Current Status (Week 11 In Progress)
+## Current Status (Week 11 Complete)
 
 - **Tests:** 186 passed, 459 assertions
 - **Weeks 0-11:** All complete, all audit findings from `planning/audit-final-2026-05-18.md` applied
@@ -86,15 +86,14 @@ app/Domain/{Domain}/
   - F8: Thumbnails saved as `.svg`
   - F9: Atomic karma increment
   - F10: `ExpireRequests` scheduled command
-  - F16: `App\Models\Request` renamed to `ResourceRequest` (backward-compat alias kept)$
+  - F16: `App\Models\Request` renamed to `ResourceRequest` (backward-compat alias kept)
   - W9-1: Record-as-Lend form on request show page
   - W9-2: Report button on chat messages
   - W9-3: Report button on user profiles
   - W9-6: Navigation links conditional on role
 - **PHPStan:** Level 6 clean
-- **Next:** Week 12 — Streaming search, email digest, admin analytics
-- **Handoff doc:** `planning/session-handoff-2026-05-17.md`
-- **Handoff doc:** `planning/session-handoff-2026-05-17.md`
+- **Next:** Week 12 — Pilot launch, paper draft, demo deck, final polish
+- **Handoff doc:** `planning/session-handoff-2026-05-20.md`
 
 ## Key Commands
 
