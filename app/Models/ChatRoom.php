@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Domain\Chat\Enums\ChatRoomKind;
+use Database\Factories\ChatRoomFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ChatRoom extends Model
 {
+    /** @use HasFactory<ChatRoomFactory> */
     use HasFactory;
 
     protected $fillable = [

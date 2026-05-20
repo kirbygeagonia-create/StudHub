@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Domain\Catalog\Enums\ResourceAvailability;
 use App\Domain\Catalog\Enums\ResourceType;
 use App\Domain\Catalog\Enums\ResourceVisibility;
+use Database\Factories\LearningResourceFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 
 class LearningResource extends Model
 {
+    /** @use HasFactory<LearningResourceFactory> */
     use HasFactory, SoftDeletes;
 
     protected $table = 'resources';

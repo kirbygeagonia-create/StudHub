@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Domain\Requests\Enums\RequestStatus;
 use App\Domain\Requests\Enums\RequestUrgency;
+use Database\Factories\RequestFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,6 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Request extends Model
 {
+    /** @use HasFactory<RequestFactory> */
     use HasFactory;
 
     protected $table = 'requests';

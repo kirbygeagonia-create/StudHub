@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use Database\Factories\KarmaEventFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class KarmaEvent extends Model
 {
+    /** @use HasFactory<KarmaEventFactory> */
     use HasFactory;
 
     protected $table = 'karma_events';

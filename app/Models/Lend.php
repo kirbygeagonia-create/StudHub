@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Domain\Lends\Enums\LendCondition;
+use Database\Factories\LendFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Lend extends Model
 {
+    /** @use HasFactory<LendFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -104,6 +106,9 @@ class Lend extends Model
 
     /**
      * Scope lends that need a return reminder (due within N days, not returned, has a return_by date).
+     *
+     * @param  Builder<Lend>  $query
+     * @return Builder<Lend>
      */
     public function scopeDueSoon(Builder $query, int $days = 2): Builder
     {

@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use Database\Factories\ProgramModeratorFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProgramModerator extends Model
 {
+    /** @use HasFactory<ProgramModeratorFactory> */
     use HasFactory;
 
     protected $table = 'program_moderators';

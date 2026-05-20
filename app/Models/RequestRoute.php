@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use Database\Factories\RequestRouteFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class RequestRoute extends Model
 {
+    /** @use HasFactory<RequestRouteFactory> */
     use HasFactory;
 
     protected $table = 'request_routes';

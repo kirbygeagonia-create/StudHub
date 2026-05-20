@@ -5,9 +5,13 @@ namespace App\Http\Controllers;
 use App\Domain\Identity\Enums\UserRole;
 use App\Domain\Moderation\Actions\LogAudit;
 use App\Domain\Moderation\Actions\SuspendUser;
+use App\Models\ChatMessage;
+use App\Models\LearningResource;
+use App\Models\Lend;
 use App\Models\Program;
 use App\Models\ProgramModerator;
 use App\Models\Report;
+use App\Models\Request;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request as HttpRequest;
@@ -23,6 +27,19 @@ class AdminController extends Controller
         $openReports = Report::where('status', 'open')->count();
         $totalModerators = User::where('role', 'moderator')->count();
         $activeUsers = User::whereNotNull('onboarded_at')->whereNull('suspended_until')->count();
+        $totalResources = LearningResource::whereNull('deleted_at')->count();
+        $totalRequests = Request::count();
+        $activeLends = Lend::whereNull('returned_at')->count();
+        $messagesToday = ChatMessage::whereDate('created_at', now()->toDateString())->count();
+
+        $recentSignups = User::whereNotNull('onboarded_at')
+            ->where('onboarded_at', '>=', now()->subDays(7))
+            ->count();
+
+        $dau = User::whereNotNull('last_seen_at')
+            ->where('last_seen_at', '>=', now()->startOfDay())
+            ->count();
+
         $programs = Program::with('college')->orderBy('code')->get(['id', 'code', 'name', 'college_id']);
 
         $moderators = ProgramModerator::with(['user:id,display_name,name,program_id', 'program:id,code,name'])
@@ -33,6 +50,12 @@ class AdminController extends Controller
             'openReports' => $openReports,
             'totalModerators' => $totalModerators,
             'activeUsers' => $activeUsers,
+            'totalResources' => $totalResources,
+            'totalRequests' => $totalRequests,
+            'activeLends' => $activeLends,
+            'messagesToday' => $messagesToday,
+            'recentSignups' => $recentSignups,
+            'dau' => $dau,
             'programs' => $programs,
             'moderators' => $moderators,
         ]);

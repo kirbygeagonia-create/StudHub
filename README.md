@@ -9,8 +9,8 @@
 > e-modules, reviewers, and past exams **across programs and across
 > colleges** — not just inside their own bubble.
 
-This repository now contains the **Laravel 11 skeleton** for StudHub.
-No product features are implemented yet — see
+This repository now contains the **Laravel 11 application** for StudHub.
+Weeks 0–9 are complete with full CI. See
 [`docs/05-roadmap.md`](docs/05-roadmap.md) for the week-by-week
 build plan.
 

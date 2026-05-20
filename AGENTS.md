@@ -72,12 +72,13 @@ app/Domain/{Domain}/
 | `codebase-audit-pre-push` | Pre-push audit |
 | `testing-studhub-chat` | Testing chat functionality |
 
-## Current Status (Week 7 Complete)
+## Current Status (Week 10 In Progress)
 
-- **Tests:** 137 passed, 333 assertions
-- **Weeks 0-7:** All complete
-- **Next:** Week 8 — Lend tracking + return reminders
-- **Handoff doc:** `planning/session-handoff-2026-05-16.md`
+- **Tests:** 182 passed, 450 assertions
+- **Weeks 0-9:** All complete, 12 audit fixes applied
+- **PHPStan:** Level 6 clean
+- **Next:** Week 10 — Global search, email digest, admin analytics
+- **Handoff doc:** `planning/session-handoff-2026-05-17.md`
 
 ## Key Commands
 

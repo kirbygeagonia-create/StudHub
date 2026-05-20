@@ -3,12 +3,14 @@
 namespace App\Models;
 
 use App\Domain\Requests\Enums\OfferStatus;
+use Database\Factories\OfferFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Offer extends Model
 {
+    /** @use HasFactory<OfferFactory> */
     use HasFactory;
 
     protected $fillable = [

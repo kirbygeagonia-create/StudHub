@@ -1,0 +1,67 @@
+<?php
+
+namespace App\Domain\Search\Jobs;
+
+use App\Mail\DailyDigest;
+use App\Models\RequestRoute;
+use App\Models\User;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+
+class SendDailyDigest implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    public function handle(): void
+    {
+        $programsWithRoutes = RequestRoute::query()
+            ->whereDate('created_at', now()->toDateString())
+            ->distinct('program_id')
+            ->pluck('program_id');
+
+        if ($programsWithRoutes->isEmpty()) {
+            return;
+        }
+
+        $users = User::query()
+            ->whereIn('program_id', $programsWithRoutes)
+            ->whereNotNull('onboarded_at')
+            ->whereNull('suspended_until')
+            ->get();
+
+        $todayRequestCount = RequestRoute::query()
+            ->whereDate('created_at', now()->toDateString())
+            ->count();
+
+        $chatActivityByProgram = DB::table('chat_messages')
+            ->select('users.program_id', DB::raw('COUNT(*) as count'))
+            ->join('users', 'users.id', '=', 'chat_messages.sender_id')
+            ->whereDate('chat_messages.created_at', now()->toDateString())
+            ->groupBy('users.program_id')
+            ->pluck('count', 'program_id');
+
+        foreach ($users as $user) {
+            $programId = $user->program_id;
+            $requestCount = RequestRoute::query()
+                ->where('program_id', $programId)
+                ->whereDate('created_at', now()->toDateString())
+                ->count();
+            $chatActivity = $chatActivityByProgram[$programId] ?? 0;
+
+            if ($requestCount === 0 && $chatActivity === 0) {
+                continue;
+            }
+
+            Mail::to($user)->queue(new DailyDigest($user, [
+                'request_count' => $requestCount,
+                'chat_activity' => $chatActivity,
+                'active_programs' => $programsWithRoutes->count(),
+            ]));
+        }
+    }
+}

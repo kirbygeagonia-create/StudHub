@@ -23,7 +23,7 @@
                 </div>
             @endif
 
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                 <div class="bg-white shadow-sm sm:rounded-lg p-6">
                     <p class="text-xs uppercase tracking-wide text-gray-500">Open Reports</p>
                     <p class="text-2xl font-bold text-gray-900">{{ $openReports }}</p>
@@ -35,6 +35,36 @@
                 <div class="bg-white shadow-sm sm:rounded-lg p-6">
                     <p class="text-xs uppercase tracking-wide text-gray-500">Active Users</p>
                     <p class="text-2xl font-bold text-gray-900">{{ $activeUsers }}</p>
+                </div>
+                <div class="bg-white shadow-sm sm:rounded-lg p-6">
+                    <p class="text-xs uppercase tracking-wide text-gray-500">New Signups (7d)</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $recentSignups }}</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                <div class="bg-white shadow-sm sm:rounded-lg p-6">
+                    <p class="text-xs uppercase tracking-wide text-gray-500">Daily Active Users</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $dau }}</p>
+                </div>
+                <div class="bg-white shadow-sm sm:rounded-lg p-6">
+                    <p class="text-xs uppercase tracking-wide text-gray-500">Total Resources</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $totalResources }}</p>
+                </div>
+                <div class="bg-white shadow-sm sm:rounded-lg p-6">
+                    <p class="text-xs uppercase tracking-wide text-gray-500">Total Requests</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $totalRequests }}</p>
+                </div>
+                <div class="bg-white shadow-sm sm:rounded-lg p-6">
+                    <p class="text-xs uppercase tracking-wide text-gray-500">Messages Today</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $messagesToday }}</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="bg-white shadow-sm sm:rounded-lg p-6">
+                    <p class="text-xs uppercase tracking-wide text-gray-500">Active Lends</p>
+                    <p class="text-2xl font-bold text-gray-900">{{ $activeLends }}</p>
                 </div>
             </div>
 
