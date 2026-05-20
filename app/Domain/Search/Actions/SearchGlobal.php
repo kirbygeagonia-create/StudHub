@@ -4,7 +4,7 @@ namespace App\Domain\Search\Actions;
 
 use App\Models\ChatMessage;
 use App\Models\LearningResource;
-use App\Models\Request;
+use App\Models\ResourceRequest;
 use App\Models\User;
 use Illuminate\Support\Collection;
 
@@ -13,7 +13,7 @@ class SearchGlobal
     /**
      * @return array{
      *     resources: Collection<int, LearningResource>,
-     *     requests: Collection<int, Request>,
+     *     requests: Collection<int, ResourceRequest>,
      *     messages: Collection<int, ChatMessage>,
      * }
      */
@@ -42,7 +42,7 @@ class SearchGlobal
             ->limit($limit)
             ->get();
 
-        $requests = Request::query()
+        $requests = ResourceRequest::query()
             ->with(['requester:id,display_name,name', 'subject:id,code,name'])
             ->whereHas('requester', function ($q) use ($user) {
                 $q->where('school_id', $user->school_id);

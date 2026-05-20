@@ -47,6 +47,13 @@ return [
             'report' => false,
         ],
 
+        'backups' => [
+            'driver' => env('BACKUP_DISK_DRIVER', 'local'),
+            'root' => env('BACKUP_DISK_ROOT', storage_path('app/backups')),
+            'throw' => false,
+            'report' => false,
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

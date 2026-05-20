@@ -12,7 +12,7 @@ use App\Models\Lend;
 use App\Models\Program;
 use App\Models\ProgramModerator;
 use App\Models\Report;
-use App\Models\Request;
+use App\Models\ResourceRequest;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request as HttpRequest;
@@ -29,7 +29,7 @@ class AdminController extends Controller
         $totalModerators = User::where('role', UserRole::Moderator->value)->count();
         $activeUsers = User::whereNotNull('onboarded_at')->whereNull('suspended_until')->count();
         $totalResources = LearningResource::whereNull('deleted_at')->count();
-        $totalRequests = Request::count();
+        $totalRequests = ResourceRequest::count();
         $activeLends = Lend::whereNull('returned_at')->count();
         $messagesToday = ChatMessage::whereDate('created_at', now()->toDateString())->count();
 

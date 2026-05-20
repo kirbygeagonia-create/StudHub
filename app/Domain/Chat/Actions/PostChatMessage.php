@@ -21,6 +21,15 @@ use InvalidArgumentException;
  */
 class PostChatMessage
 {
+    /** @var list<string> */
+    private const ALLOWED_ATTACHMENT_MIMES = [
+        'application/pdf',
+        'image/jpeg',
+        'image/png',
+        'image/webp',
+        'image/gif',
+    ];
+
     /**
      * @param  AttachmentPayload|null  $attachment
      */
@@ -30,6 +39,12 @@ class PostChatMessage
 
         if ($body === '' && $attachment === null) {
             throw new InvalidArgumentException('Chat message must have a body or an attachment.');
+        }
+
+        if ($attachment !== null && isset($attachment['mime'])) {
+            if (! in_array($attachment['mime'], self::ALLOWED_ATTACHMENT_MIMES, true)) {
+                throw new InvalidArgumentException('Attachment file type is not allowed.');
+            }
         }
 
         /** @var ChatMessage $message */
@@ -70,24 +85,20 @@ class PostChatMessage
      */
     private function resolveMentions(string $body, User $sender): Collection
     {
-        preg_match_all('/(?<![\w@])@([A-Za-z0-9_.\-]{2,40})/u', $body, $matches);
+        preg_match_all('/@([\w.\-]+)/u', $body, $matches);
 
-        $handles = collect($matches[1])
-            ->map(fn (string $h) => mb_strtolower($h))
-            ->unique()
-            ->values();
+        $mentionedNames = collect($matches[1])->unique()->all();
 
-        if ($handles->isEmpty()) {
-            return User::query()->whereRaw('1 = 0')->get();
+        if (empty($mentionedNames)) {
+            return User::whereRaw('0 = 1')->get();
         }
 
-        return User::query()
-            ->when($sender->school_id, fn ($q) => $q->where('school_id', $sender->school_id))
-            ->whereKeyNot($sender->id)
-            ->where(function ($q) use ($handles) {
-                foreach ($handles as $handle) {
-                    $q->orWhereRaw('LOWER(display_name) = ?', [$handle])
-                        ->orWhereRaw('LOWER(REPLACE(name, " ", ".")) = ?', [$handle]);
+        return User::where('school_id', $sender->school_id)
+            ->where('id', '!=', $sender->id)
+            ->where(function ($query) use ($mentionedNames) {
+                $query->whereIn('display_name', $mentionedNames);
+                foreach ($mentionedNames as $name) {
+                    $query->orWhereRaw("REPLACE(display_name, ' ', '.') LIKE ?", ["%{$name}%"]);
                 }
             })
             ->get();

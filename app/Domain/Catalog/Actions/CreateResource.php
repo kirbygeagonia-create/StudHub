@@ -18,6 +18,17 @@ use RuntimeException;
 
 class CreateResource
 {
+    /** @var list<string> */
+    private const ALLOWED_MIMES = [
+        'application/pdf',
+        'image/jpeg',
+        'image/png',
+        'image/webp',
+    ];
+
+    /** @var list<string> */
+    private const ALLOWED_EXTENSIONS = ['pdf', 'jpg', 'jpeg', 'png', 'webp'];
+
     /**
      * @param  array{
      *     subject_id: int,
@@ -51,6 +62,10 @@ class CreateResource
             $filePayload = ['file_url' => null, 'file_mime' => null, 'file_size' => null];
 
             if ($file !== null) {
+                if (! $this->isAllowedFileType($file)) {
+                    throw new RuntimeException('This file type is not allowed. Accepted: PDF, JPEG, PNG, WebP.');
+                }
+
                 $path = $file->store('resources', ['disk' => 'public']);
 
                 $filePayload = [
@@ -104,5 +119,20 @@ class CreateResource
     public static function storageDisk(): string
     {
         return Storage::disk('public')->getConfig()['driver'] ?? 'local';
+    }
+
+    private function isAllowedFileType(UploadedFile $file): bool
+    {
+        $mime = $file->getMimeType() ?: '';
+        if ($mime !== '' && in_array($mime, self::ALLOWED_MIMES, true)) {
+            return true;
+        }
+
+        $ext = strtolower($file->getClientOriginalExtension() ?: '');
+        if ($ext !== '' && in_array($ext, self::ALLOWED_EXTENSIONS, true)) {
+            return true;
+        }
+
+        return false;
     }
 }

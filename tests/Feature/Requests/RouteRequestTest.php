@@ -4,8 +4,8 @@ use App\Domain\Catalog\Enums\ResourceType;
 use App\Domain\Requests\Actions\RouteRequest;
 use App\Domain\Requests\Jobs\NotifyRoutedUsers;
 use App\Models\LearningResource;
-use App\Models\Request;
 use App\Models\RequestRoute;
+use App\Models\ResourceRequest;
 use App\Models\Subject;
 use App\Models\User;
 use Database\Seeders\SeaitCollegesSeeder;
@@ -28,7 +28,7 @@ it('routes a request to programs that have the subject in their curriculum', fun
     /** @var Subject $subject */
     $subject = Subject::where('code', 'IT 211')->firstOrFail();
 
-    $request = Request::factory()->create([
+    $request = ResourceRequest::factory()->create([
         'requester_user_id' => $requester->id,
         'subject_id' => $subject->id,
         'type_wanted' => ResourceType::Reviewer->value,
@@ -52,7 +52,7 @@ it('applies the self-program penalty correctly', function () {
     $subject = Subject::where('code', 'IT 211')->firstOrFail();
     $requesterProgram = $requester->program;
 
-    $request = Request::factory()->create([
+    $request = ResourceRequest::factory()->create([
         'requester_user_id' => $requester->id,
         'subject_id' => $subject->id,
         'type_wanted' => ResourceType::Reviewer->value,
@@ -90,7 +90,7 @@ it('picks users to notify from routed programs', function () {
         'type' => ResourceType::Reviewer->value,
     ]);
 
-    $request = Request::factory()->create([
+    $request = ResourceRequest::factory()->create([
         'requester_user_id' => $requester->id,
         'subject_id' => $subject->id,
         'type_wanted' => ResourceType::Reviewer->value,
@@ -110,7 +110,7 @@ it('does not notify the requester', function () {
 
     $helper = User::factory()->onboarded()->create();
 
-    $request = Request::factory()->create([
+    $request = ResourceRequest::factory()->create([
         'requester_user_id' => $requester->id,
         'subject_id' => $subject->id,
         'type_wanted' => ResourceType::Reviewer->value,
@@ -129,7 +129,7 @@ it('dispatches the NotifyRoutedUsers job', function () {
     /** @var Subject $subject */
     $subject = Subject::where('code', 'IT 211')->firstOrFail();
 
-    $request = Request::factory()->create([
+    $request = ResourceRequest::factory()->create([
         'requester_user_id' => $requester->id,
         'subject_id' => $subject->id,
         'type_wanted' => ResourceType::Reviewer->value,
@@ -147,7 +147,7 @@ it('falls back to routing only the requester\'s program when subject is not in a
 
     $subject->programs()->detach();
 
-    $request = Request::factory()->create([
+    $request = ResourceRequest::factory()->create([
         'requester_user_id' => $requester->id,
         'subject_id' => $subject->id,
         'type_wanted' => ResourceType::Reviewer->value,
@@ -165,7 +165,7 @@ it('enforces the 3-notifications-per-day cap per user', function () {
     /** @var Subject $subject */
     $subject = Subject::where('code', 'IT 211')->firstOrFail();
 
-    $request = Request::factory()->create([
+    $request = ResourceRequest::factory()->create([
         'requester_user_id' => $requester->id,
         'subject_id' => $subject->id,
         'type_wanted' => ResourceType::Reviewer->value,
@@ -181,7 +181,7 @@ it('routing is idempotent — running twice does not double routes', function ()
     /** @var Subject $subject */
     $subject = Subject::where('code', 'IT 211')->firstOrFail();
 
-    $request = Request::factory()->create([
+    $request = ResourceRequest::factory()->create([
         'requester_user_id' => $requester->id,
         'subject_id' => $subject->id,
         'type_wanted' => ResourceType::Reviewer->value,

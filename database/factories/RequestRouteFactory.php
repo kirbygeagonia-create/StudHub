@@ -3,8 +3,8 @@
 namespace Database\Factories;
 
 use App\Models\Program;
-use App\Models\Request;
 use App\Models\RequestRoute;
+use App\Models\ResourceRequest;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -20,7 +20,7 @@ class RequestRouteFactory extends Factory
     public function definition(): array
     {
         return [
-            'request_id' => Request::factory(),
+            'request_id' => ResourceRequest::factory(),
             'program_id' => Program::factory(),
             'score' => 1.0,
             'notified_user_count' => 0,

@@ -7,8 +7,8 @@ use App\Domain\Requests\Jobs\CrossPostRequest;
 use App\Domain\Requests\Jobs\NotifyRoutedUsers;
 use App\Models\LearningResource;
 use App\Models\Program;
-use App\Models\Request;
 use App\Models\RequestRoute;
+use App\Models\ResourceRequest;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -38,7 +38,7 @@ class RouteRequest
 
     private const GLOBAL_USER_CAP = 25;
 
-    public function handle(Request $request): void
+    public function handle(ResourceRequest $request): void
     {
         $subject = $request->subject;
         $requester = $request->requester;
@@ -154,7 +154,7 @@ class RouteRequest
         ];
     }
 
-    private function routeToOwnProgramOnly(Request $request, mixed $subject): void
+    private function routeToOwnProgramOnly(ResourceRequest $request, mixed $subject): void
     {
         $ownProgram = $request->requester->program;
 
@@ -259,52 +259,40 @@ class RouteRequest
     /**
      * @return Collection<int, User>
      */
-    private function pickUsersToNotify(Program $program, mixed $subject, Request $request, ?int $typicalYear): Collection
+    private function pickUsersToNotify(Program $program, mixed $subject, ResourceRequest $request, ?int $typicalYear): Collection
     {
+        // Batch-load candidates with their karma + last_seen_at for scoring
         $candidates = User::where('program_id', $program->id)
             ->where('id', '!=', $request->requester_user_id)
             ->whereNotNull('onboarded_at')
-            ->get();
+            ->get(['id', 'program_id', 'karma', 'last_seen_at', 'year_level', 'onboarded_at']);
 
         $subjectId = $subject->id;
         $typeWanted = $request->type_wanted;
 
-        $scored = $candidates->map(function (User $user) use ($subjectId, $typeWanted, $typicalYear): array {
-            $score = 0.0;
+        // Batch-lookup matching resources for all candidates in a single query
+        $candidateIds = $candidates->pluck('id')->all();
 
+        $matchingResourceIds = LearningResource::query()
+            ->whereIn('owner_user_id', $candidateIds)
+            ->where('subject_id', $subjectId)
+            ->where('type', $typeWanted)
+            ->where('availability', '!=', 'archived')
+            ->pluck('owner_user_id')
+            ->flip(); // Flip to use as a fast lookup set
+
+        $scored = $candidates->map(function (User $user) use ($matchingResourceIds, $typicalYear): array {
             if ($typicalYear !== null && $user->year_level !== null && $user->year_level < $typicalYear) {
                 return ['user' => $user, 'score' => -999.0];
             }
 
-            $hasMatchingResource = LearningResource::where('owner_user_id', $user->id)
-                ->where('subject_id', $subjectId)
-                ->where('type', $typeWanted)
-                ->where('availability', '!=', 'archived')
-                ->exists();
+            $score = 0.0;
 
-            if ($hasMatchingResource) {
+            if ($matchingResourceIds->has($user->id)) {
                 $score += 1.0;
             }
 
             $score += ($user->karma ?? 0) > 0 ? min(0.2, ($user->karma / 500) * 0.2) : 0.0;
-
-            $recentNotifications = $user->notifications()
-                ->where('type', 'App\Domain\Requests\Jobs\NotifyRoutedUsers')
-                ->where('created_at', '>=', now()->subHours(24))
-                ->count();
-
-            if ($recentNotifications > 0) {
-                $score -= 0.5;
-            }
-
-            $todayNotifications = $user->notifications()
-                ->where('type', 'App\Domain\Requests\Jobs\NotifyRoutedUsers')
-                ->where('created_at', '>=', now()->startOfDay())
-                ->count();
-
-            if ($todayNotifications >= 3) {
-                return ['user' => $user, 'score' => -999.0];
-            }
 
             return ['user' => $user, 'score' => $score];
         });

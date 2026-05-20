@@ -4,7 +4,7 @@ namespace App\Domain\Requests\Actions;
 
 use App\Domain\Requests\Enums\RequestStatus;
 use App\Domain\Requests\Enums\RequestUrgency;
-use App\Models\Request;
+use App\Models\ResourceRequest;
 use App\Models\Subject;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -21,7 +21,7 @@ class CreateRequest
      *     description?: string|null,
      * }  $data
      */
-    public function handle(User $requester, array $data): Request
+    public function handle(User $requester, array $data): ResourceRequest
     {
         if (! $requester->school_id) {
             throw new RuntimeException('Requester must belong to a school.');
@@ -36,7 +36,7 @@ class CreateRequest
             throw new RuntimeException('Subject does not exist for this school.');
         }
 
-        $openCount = Request::where('requester_user_id', $requester->id)
+        $openCount = ResourceRequest::where('requester_user_id', $requester->id)
             ->whereIn('status', RequestStatus::openValues())
             ->count();
 
@@ -44,7 +44,7 @@ class CreateRequest
             throw new RuntimeException('You already have 5 open requests. Please resolve or withdraw some first.');
         }
 
-        $recentRequest = Request::where('requester_user_id', $requester->id)
+        $recentRequest = ResourceRequest::where('requester_user_id', $requester->id)
             ->where('created_at', '>=', now()->subMinutes(10))
             ->first();
 
@@ -52,8 +52,8 @@ class CreateRequest
             throw new RuntimeException('You can only post one request every 10 minutes. Please wait before posting again.');
         }
 
-        return DB::transaction(function () use ($requester, $subject, $data): Request {
-            $request = Request::create([
+        return DB::transaction(function () use ($requester, $subject, $data): ResourceRequest {
+            $request = ResourceRequest::create([
                 'requester_user_id' => $requester->id,
                 'subject_id' => $subject->id,
                 'type_wanted' => $data['type_wanted'],

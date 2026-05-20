@@ -32,11 +32,11 @@ class Offer extends Model
     }
 
     /**
-     * @return BelongsTo<Request, $this>
+     * @return BelongsTo<ResourceRequest, $this>
      */
     public function request(): BelongsTo
     {
-        return $this->belongsTo(Request::class);
+        return $this->belongsTo(ResourceRequest::class);
     }
 
     /**

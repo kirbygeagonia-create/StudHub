@@ -112,7 +112,7 @@ class ResourceForm extends Component
             'condition' => ['nullable', 'in:like_new,good,worn'],
             'availability' => ['required', 'string', 'in:' . implode(',', ResourceAvailability::values())],
             'visibility' => ['required', 'string', 'in:' . implode(',', ResourceVisibility::values())],
-            'file' => ['nullable', 'file', 'max:25600', 'mimetypes:image/jpeg,image/png,image/webp,application/pdf,application/zip,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,text/plain'],
+            'file' => ['nullable', 'file', 'max:25600', 'mimetypes:application/pdf,image/jpeg,image/png,image/webp'],
         ]);
 
         $user = auth()->user();

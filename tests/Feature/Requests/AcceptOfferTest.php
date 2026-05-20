@@ -4,7 +4,7 @@ use App\Domain\Requests\Actions\AcceptOffer;
 use App\Domain\Requests\Enums\OfferStatus;
 use App\Domain\Requests\Enums\RequestStatus;
 use App\Models\Offer;
-use App\Models\Request;
+use App\Models\ResourceRequest;
 use App\Models\Subject;
 use App\Models\User;
 use Database\Seeders\SeaitCollegesSeeder;
@@ -25,7 +25,7 @@ it('accepts an offer and marks the request as fulfilled', function () {
     /** @var Subject $subject */
     $subject = Subject::where('code', 'IT 211')->firstOrFail();
 
-    $request = Request::factory()->create([
+    $request = ResourceRequest::factory()->create([
         'requester_user_id' => $requester->id,
         'subject_id' => $subject->id,
     ]);
@@ -51,7 +51,7 @@ it('rejects other pending offers when one is accepted', function () {
     /** @var Subject $subject */
     $subject = Subject::where('code', 'IT 211')->firstOrFail();
 
-    $request = Request::factory()->create([
+    $request = ResourceRequest::factory()->create([
         'requester_user_id' => $requester->id,
         'subject_id' => $subject->id,
     ]);
@@ -80,7 +80,7 @@ it('refuses if a non-requester tries to accept', function () {
     /** @var Subject $subject */
     $subject = Subject::where('code', 'IT 211')->firstOrFail();
 
-    $request = Request::factory()->create([
+    $request = ResourceRequest::factory()->create([
         'requester_user_id' => $requester->id,
         'subject_id' => $subject->id,
     ]);
@@ -100,7 +100,7 @@ it('refuses to accept an already-accepted offer', function () {
     /** @var Subject $subject */
     $subject = Subject::where('code', 'IT 211')->firstOrFail();
 
-    $request = Request::factory()->create([
+    $request = ResourceRequest::factory()->create([
         'requester_user_id' => $requester->id,
         'subject_id' => $subject->id,
     ]);
@@ -120,7 +120,7 @@ it('accepts an offer via the accept route', function () {
     /** @var Subject $subject */
     $subject = Subject::where('code', 'IT 211')->firstOrFail();
 
-    $request = Request::factory()->create([
+    $request = ResourceRequest::factory()->create([
         'requester_user_id' => $requester->id,
         'subject_id' => $subject->id,
     ]);

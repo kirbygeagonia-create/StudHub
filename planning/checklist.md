@@ -66,8 +66,8 @@ formal review. Once a task is done, check it off; don't delete it
 
 ## Cross-cutting
 
-- [ ] Write a short "Acceptable Use Policy" before pilot.
-- [ ] Write a "How to ask for resources" guide for students.
+- [x] Write a short "Acceptable Use Policy" before pilot.
+- [x] Write a "How to ask for resources" guide for students.
 - [ ] Decide who owns moderation per program (class president by
       default?).
 - [ ] Decide retention policy for chat (forever? 12 months?).
@@ -78,3 +78,23 @@ formal review. Once a task is done, check it off; don't delete it
 - [ ] Onboarding email template.
 - [ ] Feedback form (Google Form is fine for v1).
 - [ ] Weekly office hours during pilot.
+
+## Week 10 delivered
+
+- [x] Global search across resources, requests, chat messages
+- [x] Daily email digest job (routed requests + chat activity)
+- [x] Admin analytics dashboard (signups, DAU, total resources, requests, lends, messages today)
+- [x] PHPStan bumped to level 6 (0 errors)
+- [x] README.md and AGENTS.md updated to Week 10 state
+
+## Week 11 delivered
+
+- [x] Rate limiting on all POST routes (throttle per-route)
+- [x] Server-side MIME validation in CreateResource + PostChatMessage
+- [x] Real per-user PDF watermarking (already existed, verified)
+- [x] Daily DB backup command (studhub:backup-database) scheduled at 02:00
+- [x] Landing page replaced with StudHub branding
+- [x] Help page with getting started guide + karma badge info
+- [x] Acceptable Use Policy page
+- [x] Smoke tests for landing, help, AUP pages
+- [x] Suspended users blocked from chat + HTTP (verified F3, F7 from audit)

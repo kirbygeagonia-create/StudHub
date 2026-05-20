@@ -11,7 +11,7 @@ use App\Domain\Requests\Enums\RequestStatus;
 use App\Models\LearningResource;
 use App\Models\Lend;
 use App\Models\Offer;
-use App\Models\Request;
+use App\Models\ResourceRequest;
 use App\Models\Subject;
 use App\Models\User;
 use Database\Seeders\SeaitCollegesSeeder;
@@ -51,7 +51,7 @@ it('records a lend for a matched request with a physical resource', function () 
 
     $resource = lendTestResource($offerer, ResourceType::Textbook);
 
-    $request = Request::factory()->create([
+    $request = ResourceRequest::factory()->create([
         'requester_user_id' => $requester->id,
         'subject_id' => lendTestSubject()->id,
         'status' => RequestStatus::Matched,
@@ -89,7 +89,7 @@ it('refuses to record a lend for a non-matched request', function () {
 
     $resource = lendTestResource($offerer);
 
-    $request = Request::factory()->create([
+    $request = ResourceRequest::factory()->create([
         'requester_user_id' => $requester->id,
         'subject_id' => lendTestSubject()->id,
         'status' => RequestStatus::Open,
@@ -110,7 +110,7 @@ it('refuses to record a lend for an offer without a resource', function () {
     $requester = User::factory()->onboarded()->create();
     $offerer = User::factory()->onboarded()->create();
 
-    $request = Request::factory()->create([
+    $request = ResourceRequest::factory()->create([
         'requester_user_id' => $requester->id,
         'subject_id' => lendTestSubject()->id,
         'status' => RequestStatus::Matched,
@@ -135,7 +135,7 @@ it('refuses to record a duplicate lend for the same offer', function () {
 
     $resource = lendTestResource($offerer);
 
-    $request = Request::factory()->create([
+    $request = ResourceRequest::factory()->create([
         'requester_user_id' => $requester->id,
         'subject_id' => lendTestSubject()->id,
         'status' => RequestStatus::Matched,
@@ -334,7 +334,7 @@ it('records a lend via the record route', function () {
 
     $resource = lendTestResource($offerer, ResourceType::Textbook);
 
-    $request = Request::factory()->create([
+    $request = ResourceRequest::factory()->create([
         'requester_user_id' => $requester->id,
         'subject_id' => lendTestSubject()->id,
         'status' => RequestStatus::Matched,

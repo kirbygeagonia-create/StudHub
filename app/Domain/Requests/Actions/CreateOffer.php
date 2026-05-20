@@ -5,7 +5,7 @@ namespace App\Domain\Requests\Actions;
 use App\Domain\Requests\Enums\OfferStatus;
 use App\Models\LearningResource;
 use App\Models\Offer;
-use App\Models\Request;
+use App\Models\ResourceRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
@@ -18,7 +18,7 @@ class CreateOffer
      *     message?: string|null,
      * }  $data
      */
-    public function handle(User $offerer, Request $request, array $data): Offer
+    public function handle(User $offerer, ResourceRequest $request, array $data): Offer
     {
         if (! $offerer->school_id) {
             throw new RuntimeException('User must belong to a school.');

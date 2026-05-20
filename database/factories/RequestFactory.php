@@ -4,16 +4,16 @@ namespace Database\Factories;
 
 use App\Domain\Requests\Enums\RequestStatus;
 use App\Domain\Requests\Enums\RequestUrgency;
-use App\Models\Request;
+use App\Models\ResourceRequest;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Request>
+ * @extends Factory<ResourceRequest>
  */
 class RequestFactory extends Factory
 {
-    protected $model = Request::class;
+    protected $model = ResourceRequest::class;
 
     /**
      * @return array<string, mixed>

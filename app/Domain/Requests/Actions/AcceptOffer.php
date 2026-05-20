@@ -8,14 +8,14 @@ use App\Domain\Reputation\Enums\KarmaEventReason;
 use App\Domain\Requests\Enums\OfferStatus;
 use App\Domain\Requests\Enums\RequestStatus;
 use App\Models\Offer;
-use App\Models\Request;
+use App\Models\ResourceRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
 class AcceptOffer
 {
-    public function handle(User $requester, Request $request, Offer $offer): void
+    public function handle(User $requester, ResourceRequest $request, Offer $offer): void
     {
         if ($request->requester_user_id !== $requester->id) {
             throw new RuntimeException('Only the requester can accept an offer.');

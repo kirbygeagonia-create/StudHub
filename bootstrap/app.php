@@ -20,6 +20,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => EnsureHasRole::class,
             'not_suspended' => EnsureNotSuspended::class,
         ]);
+
+        $middleware->throttleApi();
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

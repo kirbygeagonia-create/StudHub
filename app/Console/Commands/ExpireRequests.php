@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Domain\Requests\Enums\RequestStatus;
-use App\Models\Request as ResourceRequest;
+use App\Models\ResourceRequest;
 use Illuminate\Console\Command;
 
 class ExpireRequests extends Command

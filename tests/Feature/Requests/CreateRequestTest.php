@@ -3,7 +3,7 @@
 use App\Domain\Catalog\Enums\ResourceType;
 use App\Domain\Requests\Actions\CreateRequest;
 use App\Domain\Requests\Enums\RequestUrgency;
-use App\Models\Request;
+use App\Models\ResourceRequest;
 use App\Models\School;
 use App\Models\Subject;
 use App\Models\User;
@@ -31,7 +31,7 @@ it('creates a request and stamps it with the requester', function () {
         'description' => 'Need a DSA reviewer for midterms',
     ]);
 
-    expect($request)->toBeInstanceOf(Request::class);
+    expect($request)->toBeInstanceOf(ResourceRequest::class);
     expect($request->requester_user_id)->toBe($user->id);
     expect($request->subject_id)->toBe($subject->id);
     expect($request->type_wanted)->toBe('reviewer');
@@ -68,7 +68,7 @@ it('refuses to create a request when user already has 5 open requests', function
     $subject = Subject::where('code', 'IT 211')->firstOrFail();
 
     for ($i = 0; $i < 5; $i++) {
-        Request::factory()->create([
+        ResourceRequest::factory()->create([
             'requester_user_id' => $user->id,
             'subject_id' => $subject->id,
             'status' => 'open',
@@ -121,7 +121,7 @@ it('stores a request via the POST route', function () {
             'description' => 'Need help with DSA',
         ])->assertRedirect();
 
-    expect(Request::where('requester_user_id', $user->id)->count())->toBe(1);
+    expect(ResourceRequest::where('requester_user_id', $user->id)->count())->toBe(1);
 });
 
 it('renders the request create page', function () {

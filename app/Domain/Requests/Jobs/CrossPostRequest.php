@@ -3,7 +3,7 @@
 namespace App\Domain\Requests\Jobs;
 
 use App\Models\Program;
-use App\Models\Request;
+use App\Models\ResourceRequest;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 
@@ -18,7 +18,7 @@ class CrossPostRequest implements ShouldQueue
 
     public function handle(): void
     {
-        $request = Request::with('subject', 'requester')->find($this->requestId);
+        $request = ResourceRequest::with('subject', 'requester')->find($this->requestId);
         $program = Program::find($this->programId);
 
         if ($request === null || $program === null) {

@@ -71,10 +71,27 @@
                     </div>
                 </dl>
 
-                <div class="mt-6">
+                <div class="mt-6 flex items-center gap-3">
                     <a href="{{ route('profile.edit') }}" class="text-sm text-indigo-600 hover:underline">
                         Edit account settings
                     </a>
+                    @if (auth()->id() !== ($user?->id ?? -1))
+                        <form method="POST" action="{{ route('reports.store') }}" class="inline">
+                            @csrf
+                            <input type="hidden" name="reported_type" value="user">
+                            <input type="hidden" name="reported_id" value="{{ $user->id }}">
+                            <select name="reason" required class="text-xs border-gray-300 rounded-md shadow-sm mr-1">
+                                <option value="">Select reason</option>
+                                @foreach (\App\Domain\Moderation\Enums\ReportReason::cases() as $reason)
+                                    <option value="{{ $reason->value }}">{{ $reason->label() }}</option>
+                                @endforeach
+                            </select>
+                            <button type="submit"
+                                    class="px-2 py-1 bg-red-500 border border-transparent rounded text-xs font-semibold text-white uppercase tracking-widest hover:bg-red-600">
+                                Report this user
+                            </button>
+                        </form>
+                    @endif
                 </div>
             </div>
         </div>

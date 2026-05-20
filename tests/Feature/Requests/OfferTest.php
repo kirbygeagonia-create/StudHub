@@ -5,7 +5,7 @@ use App\Domain\Requests\Actions\CreateOffer;
 use App\Domain\Requests\Enums\OfferStatus;
 use App\Models\LearningResource;
 use App\Models\Offer;
-use App\Models\Request;
+use App\Models\ResourceRequest;
 use App\Models\Subject;
 use App\Models\User;
 use Database\Seeders\SeaitCollegesSeeder;
@@ -26,7 +26,7 @@ it('creates an offer on an open request', function () {
     /** @var Subject $subject */
     $subject = Subject::where('code', 'IT 211')->firstOrFail();
 
-    $request = Request::factory()->create([
+    $request = ResourceRequest::factory()->create([
         'requester_user_id' => $requester->id,
         'subject_id' => $subject->id,
         'type_wanted' => ResourceType::Reviewer->value,
@@ -48,7 +48,7 @@ it('refuses an offer from the requester themselves', function () {
     /** @var Subject $subject */
     $subject = Subject::where('code', 'IT 211')->firstOrFail();
 
-    $request = Request::factory()->create([
+    $request = ResourceRequest::factory()->create([
         'requester_user_id' => $user->id,
         'subject_id' => $subject->id,
     ]);
@@ -63,7 +63,7 @@ it('refuses a second offer from the same user', function () {
     /** @var Subject $subject */
     $subject = Subject::where('code', 'IT 211')->firstOrFail();
 
-    $request = Request::factory()->create([
+    $request = ResourceRequest::factory()->create([
         'requester_user_id' => $requester->id,
         'subject_id' => $subject->id,
     ]);
@@ -80,7 +80,7 @@ it('refuses an offer on a closed request', function () {
     /** @var Subject $subject */
     $subject = Subject::where('code', 'IT 211')->firstOrFail();
 
-    $request = Request::factory()->create([
+    $request = ResourceRequest::factory()->create([
         'requester_user_id' => $requester->id,
         'subject_id' => $subject->id,
         'status' => 'fulfilled',
@@ -104,7 +104,7 @@ it('accepts an offer with a matching resource', function () {
         'type' => ResourceType::Reviewer->value,
     ]);
 
-    $request = Request::factory()->create([
+    $request = ResourceRequest::factory()->create([
         'requester_user_id' => $requester->id,
         'subject_id' => $subject->id,
         'type_wanted' => ResourceType::Reviewer->value,
@@ -124,7 +124,7 @@ it('posts an offer via the route', function () {
     /** @var Subject $subject */
     $subject = Subject::where('code', 'IT 211')->firstOrFail();
 
-    $request = Request::factory()->create([
+    $request = ResourceRequest::factory()->create([
         'requester_user_id' => $requester->id,
         'subject_id' => $subject->id,
         'type_wanted' => ResourceType::Reviewer->value,

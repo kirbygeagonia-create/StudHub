@@ -11,7 +11,7 @@ use App\Domain\Requests\Enums\RequestStatus;
 use App\Domain\Requests\Enums\RequestUrgency;
 use App\Models\LearningResource;
 use App\Models\Offer;
-use App\Models\Request;
+use App\Models\ResourceRequest;
 use App\Models\Subject;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request as HttpRequest;
@@ -24,7 +24,7 @@ class RequestController extends Controller
         $user = $httpRequest->user();
         abort_unless($user !== null, 403);
 
-        $query = Request::with(['requester:id,display_name,name,program_id', 'subject:id,code,name'])
+        $query = ResourceRequest::with(['requester:id,display_name,name,program_id', 'subject:id,code,name'])
             ->whereIn('status', RequestStatus::openValues())
             ->orderByDesc('created_at');
 
@@ -101,7 +101,7 @@ class RequestController extends Controller
         return redirect()->route('requests.show', $request);
     }
 
-    public function show(HttpRequest $httpRequest, Request $request): View
+    public function show(HttpRequest $httpRequest, ResourceRequest $request): View
     {
         $user = $httpRequest->user();
         abort_unless($user !== null, 403);
@@ -129,7 +129,7 @@ class RequestController extends Controller
         ]);
     }
 
-    public function storeOffer(HttpRequest $httpRequest, Request $request, CreateOffer $createOffer): RedirectResponse
+    public function storeOffer(HttpRequest $httpRequest, ResourceRequest $request, CreateOffer $createOffer): RedirectResponse
     {
         $user = $httpRequest->user();
         abort_unless($user !== null, 403);
@@ -152,7 +152,7 @@ class RequestController extends Controller
         return redirect()->route('requests.show', $request);
     }
 
-    public function acceptOffer(HttpRequest $httpRequest, Request $request, Offer $offer, AcceptOffer $acceptOffer): RedirectResponse
+    public function acceptOffer(HttpRequest $httpRequest, ResourceRequest $request, Offer $offer, AcceptOffer $acceptOffer): RedirectResponse
     {
         $user = $httpRequest->user();
         abort_unless($user !== null, 403);

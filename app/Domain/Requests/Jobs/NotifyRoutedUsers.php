@@ -3,7 +3,7 @@
 namespace App\Domain\Requests\Jobs;
 
 use App\Domain\Requests\Enums\RequestUrgency;
-use App\Models\Request;
+use App\Models\ResourceRequest;
 use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -23,7 +23,7 @@ class NotifyRoutedUsers implements ShouldQueue
 
     public function handle(): void
     {
-        $request = Request::with('subject', 'requester')->find($this->requestId);
+        $request = ResourceRequest::with('subject', 'requester')->find($this->requestId);
 
         if ($request === null) {
             return;
@@ -34,7 +34,7 @@ class NotifyRoutedUsers implements ShouldQueue
         foreach ($users as $user) {
             $user->notify(new class($request) extends Notification
             {
-                public function __construct(public Request $request) {}
+                public function __construct(public ResourceRequest $request) {}
 
                 /**
                  * @return array<int, string>

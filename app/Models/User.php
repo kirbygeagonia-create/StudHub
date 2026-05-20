@@ -115,11 +115,11 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * @return HasMany<Request, $this>
+     * @return HasMany<ResourceRequest, $this>
      */
     public function requests(): HasMany
     {
-        return $this->hasMany(Request::class, 'requester_user_id');
+        return $this->hasMany(ResourceRequest::class, 'requester_user_id');
     }
 
     /**

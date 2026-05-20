@@ -7,14 +7,14 @@ use App\Domain\Requests\Enums\RequestStatus;
 use App\Models\LearningResource;
 use App\Models\Lend;
 use App\Models\Offer;
-use App\Models\Request;
+use App\Models\ResourceRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
 class RecordLend
 {
-    public function handle(Request $request, Offer $offer, User $requester, ?string $returnBy = null): Lend
+    public function handle(ResourceRequest $request, Offer $offer, User $requester, ?string $returnBy = null): Lend
     {
         if ($request->requester_user_id !== $requester->id) {
             throw new RuntimeException('Only the requester can record a lend.');
@@ -37,7 +37,7 @@ class RecordLend
         }
 
         return DB::transaction(function () use ($request, $offer, $returnBy) {
-            $request = Request::lockForUpdate()->findOrFail($request->id);
+            $request = ResourceRequest::lockForUpdate()->findOrFail($request->id);
 
             if ($request->status !== RequestStatus::Matched) {
                 throw new RuntimeException('The request must be in matched status to record a lend.');

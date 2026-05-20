@@ -23,11 +23,11 @@ it('downloads the original file for non-PDF resources', function () {
     $subject = Subject::where('code', 'IT 211')->firstOrFail();
     Storage::fake('public');
 
-    $file = UploadedFile::fake()->create('notes.txt', 100, 'text/plain');
+    $file = UploadedFile::fake()->create('notes.jpg', 100, 'image/jpeg');
     $resource = (new CreateResource)->handle($user, [
         'subject_id' => $subject->id,
         'type' => ResourceType::LectureNotes->value,
-        'title' => 'Plain text notes',
+        'title' => 'JPG notes',
     ], $file);
 
     $response = $this->actingAs($user)

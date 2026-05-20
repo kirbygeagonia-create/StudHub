@@ -7,7 +7,7 @@ use App\Domain\Lends\Actions\ReturnResource;
 use App\Domain\Lends\Enums\LendCondition;
 use App\Models\Lend;
 use App\Models\Offer;
-use App\Models\Request;
+use App\Models\ResourceRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request as HttpRequest;
 use Illuminate\View\View;
@@ -35,7 +35,7 @@ class LendController extends Controller
         ]);
     }
 
-    public function record(HttpRequest $httpRequest, Request $request, Offer $offer, RecordLend $recordLend): RedirectResponse
+    public function record(HttpRequest $httpRequest, ResourceRequest $request, Offer $offer, RecordLend $recordLend): RedirectResponse
     {
         $user = $httpRequest->user();
         abort_unless($user !== null, 403);
