@@ -3,6 +3,7 @@
 namespace App\Domain\Moderation\Actions;
 
 use App\Domain\Moderation\Enums\ReportedType;
+use App\Domain\Moderation\Enums\ReportStatus;
 use App\Models\ChatMessage;
 use App\Models\LearningResource;
 use App\Models\Report;
@@ -34,7 +35,7 @@ class CreateReport
         $existing = Report::where('reporter_user_id', $reporter->id)
             ->where('reported_type', $reportedType->value)
             ->where('reported_id', $reportedId)
-            ->where('status', 'open')
+            ->where('status', ReportStatus::Open->value)
             ->exists();
 
         if ($existing) {
@@ -47,7 +48,7 @@ class CreateReport
             'reported_id' => $reportedId,
             'reason' => $reason,
             'notes' => $notes,
-            'status' => 'open',
+            'status' => ReportStatus::Open->value,
         ]);
     }
 

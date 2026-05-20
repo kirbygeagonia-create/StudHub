@@ -21,7 +21,8 @@ class SendDailyDigest implements ShouldQueue
     {
         $programsWithRoutes = RequestRoute::query()
             ->whereDate('created_at', now()->toDateString())
-            ->distinct('program_id')
+            ->select('program_id')
+            ->distinct()
             ->pluck('program_id');
 
         if ($programsWithRoutes->isEmpty()) {
@@ -33,10 +34,6 @@ class SendDailyDigest implements ShouldQueue
             ->whereNotNull('onboarded_at')
             ->whereNull('suspended_until')
             ->get();
-
-        $todayRequestCount = RequestRoute::query()
-            ->whereDate('created_at', now()->toDateString())
-            ->count();
 
         $chatActivityByProgram = DB::table('chat_messages')
             ->select('users.program_id', DB::raw('COUNT(*) as count'))

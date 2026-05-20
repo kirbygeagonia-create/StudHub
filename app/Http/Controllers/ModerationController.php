@@ -27,7 +27,7 @@ class ModerationController extends Controller
 
         $query = Report::query()
             ->with(['reporter:id,display_name,name', 'reported'])
-            ->where('status', 'open');
+            ->where('status', ReportStatus::Open->value);
 
         if (! $user->isAdmin()) {
             if ($moderatedProgramIds->isEmpty()) {

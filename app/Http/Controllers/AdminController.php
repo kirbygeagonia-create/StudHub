@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Domain\Identity\Enums\UserRole;
 use App\Domain\Moderation\Actions\LogAudit;
 use App\Domain\Moderation\Actions\SuspendUser;
+use App\Domain\Moderation\Enums\ReportStatus;
 use App\Models\ChatMessage;
 use App\Models\LearningResource;
 use App\Models\Lend;
@@ -24,8 +25,8 @@ class AdminController extends Controller
         $user = $httpRequest->user();
         abort_unless($user !== null, 403);
 
-        $openReports = Report::where('status', 'open')->count();
-        $totalModerators = User::where('role', 'moderator')->count();
+        $openReports = Report::where('status', ReportStatus::Open->value)->count();
+        $totalModerators = User::where('role', UserRole::Moderator->value)->count();
         $activeUsers = User::whereNotNull('onboarded_at')->whereNull('suspended_until')->count();
         $totalResources = LearningResource::whereNull('deleted_at')->count();
         $totalRequests = Request::count();
