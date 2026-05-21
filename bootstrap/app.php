@@ -3,6 +3,7 @@
 use App\Http\Middleware\EnsureHasRole;
 use App\Http\Middleware\EnsureNotSuspended;
 use App\Http\Middleware\EnsureUserIsOnboarded;
+use App\Http\Middleware\UpdateLastSeenAt;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -22,6 +23,10 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->throttleApi();
+
+        $middleware->web(append: [
+            UpdateLastSeenAt::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

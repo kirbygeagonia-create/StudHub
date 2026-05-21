@@ -6,6 +6,7 @@ use App\Models\LearningResource;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use setasign\Fpdi\Fpdi;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -14,9 +15,6 @@ class DownloadResourceFile
     /**
      * Serve a watermarked copy of the resource file for the given user.
      * The watermarked copy is cached per-user for 24 hours.
-     *
-     * For non-PDF files, or when watermarking isn't applicable, the original
-     * file is served directly.
      */
     public function handle(User $user, LearningResource $resource): StreamedResponse
     {
@@ -66,23 +64,26 @@ class DownloadResourceFile
             throw new NotFoundHttpException('Original file not found.');
         }
 
-        $pdfContent = file_get_contents($originalPath);
-
-        if ($pdfContent === false) {
-            throw new NotFoundHttpException('Could not read the original file.');
+        $actualMime = mime_content_type($originalPath);
+        if (strtolower($resource->file_mime ?? '') !== '' && $actualMime !== $resource->file_mime) {
+            Log::warning('Download resource MIME mismatch', [
+                'resource_id' => $resource->id,
+                'stored_mime' => $resource->file_mime,
+                'actual_mime' => $actualMime,
+            ]);
         }
 
         $watermarkText = 'Downloaded by ' . $user->preferredDisplayName()
             . ' (' . $user->email . ') — ' . now()->format('Y-m-d H:i:s T');
 
-        $watermarked = $this->stampPdf($pdfContent, $watermarkText);
-
-        $cacheDir = Storage::disk('local')->path('watermarked');
+        $outputPath = Storage::disk('local')->path($cachePath);
+        $cacheDir = dirname($outputPath);
         if (! is_dir($cacheDir)) {
             mkdir($cacheDir, 0755, true);
         }
 
-        file_put_contents(Storage::disk('local')->path($cachePath), $watermarked);
+        $watermarked = $this->stampPdfWithFpdi($originalPath, $watermarkText);
+        file_put_contents($outputPath, $watermarked);
 
         Log::info('Watermarked PDF generated', [
             'resource_id' => $resource->id,
@@ -92,40 +93,73 @@ class DownloadResourceFile
     }
 
     /**
-     * A lightweight PDF watermarking implementation that stamps text on each
-     * page using basic PDF manipulation. This avoids external dependencies
-     * (FPDI, TCPDF) by working with PDF content streams directly.
-     *
-     * For production-grade watermarking (complex PDFs, images, compression),
-     * swap this with setasign/fpdi + setasign/fpdf.
+     * Stamp a semi-transparent watermark on every page using FPDI.
+     * Falls back to the lightweight string-based approach if fpdi fails.
      */
-    private function stampPdf(string $pdfContent, string $stampText): string
+    private function stampPdfWithFpdi(string $sourcePath, string $stampText): string
+    {
+        try {
+            $pageCount = $this->countPdfPages(file_get_contents($sourcePath));
+
+            $pdf = new Fpdi;
+            $pdf->setSourceFile($sourcePath);
+
+            for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+                $tplIdx = $pdf->importPage($pageNo);
+                $size = $pdf->getTemplateSize($tplIdx);
+                $pageWidth = $size['width'];
+                $pageHeight = $size['height'];
+
+                $pdf->AddPage($size['orientation'], [$pageWidth, $pageHeight]);
+                $pdf->useTemplate($tplIdx);
+
+                $pdf->SetFont('Helvetica', '', 8);
+                $pdf->SetTextColor(180, 180, 180);
+
+                $text = $stampText;
+                if ($pageCount > 1) {
+                    $text .= ' (page ' . $pageNo . ' of ' . $pageCount . ')';
+                }
+
+                $textWidth = $pdf->GetStringWidth($text);
+                $x = ($pageWidth - $textWidth) / 2;
+                $y = $pageHeight * 0.5;
+
+                $pdf->Text($x, $y, $text);
+
+                $pdf->SetFont('Helvetica', '', 6);
+                $pdf->Text(10, 10, $stampText);
+            }
+
+            return $pdf->Output('S');
+        } catch (\Exception $e) {
+            Log::warning('FPDI watermarking failed, falling back to basic stamp', [
+                'error' => $e->getMessage(),
+            ]);
+
+            $pdfContent = file_get_contents($sourcePath);
+
+            return $this->stampPdfFallback($pdfContent, $stampText);
+        }
+    }
+
+    private function stampPdfFallback(string $pdfContent, string $stampText): string
     {
         $pageCount = $this->countPdfPages($pdfContent);
-        $stamp = sprintf(
-            '/Filter /FlateDecode' . "\n" .
-            'stream' . "\n" .
-            "%s\n" .
-            'endstream',
-            gzcompress(sprintf(
-                "BT /F1 8 Tf 0.5 g\n" .
-                "%d %d Td (%s) Tj\n" .
-                "ET\n",
-                30, 20, $this->escapePdfString($stampText)
-            ))
-        );
+        $stamp = '';
 
-        if ($pageCount > 1) {
-            $stamp = '';
-            for ($i = 0; $i < $pageCount; $i++) {
-                $stamp .= sprintf(
-                    "\n/Filter /FlateDecode\nstream\n%s\nendstream",
-                    gzcompress(sprintf(
-                        "BT /F1 8 Tf 0.5 g\n%d %d Td (%s) Tj\nET\n",
-                        30, 20, $this->escapePdfString($stampText . ' (page ' . ($i + 1) . ')')
-                    ))
-                );
+        for ($i = 0; $i < $pageCount; $i++) {
+            $pageText = $stampText;
+            if ($pageCount > 1) {
+                $pageText .= ' (page ' . ($i + 1) . ')';
             }
+            $stamp .= sprintf(
+                "\n/Filter /FlateDecode\nstream\n%s\nendstream",
+                gzcompress(sprintf(
+                    "BT /F1 8 Tf 0.5 g\n30 20 Td (%s) Tj\nET\n",
+                    $this->escapePdfString($pageText)
+                ))
+            );
         }
 
         return str_replace(
@@ -144,8 +178,6 @@ class DownloadResourceFile
 
     private function escapePdfString(string $value): string
     {
-        $value = str_replace(['\\', '(', ')'], ['\\\\', '\\(', '\\)'], $value);
-
-        return $value;
+        return str_replace(['\\', '(', ')'], ['\\\\', '\\(', '\\)'], $value);
     }
 }

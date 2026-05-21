@@ -91,7 +91,17 @@
             <div class="bg-white shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     @if ($resources->isEmpty())
-                        <p class="text-sm text-gray-500" data-testid="resources-empty">No resources found.</p>
+                        <div class="text-center py-16">
+                            <svg class="mx-auto h-12 w-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/>
+                            </svg>
+                            <h3 class="mt-2 text-sm font-semibold text-gray-900">No resources found</h3>
+                            <p class="mt-1 text-sm text-gray-500">Be the first to share a reviewer, e-module, or textbook for your subject.</p>
+                            <a href="{{ route('resources.create') }}"
+                               class="mt-4 inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
+                                Upload a resource
+                            </a>
+                        </div>
                     @else
                         <ul class="divide-y divide-gray-100" data-testid="resources-list">
                             @foreach ($resources as $resource)
@@ -104,7 +114,7 @@
                                         <p class="text-xs text-gray-500 mt-0.5">
                                             {{ $resource->subject->code }} · {{ $resource->type->label() }}
                                             @if ($resource->program)
-                                                · {{ $resource->program->code }}
+                                                · <span class="inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium bg-indigo-50 text-indigo-700">{{ $resource->program->code }}</span>
                                             @endif
                                         </p>
                                         <p class="text-xs text-gray-400 mt-0.5">

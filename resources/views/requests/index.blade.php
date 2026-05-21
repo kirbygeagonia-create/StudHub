@@ -68,7 +68,17 @@
             <div class="bg-white shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900">
                     @if ($requests->isEmpty())
-                        <p class="text-sm text-gray-500" data-testid="requests-empty">No open requests found.</p>
+                        <div class="text-center py-16">
+                            <svg class="mx-auto h-12 w-12 text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/>
+                            </svg>
+                            <h3 class="mt-2 text-sm font-semibold text-gray-900">No open requests</h3>
+                            <p class="mt-1 text-sm text-gray-500">Need a reviewer or textbook? Your request will be auto-routed to programs that teach the same subject.</p>
+                            <a href="{{ route('requests.create') }}"
+                               class="mt-4 inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
+                                Post a request
+                            </a>
+                        </div>
                     @else
                         <ul class="divide-y divide-gray-100" data-testid="requests-list">
                             @foreach ($requests as $request)

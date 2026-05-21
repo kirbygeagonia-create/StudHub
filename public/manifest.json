@@ -1,0 +1,22 @@
+{
+    "name": "StudHub — SEAIT Academic Resource Exchange",
+    "short_name": "StudHub",
+    "description": "Cross-program academic resource exchange for SEAIT students",
+    "start_url": "/dashboard",
+    "display": "standalone",
+    "background_color": "#f8fafc",
+    "theme_color": "#4f46e5",
+    "orientation": "any",
+    "icons": [
+        {
+            "src": "/build/assets/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/build/assets/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
