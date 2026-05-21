@@ -10,7 +10,7 @@
 > colleges** — not just inside their own bubble.
 
 This repository now contains the **Laravel 11 application** for StudHub.
-Weeks 0–9 are complete with full CI. See
+Weeks 0–12 are complete with full CI. See
 [`docs/05-roadmap.md`](docs/05-roadmap.md) for the week-by-week
 build plan.
 
@@ -43,15 +43,27 @@ StudHub fixes this by combining three things:
 
 ## Status
 
-**Week 1 — Project skeleton.** Laravel 11 app, Docker compose dev
-stack, Pint + PHPStan/Larastan + Pest, GitHub Actions CI, empty
-domain folders. No business logic yet.
+**Week 12 — Pilot launch ready.** 221 Pest tests passing, PHPStan level 6 clean.
+All core features delivered: per-program chat, resource catalog, request board with
+cross-program auto-routing, karma/badges, lend tracking, moderation dashboard.
+See [`planning/session-handoff-2026-05-20.md`](planning/session-handoff-2026-05-20.md)
+for the latest state.
 
 ---
 
 ## Quickstart (dev)
 
-With Docker:
+### Without Docker (host PHP 8.2 + Composer + SQLite for dev)
+
+```bash
+cp .env.example .env
+composer install
+php artisan key:generate
+php artisan migrate
+php artisan serve
+```
+
+### With Docker
 
 ```bash
 cp .env.example .env
@@ -67,28 +79,58 @@ open http://localhost:8080    # Laravel welcome page
 open http://localhost:8025    # Mailpit web UI
 ```
 
-Without Docker (host PHP 8.3 + Composer + a local MySQL or sqlite):
-
-```bash
-cp .env.example .env
-composer install
-php artisan key:generate
-php artisan migrate
-php artisan serve
-```
-
 ## Dev commands
 
-| Command           | What it does                                   |
-| ----------------- | ---------------------------------------------- |
-| `composer lint`   | Apply Pint code style fixes                    |
-| `composer lint:check` | Check style without writing (used in CI)   |
-| `composer analyse`| Run PHPStan / Larastan                         |
-| `composer test`   | Run Pest test suite                            |
-| `composer ci`     | Lint check + analyse + test (full local CI)    |
-| `make ci`         | Same as `composer ci`                          |
+| Command | What it does |
+| --- | --- |
+| `composer lint` | Apply Pint code style fixes |
+| `composer lint:check` | Check style without writing (used in CI) |
+| `composer analyse` | Run PHPStan Level 6 |
+| `composer test` | Run 221 Pest tests (SQLite in-memory) |
+| `composer ci` | Lint check + analyse + test (full local CI) |
+| `make ci` | Same as `composer ci` |
+
+**Windows quick commands (PowerShell):**
+```powershell
+$env:Path = "C:\xampp\php;$env:Path"; php vendor/bin/pest
+$env:Path = "C:\xampp\php;$env:Path"; php vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+$env:Path = "C:\xampp\php;$env:Path"; php vendor/bin/pint --test
+```
 
 ---
+
+## Features (all delivered)
+
+| Feature | Domain | Status |
+|---------|--------|--------|
+| School-restricted email sign-up | Identity | ✅ |
+| Onboarding (program, year level, display name) | Identity | ✅ |
+| 3 user roles (Student, Moderator, Admin) | Identity | ✅ |
+| Per-program + per-year chat rooms | Chat | ✅ |
+| Real-time messaging via Reverb WebSockets | Chat | ✅ |
+| @display_name mentions with notifications | Chat | ✅ |
+| 25 MB file attachments (MIME-validated) | Chat | ✅ |
+| Subject-tagged resource catalog | Catalog | ✅ |
+| Full-text search across resources | Catalog | ✅ |
+| Personal shelves (save/bookmark resources) | Catalog | ✅ |
+| Request board with auto-routing engine | Requests | ✅ |
+| Weighted scoring: curriculum match + resources + fulfillment history | Requests | ✅ |
+| Offer/accept flow for matched requests | Requests | ✅ |
+| Karma system (5 events, atomic increment) | Reputation | ✅ |
+| Badge tiers (Bronze 25 / Silver 75 / Gold 150) | Reputation | ✅ |
+| Leaderboard by program | Reputation | ✅ |
+| Lend tracking + return reminders | Lends | ✅ |
+| Report system (messages, resources, users) | Moderation | ✅ |
+| Moderator program dashboard with SQL filtering | Moderation | ✅ |
+| Admin dashboard (signups, DAU, activity metrics) | Moderation | ✅ |
+| User suspension (blocked from HTTP + WebSockets) | Moderation | ✅ |
+| Audit log for all moderation actions | Moderation | ✅ |
+| Self-report prevention guard | Moderation | ✅ |
+| Report school-scope filtering (F17) | Moderation | ✅ |
+| Rate limiting on 20 POST routes | Security | ✅ |
+| MIME allow-list on uploads | Security | ✅ |
+| Daily DB backup + request expiration jobs | Operations | ✅ |
+| Landing page, Help page, AUP page | UX | ✅ |
 
 ## Planning docs (still relevant)
 
@@ -109,15 +151,13 @@ php artisan serve
 
 ## Project at a glance
 
-- **Stack:** PHP 8.3, Laravel 11, Laravel Reverb (real-time, lands in
-  Week 3), MySQL 8 / MariaDB 11, Redis 7, Livewire 3 + Alpine.js +
-  Tailwind, S3-compatible storage.
-- **Audience:** SEAIT students (CHED programs in v1; K–12 / TESDA
-  programs in v1.5). Multi-school multi-tenancy is not a goal.
-- **Colleges covered in MVP:** CICT, DCE, CBGG, CTE, CAF, CCJE — see
-  [docs/07-seait-context.md](docs/07-seait-context.md).
-- **Primary innovation:** Cross-program resource routing via a subject
-  graph — *not* "yet another chat app."
+- **Stack:** PHP 8.2, Laravel 11, Laravel Reverb (real-time), MySQL 8 / SQLite (tests),
+  Redis 7, Livewire 3 + Alpine.js + Tailwind.
+- **Tests:** 221 Pest tests (526 assertions), PHPStan Level 6, Pint PSR-12.
+- **Audience:** SEAIT students across 6 colleges, 26 programs.
+- **Pilot:** 3 programs — BSIT, BSCE, BSBA-MM.
+- **Primary innovation:** Cross-program resource routing via weighted scoring +
+  historical fulfillment rate — *not* "yet another chat app."
 
 ---
 

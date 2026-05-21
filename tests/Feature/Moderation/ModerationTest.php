@@ -1,5 +1,6 @@
 <?php
 
+use App\Domain\Catalog\Enums\ResourceAvailability;
 use App\Domain\Identity\Enums\UserRole;
 use App\Domain\Moderation\Actions\CreateReport;
 use App\Domain\Moderation\Actions\LogAudit;
@@ -408,4 +409,190 @@ it('User model has correct role helper methods', function () {
 
     expect($admin->isAdmin())->toBeTrue();
     expect($admin->isStudent())->toBeFalse();
+});
+
+it('prevents self-report via CreateReport action', function () {
+    $user = User::factory()->onboarded()->create();
+
+    expect(fn () => (new CreateReport)->handle($user, ReportedType::User, $user->id, 'spam'))
+        ->toThrow(RuntimeException::class);
+});
+
+it('prevents reporting own message', function () {
+    $user = User::factory()->onboarded()->create();
+
+    $room = ChatRoom::create([
+        'program_id' => $user->program_id,
+        'school_id' => $user->school_id,
+        'kind' => 'program',
+        'title' => 'Test Room',
+        'slug' => 'test-room-self',
+    ]);
+
+    $message = ChatMessage::create([
+        'chat_room_id' => $room->id,
+        'sender_id' => $user->id,
+        'body' => 'my own message',
+    ]);
+
+    expect(fn () => (new CreateReport)->handle($user, ReportedType::Message, $message->id, 'spam'))
+        ->toThrow(RuntimeException::class);
+});
+
+it('prevents reporting own resource', function () {
+    $user = User::factory()->onboarded()->create();
+    /** @var Subject $subject */
+    $subject = Subject::where('code', 'IT 211')->firstOrFail();
+    $resource = LearningResource::factory()->create([
+        'owner_user_id' => $user->id,
+        'school_id' => $user->school_id,
+        'subject_id' => $subject->id,
+        'program_id' => $user->program_id,
+    ]);
+
+    expect(fn () => (new CreateReport)->handle($user, ReportedType::Resource, $resource->id, 'spam'))
+        ->toThrow(RuntimeException::class);
+});
+
+it('snapshots message preview into audit log when report actioned on message', function () {
+    $moderator = User::factory()->onboarded()->create(['role' => UserRole::Moderator]);
+    $reporter = User::factory()->onboarded()->create();
+    $sender = User::factory()->onboarded()->create();
+
+    $room = ChatRoom::create([
+        'program_id' => $sender->program_id,
+        'school_id' => $sender->school_id,
+        'kind' => 'program',
+        'title' => 'Snapshot Room',
+        'slug' => 'snapshot-room',
+    ]);
+
+    $message = ChatMessage::create([
+        'chat_room_id' => $room->id,
+        'sender_id' => $sender->id,
+        'body' => 'this is the inappropriate content',
+    ]);
+
+    $report = (new CreateReport)->handle($reporter, ReportedType::Message, $message->id, 'harassment');
+
+    (new ResolveReport)->handle($moderator, $report, ReportStatus::Actioned, 'Hidden message');
+
+    expect(AuditLog::where('action', 'message.hide')->where('target_id', $message->id)->exists())->toBeTrue();
+});
+
+it('ResolveReport actioned on resource archives it', function () {
+    $moderator = User::factory()->onboarded()->create(['role' => UserRole::Moderator]);
+    $reporter = User::factory()->onboarded()->create();
+    $owner = User::factory()->onboarded()->create();
+    /** @var Subject $subject */
+    $subject = Subject::where('code', 'IT 211')->firstOrFail();
+    $resource = LearningResource::factory()->create([
+        'owner_user_id' => $owner->id,
+        'school_id' => $owner->school_id,
+        'subject_id' => $subject->id,
+        'program_id' => $owner->program_id,
+        'availability' => 'available',
+    ]);
+
+    $report = (new CreateReport)->handle($reporter, ReportedType::Resource, $resource->id, 'copyright');
+
+    (new ResolveReport)->handle($moderator, $report, ReportStatus::Actioned, 'Copyright violation');
+
+    expect($resource->refresh()->availability)->toBe(ResourceAvailability::Archived);
+    expect(AuditLog::where('action', 'resource.archive')->where('target_id', $resource->id)->exists())->toBeTrue();
+});
+
+it('SuspendUser accepts days and reason parameters', function () {
+    $moderator = User::factory()->onboarded()->create(['role' => UserRole::Moderator]);
+    $target = User::factory()->onboarded()->create();
+
+    (new SuspendUser)->handle($moderator, $target, 14, 'inappropriate behavior');
+
+    expect($target->refresh()->suspended_until)->not->toBeNull();
+    expect($target->refresh()->suspended_until->isFuture())->toBeTrue();
+});
+
+it('Report model returns correct status labels', function () {
+    $reporter = User::factory()->onboarded()->create();
+    $owner = User::factory()->onboarded()->create();
+    /** @var Subject $subject */
+    $subject = Subject::where('code', 'IT 211')->firstOrFail();
+    $resource = LearningResource::factory()->create([
+        'owner_user_id' => $owner->id,
+        'school_id' => $owner->school_id,
+        'subject_id' => $subject->id,
+        'program_id' => $owner->program_id,
+    ]);
+
+    $report = (new CreateReport)->handle($reporter, ReportedType::Resource, $resource->id, 'spam');
+
+    expect($report->status)->toBe(ReportStatus::Open);
+    expect($report->status->label())->toBe('Open');
+    expect($report->isOpen())->toBeTrue();
+
+    $moderator = User::factory()->onboarded()->create(['role' => UserRole::Moderator]);
+    (new ResolveReport)->handle($moderator, $report, ReportStatus::Dismissed);
+
+    expect($report->refresh()->isOpen())->toBeFalse();
+    expect($report->refresh()->status)->toBe(ReportStatus::Dismissed);
+});
+
+it('ReportSchoolScope filters reports by reporter school', function () {
+    $schoolASeeder = new SeaitSchoolSeeder;
+    $schoolASeeder->run();
+
+    $userA = User::factory()->onboarded()->create();
+    $reporterA = User::factory()->onboarded()->create();
+    /** @var Subject $subject */
+    $subject = Subject::where('code', 'IT 211')->firstOrFail();
+    $resourceA = LearningResource::factory()->create([
+        'owner_user_id' => $userA->id,
+        'school_id' => $userA->school_id,
+        'subject_id' => $subject->id,
+        'program_id' => $userA->program_id,
+    ]);
+
+    (new CreateReport)->handle($reporterA, ReportedType::Resource, $resourceA->id, 'spam');
+
+    $this->actingAs($reporterA);
+    expect(Report::count())->toBe(1);
+});
+
+it('non-moderator cannot resolve a report', function () {
+    $reporter = User::factory()->onboarded()->create();
+    $owner = User::factory()->onboarded()->create();
+    /** @var Subject $subject */
+    $subject = Subject::where('code', 'IT 211')->firstOrFail();
+    $resource = LearningResource::factory()->create([
+        'owner_user_id' => $owner->id,
+        'school_id' => $owner->school_id,
+        'subject_id' => $subject->id,
+        'program_id' => $owner->program_id,
+    ]);
+
+    $report = (new CreateReport)->handle($reporter, ReportedType::Resource, $resource->id, 'spam');
+    $student = User::factory()->onboarded()->create(['role' => UserRole::Student]);
+
+    $this->actingAs($student)
+        ->post(route('moderation.resolve', $report), [
+            'resolution' => 'actioned',
+        ])
+        ->assertForbidden();
+
+    expect($report->fresh()->isOpen())->toBeTrue();
+});
+
+it('isSuspended returns false for past suspensions', function () {
+    $user = User::factory()->onboarded()->create(['suspended_until' => now()->subMinute()]);
+    expect($user->isSuspended())->toBeFalse();
+});
+
+it('isSuspended returns true for future suspensions', function () {
+    $user = User::factory()->onboarded()->create(['suspended_until' => now()->addMinute()]);
+    expect($user->isSuspended())->toBeTrue();
+});
+
+it('isSuspended returns false when suspended_until is null', function () {
+    $user = User::factory()->onboarded()->create(['suspended_until' => null]);
+    expect($user->isSuspended())->toBeFalse();
 });

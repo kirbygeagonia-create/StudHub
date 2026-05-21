@@ -132,6 +132,10 @@
                 <div class="flex items-center gap-4">
                     <a href="{{ route('help') }}" class="text-sm text-slate-400 hover:text-slate-600 transition">Help</a>
                     <span class="text-slate-300">&middot;</span>
+                    @auth
+                        <a href="{{ route('feedback.create') }}" class="text-sm text-slate-400 hover:text-slate-600 transition">Feedback</a>
+                        <span class="text-slate-300">&middot;</span>
+                    @endauth
                     <a href="{{ route('aup') }}" class="text-sm text-slate-400 hover:text-slate-600 transition">Acceptable Use Policy</a>
                 </div>
             </div>

@@ -124,3 +124,40 @@ it('sorts leaderboard by karma descending', function () {
         ->assertOk()
         ->assertSeeInOrder(['Bob', 'Carol']);
 });
+
+it('KarmaEventReason returns correct points for each reason', function () {
+    expect(KarmaEventReason::ResourceUploaded->delta())->toBe(5);
+    expect(KarmaEventReason::ResourceSaved->delta())->toBe(5);
+    expect(KarmaEventReason::RequestFulfilled->delta())->toBe(10);
+    expect(KarmaEventReason::ChatMarkedHelpful->delta())->toBe(2);
+    expect(KarmaEventReason::ReportConfirmed->delta())->toBe(-5);
+});
+
+it('KarmaEventReason values returns all cases', function () {
+    $values = KarmaEventReason::values();
+    expect($values)->toContain('resource_uploaded');
+    expect($values)->toContain('resource_saved');
+    expect($values)->toContain('request_fulfilled');
+    expect($values)->toContain('report_confirmed');
+});
+
+it('BadgeTier labels are correct', function () {
+    expect(BadgeTier::Bronze->label())->toBe('Bronze');
+    expect(BadgeTier::Silver->label())->toBe('Silver');
+    expect(BadgeTier::Gold->label())->toBe('Gold');
+});
+
+it('BadgeTier threshold returns correct karma requirements', function () {
+    expect(BadgeTier::Bronze->threshold())->toBe(25);
+    expect(BadgeTier::Silver->threshold())->toBe(75);
+    expect(BadgeTier::Gold->threshold())->toBe(150);
+});
+
+it('BadgeTier fromKarma correctly resolves tiers', function () {
+    expect(BadgeTier::fromKarma(25))->toBe(BadgeTier::Bronze);
+    expect(BadgeTier::fromKarma(74))->toBe(BadgeTier::Bronze);
+    expect(BadgeTier::fromKarma(75))->toBe(BadgeTier::Silver);
+    expect(BadgeTier::fromKarma(149))->toBe(BadgeTier::Silver);
+    expect(BadgeTier::fromKarma(150))->toBe(BadgeTier::Gold);
+    expect(BadgeTier::fromKarma(500))->toBe(BadgeTier::Gold);
+});

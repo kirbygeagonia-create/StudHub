@@ -68,6 +68,9 @@
                         <x-dropdown-link :href="route('profile.edit')">
                             {{ __('Account settings') }}
                         </x-dropdown-link>
+                        <x-dropdown-link :href="route('feedback.create')">
+                            {{ __('Feedback') }}
+                        </x-dropdown-link>
 
                         <!-- Authentication -->
                         <form method="POST" action="{{ route('logout') }}">

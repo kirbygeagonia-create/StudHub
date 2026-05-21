@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\LendController;
 use App\Http\Controllers\ModerationController;
 use App\Http\Controllers\OnboardingController;
@@ -83,6 +84,11 @@ Route::middleware(['auth', 'verified', 'onboarded', 'not_suspended'])->group(fun
     Route::post('/reports', [ReportController::class, 'store'])
         ->middleware('throttle:10,1')
         ->name('reports.store');
+
+    Route::get('/feedback', [FeedbackController::class, 'create'])->name('feedback.create');
+    Route::post('/feedback', [FeedbackController::class, 'store'])
+        ->middleware('throttle:10,1')
+        ->name('feedback.store');
 });
 
 Route::middleware(['auth', 'verified', 'onboarded', 'role:moderator,admin'])->group(function () {

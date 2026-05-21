@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Domain\Moderation\Enums\ReportedType;
 use App\Domain\Moderation\Enums\ReportStatus;
+use App\Models\Scopes\ReportSchoolScope;
 use Database\Factories\ReportFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -14,6 +15,11 @@ class Report extends Model
 {
     /** @use HasFactory<ReportFactory> */
     use HasFactory;
+
+    protected static function booted(): void
+    {
+        static::addGlobalScope(new ReportSchoolScope);
+    }
 
     protected $fillable = [
         'reporter_user_id',

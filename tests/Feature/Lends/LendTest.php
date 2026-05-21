@@ -382,3 +382,10 @@ it('returns a resource via the return route', function () {
     expect($lend->refresh()->isReturned())->toBeTrue();
     expect($lend->refresh()->condition_on_return)->toBe(LendCondition::Good);
 });
+
+it('LendCondition enum has expected values', function () {
+    expect(LendCondition::LikeNew->value)->toBe('like_new');
+    expect(LendCondition::Good->value)->toBe('good');
+    expect(LendCondition::Worn->value)->toBe('worn');
+    expect(LendCondition::Damaged->value)->toBe('damaged');
+});

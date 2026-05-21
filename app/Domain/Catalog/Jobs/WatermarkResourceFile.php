@@ -112,29 +112,46 @@ class WatermarkResourceFile implements ShouldQueue
     }
 
     /**
-     * Generate a simple SVG placeholder thumbnail for PDF files.
-     * In production, swap this with Imagick or Ghostscript rendering.
+     * Generate a polished SVG thumbnail for PDF files.
+     * Shows title, page count, and a document icon.
+     * Ghostscript/Imagick rendering can replace this when installed.
      */
     private function generatePdfThumbnailSvg(string $title, int $pages): string
     {
         $safeTitle = htmlspecialchars(mb_substr($title, 0, 60));
+        $displayTitle = wordwrap($safeTitle, 18, "\n", true);
+        $titleLines = explode("\n", $displayTitle);
+        $titleSvg = '';
+        $y = 218;
+        foreach (array_slice($titleLines, 0, 2) as $line) {
+            $titleSvg .= '<text x="100" y="' . $y . '" font-family="sans-serif" font-size="8" fill="#495057" text-anchor="middle">' . htmlspecialchars($line) . '</text>';
+            $y += 10;
+        }
 
         return '<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="200" height="260" viewBox="0 0 200 260">
-  <rect width="200" height="260" rx="4" fill="#f8f9fa" stroke="#dee2e6" stroke-width="1"/>
-  <rect x="15" y="15" width="170" height="192" rx="2" fill="#ffffff" stroke="#e9ecef" stroke-width="1"/>
-  <line x1="30" y1="50" x2="170" y2="50" stroke="#e9ecef" stroke-width="2"/>
-  <line x1="30" y1="70" x2="150" y2="70" stroke="#e9ecef" stroke-width="2"/>
-  <line x1="30" y1="85" x2="160" y2="85" stroke="#e9ecef" stroke-width="2"/>
-  <line x1="30" y1="100" x2="140" y2="100" stroke="#e9ecef" stroke-width="2"/>
-  <line x1="30" y1="115" x2="155" y2="115" stroke="#e9ecef" stroke-width="2"/>
-  <line x1="30" y1="130" x2="145" y2="130" stroke="#e9ecef" stroke-width="2"/>
-  <line x1="30" y1="145" x2="165" y2="145" stroke="#e9ecef" stroke-width="2"/>
-  <line x1="30" y1="160" x2="135" y2="160" stroke="#e9ecef" stroke-width="2"/>
-  <line x1="30" y1="175" x2="150" y2="175" stroke="#e9ecef" stroke-width="2"/>
-  <rect x="40" y="215" width="120" height="16" rx="2" fill="#e9ecef"/>
-  <text x="100" y="236" font-family="sans-serif" font-size="8" fill="#6c757d" text-anchor="middle">' . $safeTitle . '</text>
-  <text x="100" y="250" font-family="sans-serif" font-size="7" fill="#adb5bd" text-anchor="middle">' . $pages . ' page' . ($pages > 1 ? 's' : '') . '</text>
+  <defs>
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#e63946;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#c1121f;stop-opacity:1"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="260" rx="6" fill="#ffffff" stroke="#dee2e6" stroke-width="1"/>
+  <rect width="200" height="36" rx="6" fill="url(#headerGrad)"/>
+  <rect y="30" width="200" height="6" fill="url(#headerGrad)"/>
+  <text x="100" y="24" font-family="sans-serif" font-size="10" fill="#ffffff" text-anchor="middle" font-weight="bold">PDF Document</text>
+  <rect x="30" y="52" width="140" height="148" rx="4" fill="#f8f9fa" stroke="#e9ecef" stroke-width="1"/>
+  <text x="44" y="74" font-family="sans-serif" font-size="24" fill="#adb5bd">&#x1F4C4;</text>
+  <line x1="44" y1="100" x2="156" y2="100" stroke="#dee2e6" stroke-width="3"/>
+  <line x1="44" y1="112" x2="130" y2="112" stroke="#dee2e6" stroke-width="2"/>
+  <line x1="44" y1="122" x2="140" y2="122" stroke="#dee2e6" stroke-width="2"/>
+  <line x1="44" y1="132" x2="120" y2="132" stroke="#dee2e6" stroke-width="2"/>
+  <line x1="44" y1="142" x2="135" y2="142" stroke="#dee2e6" stroke-width="2"/>
+  <line x1="44" y1="152" x2="110" y2="152" stroke="#dee2e6" stroke-width="2"/>
+  <line x1="44" y1="162" x2="145" y2="162" stroke="#dee2e6" stroke-width="2"/>
+  <line x1="44" y1="172" x2="125" y2="172" stroke="#dee2e6" stroke-width="2"/>
+  ' . $titleSvg . '
+  <text x="100" y="' . ($y + 2) . '" font-family="sans-serif" font-size="7" fill="#adb5bd" text-anchor="middle">' . $pages . ' page' . ($pages > 1 ? 's' : '') . '</text>
 </svg>';
     }
 }

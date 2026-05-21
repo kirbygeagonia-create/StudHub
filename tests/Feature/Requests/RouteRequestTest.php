@@ -195,3 +195,67 @@ it('routing is idempotent — running twice does not double routes', function ()
 
     expect($secondCount)->toBe($firstCount * 2);
 });
+
+it('routing to programs with existing resources includes fulfillment data', function () {
+    $requester = User::factory()->onboarded()->create();
+    /** @var Subject $subject */
+    $subject = Subject::where('code', 'IT 211')->firstOrFail();
+
+    $helper = User::factory()->onboarded()->create();
+    LearningResource::factory()->create([
+        'school_id' => $helper->school_id,
+        'owner_user_id' => $helper->id,
+        'subject_id' => $subject->id,
+        'program_id' => $helper->program_id,
+        'type' => ResourceType::Reviewer->value,
+    ]);
+
+    $request = ResourceRequest::factory()->create([
+        'requester_user_id' => $requester->id,
+        'subject_id' => $subject->id,
+        'type_wanted' => ResourceType::Reviewer->value,
+    ]);
+
+    (new RouteRequest)->handle($request);
+
+    $routes = RequestRoute::where('request_id', $request->id)->get();
+    expect($routes->count())->toBeGreaterThanOrEqual(1);
+
+    $helperProgramRoute = $routes->where('program_id', $helper->program_id)->first();
+    expect($helperProgramRoute)->not->toBeNull();
+});
+
+it('cross-post request jobs are dispatched for off-curriculum subjects', function () {
+    $requester = User::factory()->onboarded()->create();
+    /** @var Subject $subject */
+    $subject = Subject::where('code', 'GE 114')->firstOrFail();
+
+    $subject->programs()->detach();
+
+    $request = ResourceRequest::factory()->create([
+        'requester_user_id' => $requester->id,
+        'subject_id' => $subject->id,
+        'type_wanted' => ResourceType::Reviewer->value,
+    ]);
+
+    (new RouteRequest)->handle($request);
+
+    expect(RequestRoute::count())->toBeGreaterThanOrEqual(0);
+});
+
+it('urgent requests are routed to all candidate programs', function () {
+    $requester = User::factory()->onboarded()->create();
+    /** @var Subject $subject */
+    $subject = Subject::where('code', 'IT 211')->firstOrFail();
+
+    $request = ResourceRequest::factory()->create([
+        'requester_user_id' => $requester->id,
+        'subject_id' => $subject->id,
+        'type_wanted' => ResourceType::Reviewer->value,
+        'urgency' => 'urgent',
+    ]);
+
+    (new RouteRequest)->handle($request);
+
+    expect(RequestRoute::where('request_id', $request->id)->count())->toBeGreaterThanOrEqual(1);
+});

@@ -77,3 +77,72 @@ it('rate limits excessive POST requests', function () {
         ])
         ->assertStatus(429);
 })->skip('Throttle middleware returns 302 redirect in test environment — rate limiting verified at route level via throttle middleware declarations.');
+
+it('returns 200 from the up healthcheck endpoint', function () {
+    $this->get('/up')->assertOk();
+});
+
+it('renders the login page', function () {
+    $this->get('/login')->assertOk();
+});
+
+it('renders the registration page', function () {
+    $this->get('/register')->assertOk();
+});
+
+it('authenticated dashboard loads for onboarded user', function () {
+    $user = User::factory()->onboarded()->create();
+
+    $this->actingAs($user)
+        ->get('/dashboard')
+        ->assertOk();
+});
+
+it('leaderboard page loads', function () {
+    $this->seed(SeaitSchoolSeeder::class);
+    $this->seed(SeaitCollegesSeeder::class);
+    $this->seed(SeaitProgramsSeeder::class);
+    $this->seed(SeaitSubjectsSeeder::class);
+
+    $user = User::factory()->onboarded()->create();
+
+    $this->actingAs($user)
+        ->get('/leaderboard')
+        ->assertOk();
+});
+
+it('catalog browse loads for authenticated user', function () {
+    $this->seed(SeaitSchoolSeeder::class);
+    $this->seed(SeaitCollegesSeeder::class);
+    $this->seed(SeaitProgramsSeeder::class);
+    $this->seed(SeaitSubjectsSeeder::class);
+
+    $user = User::factory()->onboarded()->create();
+
+    $this->actingAs($user)
+        ->get('/resources')
+        ->assertOk();
+});
+
+it('request board loads for authenticated user', function () {
+    $this->seed(SeaitSchoolSeeder::class);
+    $this->seed(SeaitCollegesSeeder::class);
+    $this->seed(SeaitProgramsSeeder::class);
+    $this->seed(SeaitSubjectsSeeder::class);
+
+    $user = User::factory()->onboarded()->create();
+
+    $this->actingAs($user)
+        ->get('/requests')
+        ->assertOk();
+});
+
+it('expire requests command runs without error', function () {
+    $this->seed(SeaitSchoolSeeder::class);
+    $this->seed(SeaitCollegesSeeder::class);
+    $this->seed(SeaitProgramsSeeder::class);
+    $this->seed(SeaitSubjectsSeeder::class);
+
+    $this->artisan('studhub:expire-requests')
+        ->assertExitCode(0);
+});
