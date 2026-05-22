@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">{{ $user?->preferredDisplayName() ?? 'User' }}'s Profile</h2>
     </x-slot>
@@ -95,7 +95,7 @@
             </div>
 
             <div class="text-right">
-                <a href="{{ route('profile.show') }}" class="text-sm text-indigo-600 hover:text-indigo-900">
+                <a href="{{ route('profile.show') }}" class="text-sm text-seait-500 hover:text-seait-800">
                     &larr; Back to your profile
                 </a>
             </div>

@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ $request->subject->code }} — {{ $request->type_wanted }}
@@ -137,10 +137,10 @@
                         Expected return date
                     </label>
                     <input type="date" id="return_by" name="return_by"
-                           class="border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                           class="border-gray-300 rounded-md shadow-sm focus:ring-seait-400 focus:border-seait-400 text-sm">
                 </div>
                 <button type="submit"
-                        class="px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
+                        class="px-4 py-2 bg-seait-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-seait-600">
                     Record Lend
                 </button>
             </form>
@@ -157,7 +157,7 @@
                                 Your resource (optional)
                             </label>
                             <select id="resource_id" name="resource_id"
-                                    class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                                    class="w-full border-gray-300 rounded-md shadow-sm focus:ring-seait-400 focus:border-seait-400 text-sm">
                                 <option value="">No resource — just a message</option>
                                 @foreach ($userResources as $resource)
                                     <option value="{{ $resource->id }}" @selected(old('resource_id') == $resource->id)>
@@ -170,13 +170,13 @@
                         <div>
                             <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Message (optional)</label>
                             <textarea id="message" name="message" rows="2" maxlength="1000"
-                                      class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                                      class="w-full border-gray-300 rounded-md shadow-sm focus:ring-seait-400 focus:border-seait-400 text-sm"
                                       placeholder="I have a reviewer that covers this topic…">{{ old('message') }}</textarea>
                         </div>
 
                         <div class="flex justify-end">
                             <button type="submit"
-                                    class="px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
+                                    class="px-4 py-2 bg-seait-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-seait-600">
                                 Make offer
                             </button>
                         </div>
@@ -186,7 +186,7 @@
 
             <div class="text-right">
                 <a href="{{ route('requests.index') }}"
-                   class="text-sm text-indigo-600 hover:text-indigo-900">
+                   class="text-sm text-seait-500 hover:text-seait-800">
                     &larr; Back to request board
                 </a>
             </div>

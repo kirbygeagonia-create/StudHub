@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Chat') }}
@@ -25,7 +25,7 @@
                             @foreach ($rooms as $room)
                                 <li class="px-4 py-3 flex items-center justify-between">
                                     <div>
-                                        <a href="{{ route('chat.show', $room) }}" class="font-medium text-indigo-600 hover:text-indigo-900">
+                                        <a href="{{ route('chat.show', $room) }}" class="font-medium text-seait-500 hover:text-seait-800">
                                             #{{ $room->slug }}
                                         </a>
                                         <p class="text-xs text-gray-500">{{ $room->title }}</p>

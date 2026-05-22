@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             Help &amp; Guide
@@ -59,7 +59,7 @@
                 <h3 class="text-lg font-semibold text-gray-900 mb-4">Contact</h3>
                 <p class="text-sm text-gray-600">
                     For issues or questions, message a moderator in your program's chat room or email
-                    <a href="mailto:support@studhub.seait.local" class="text-indigo-600 hover:underline">support@studhub.seait.local</a>.
+                    <a href="mailto:support@studhub.seait.local" class="text-seait-500 hover:underline">support@studhub.seait.local</a>.
                 </p>
             </div>
         </div>

@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+﻿<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" x-data="{ dark: localStorage.getItem('dark') === 'true' }" x-init="$watch('dark', v => { localStorage.setItem('dark', v); document.documentElement.classList.toggle('dark', v) }); document.documentElement.classList.toggle('dark', dark)" :class="{ 'dark': dark }">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,7 +7,7 @@
 
         <link rel="icon" type="image/svg+xml" href="/favicon.svg">
         <link rel="manifest" href="/manifest.json">
-        <meta name="theme-color" content="#4f46e5">
+        <meta name="theme-color" content="#FF6B35">
         <meta name="color-scheme" content="light dark">
 
         <title>{{ config('app.name', 'Laravel') }}</title>
@@ -39,10 +39,10 @@
 
             <!-- PWA Install Banner -->
             <div id="pwa-install-banner"
-                 class="hidden fixed bottom-0 inset-x-0 z-50 bg-indigo-600 text-white px-4 py-3 flex items-center justify-between shadow-lg">
+                 class="hidden fixed bottom-0 inset-x-0 z-50 bg-seait-500 text-white px-4 py-3 flex items-center justify-between shadow-lg">
                 <p class="text-sm font-medium">Install StudHub for quick access</p>
                 <button onclick="installPwa()"
-                        class="ml-4 px-4 py-1.5 bg-white text-indigo-600 rounded-md text-sm font-semibold hover:bg-indigo-50">
+                        class="ml-4 px-4 py-1.5 bg-white text-seait-500 rounded-md text-sm font-semibold hover:bg-seait-50">
                     Install
                 </button>
             </div>

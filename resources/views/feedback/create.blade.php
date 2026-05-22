@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Feedback') }}
@@ -25,7 +25,7 @@
                         <div class="mb-4">
                             <x-input-label for="type" :value="__('Type')" />
                             <select id="type" name="type"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-seait-400 focus:ring-seait-400">
                                 <option value="feedback">General Feedback</option>
                                 <option value="bug">Bug Report</option>
                                 <option value="feature">Feature Request</option>
@@ -38,7 +38,7 @@
                         <div class="mb-4">
                             <x-input-label for="body" :value="__('Your feedback')" />
                             <textarea id="body" name="body" rows="5"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-seait-400 focus:ring-seait-400"
                                 placeholder="Describe what's on your mind..."
                                 maxlength="2000" required>{{ old('body') }}</textarea>
                             <x-input-error :messages="$errors->get('body')" class="mt-2" />

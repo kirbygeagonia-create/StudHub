@@ -1,11 +1,11 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 {{ __('Request Board') }}
             </h2>
             <a href="{{ route('requests.create') }}"
-               class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
+               class="inline-flex items-center px-4 py-2 bg-seait-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-seait-600">
                 + New request
             </a>
         </div>
@@ -18,7 +18,7 @@
                     <div>
                         <label for="subject_id" class="block text-xs font-medium text-gray-700 mb-1">Subject</label>
                         <select id="subject_id" name="subject_id"
-                                class="w-full border-gray-300 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                                class="w-full border-gray-300 rounded-md text-sm focus:ring-seait-400 focus:border-seait-400">
                             <option value="">All subjects</option>
                             @foreach ($subjects as $subject)
                                 <option value="{{ $subject->id }}" @selected(($filters['subject_id'] ?? '') == $subject->id)>
@@ -30,7 +30,7 @@
                     <div>
                         <label for="type_wanted" class="block text-xs font-medium text-gray-700 mb-1">Type wanted</label>
                         <select id="type_wanted" name="type_wanted"
-                                class="w-full border-gray-300 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                                class="w-full border-gray-300 rounded-md text-sm focus:ring-seait-400 focus:border-seait-400">
                             <option value="">All types</option>
                             @foreach ($types as $type)
                                 <option value="{{ $type->value }}" @selected(($filters['type_wanted'] ?? '') == $type->value)>
@@ -42,7 +42,7 @@
                     <div>
                         <label for="urgency" class="block text-xs font-medium text-gray-700 mb-1">Urgency</label>
                         <select id="urgency" name="urgency"
-                                class="w-full border-gray-300 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                                class="w-full border-gray-300 rounded-md text-sm focus:ring-seait-400 focus:border-seait-400">
                             <option value="">All</option>
                             @foreach ($urgencies as $urgency)
                                 <option value="{{ $urgency->value }}" @selected(($filters['urgency'] ?? '') == $urgency->value)>
@@ -54,11 +54,11 @@
                     <div></div>
                     <div class="flex items-end gap-2">
                         <button type="submit"
-                                class="w-full px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                                class="w-full px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-seait-400 focus:ring-offset-2">
                             Filter
                         </button>
                         <a href="{{ route('requests.index') }}"
-                           class="w-full px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest text-center shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                           class="w-full px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest text-center shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-seait-400 focus:ring-offset-2">
                             Clear
                         </a>
                     </div>
@@ -75,7 +75,7 @@
                             <h3 class="mt-2 text-sm font-semibold text-gray-900">No open requests</h3>
                             <p class="mt-1 text-sm text-gray-500">Need a reviewer or textbook? Your request will be auto-routed to programs that teach the same subject.</p>
                             <a href="{{ route('requests.create') }}"
-                               class="mt-4 inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
+                               class="mt-4 inline-flex items-center px-4 py-2 bg-seait-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-seait-600">
                                 Post a request
                             </a>
                         </div>
@@ -85,7 +85,7 @@
                                 <li class="py-4 flex items-start justify-between gap-4" data-testid="request-item">
                                     <div class="min-w-0">
                                         <a href="{{ route('requests.show', $request) }}"
-                                           class="font-medium text-indigo-600 hover:text-indigo-900 truncate block">
+                                           class="font-medium text-seait-500 hover:text-seait-800 truncate block">
                                             {{ $request->subject->code }} — {{ $request->type_wanted }}
                                         </a>
                                         <p class="text-xs text-gray-500 mt-0.5">

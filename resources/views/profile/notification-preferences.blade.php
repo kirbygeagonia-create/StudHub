@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight dark:text-gray-100">
             {{ __('Notification Preferences') }}
@@ -22,7 +22,7 @@
                             <div>
                                 <label class="inline-flex items-center">
                                     <input type="checkbox" name="only_urgent" value="1"
-                                           class="rounded border-gray-300 dark:border-gray-600 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                                           class="rounded border-gray-300 dark:border-gray-600 text-seait-500 shadow-sm focus:ring-seait-400"
                                            @checked(old('only_urgent', $prefs['only_urgent'] ?? false))>
                                     <span class="ms-2 text-sm text-gray-700 dark:text-gray-300">
                                         Only notify me about urgent requests
@@ -33,7 +33,7 @@
                             <div>
                                 <label class="inline-flex items-center">
                                     <input type="checkbox" name="digest_enabled" value="1"
-                                           class="rounded border-gray-300 dark:border-gray-600 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                                           class="rounded border-gray-300 dark:border-gray-600 text-seait-500 shadow-sm focus:ring-seait-400"
                                            @checked(old('digest_enabled', $prefs['digest_enabled'] ?? true))>
                                     <span class="ms-2 text-sm text-gray-700 dark:text-gray-300">
                                         Receive daily digest emails
@@ -49,7 +49,7 @@
                                 @foreach (\App\Models\Program::where('school_id', Auth::user()?->school_id)->where('is_active', true)->orderBy('code')->get(['id', 'code', 'name']) as $program)
                                     <label class="inline-flex items-center mr-4 mb-2">
                                         <input type="checkbox" name="muted_programs[]" value="{{ $program->id }}"
-                                               class="rounded border-gray-300 dark:border-gray-600 text-indigo-600 shadow-sm focus:ring-indigo-500"
+                                               class="rounded border-gray-300 dark:border-gray-600 text-seait-500 shadow-sm focus:ring-seait-400"
                                                @checked(in_array($program->id, $muted))>
                                         <span class="ms-1 text-sm text-gray-600 dark:text-gray-400">{{ $program->code }}</span>
                                     </label>

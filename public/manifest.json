@@ -4,8 +4,8 @@
     "description": "Cross-program academic resource exchange for SEAIT students",
     "start_url": "/dashboard",
     "display": "standalone",
-    "background_color": "#f8fafc",
-    "theme_color": "#4f46e5",
+    "background_color": "#F0F4F8",
+    "theme_color": "#FF6B35",
     "orientation": "any",
     "icons": [
         {

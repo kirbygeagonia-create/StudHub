@@ -1,4 +1,4 @@
-<x-guest-layout>
+﻿<x-guest-layout>
     <h1 class="text-xl font-semibold text-gray-800 mb-2">Welcome to StudHub</h1>
     <p class="text-sm text-gray-600 mb-6">
         Tell us which program you're in so we can route resources and requests
@@ -25,7 +25,7 @@
             <select id="program_id"
                     name="program_id"
                     required
-                    class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                    class="block mt-1 w-full border-gray-300 focus:border-seait-400 focus:ring-seait-400 rounded-md shadow-sm">
                 <option value="">Select your program…</option>
                 @foreach ($programs as $program)
                     <option value="{{ $program->id }}"
@@ -42,7 +42,7 @@
             <select id="year_level"
                     name="year_level"
                     required
-                    class="block mt-1 w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm">
+                    class="block mt-1 w-full border-gray-300 focus:border-seait-400 focus:ring-seait-400 rounded-md shadow-sm">
                 <option value="">Pick a year…</option>
                 @for ($y = $yearMin; $y <= $yearMax; $y++)
                     <option value="{{ $y }}" @selected(old('year_level') == $y)>Year {{ $y }}</option>

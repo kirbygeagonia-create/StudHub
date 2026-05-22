@@ -1,4 +1,4 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100 dark:bg-gray-800 dark:border-gray-700">
+﻿<nav x-data="{ open: false }" class="bg-navy-900 border-b border-navy-500 dark:bg-navy-900 dark:border-navy-500">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -45,12 +45,12 @@
                 <form method="GET" action="{{ route('search') }}" class="me-3">
                     <input type="text" name="q" value="{{ request('q') }}"
                            placeholder="Search..."
-                           class="w-40 rounded-md border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
+                           class="w-40 rounded-md border-navy-500 bg-navy-900 text-white placeholder-white/40 shadow-sm text-sm focus:border-seait-400 focus:ring-seait-400">
                 </form>
 
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150 dark:bg-gray-800 dark:text-gray-400 dark:hover:text-gray-200">
+                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white/70 bg-navy-900 hover:text-white focus:outline-none transition ease-in-out duration-150 dark:bg-navy-900 dark:text-white/70 dark:hover:text-white">
                             <div>{{ Auth::user()?->name ?? 'Guest' }}</div>
 
                             <div class="ms-1">

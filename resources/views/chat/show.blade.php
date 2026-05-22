@@ -1,10 +1,10 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <div class="flex items-center justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 #{{ $room->slug }} <span class="text-gray-400 text-sm">— {{ $room->title }}</span>
             </h2>
-            <a href="{{ route('chat.index') }}" class="text-sm text-indigo-600 hover:text-indigo-900">All rooms</a>
+            <a href="{{ route('chat.index') }}" class="text-sm text-seait-500 hover:text-seait-800">All rooms</a>
         </div>
     </x-slot>
 

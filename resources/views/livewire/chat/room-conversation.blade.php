@@ -1,4 +1,4 @@
-<div class="space-y-4" wire:poll.10s>
+﻿<div class="space-y-4" wire:poll.10s>
     <div data-testid="chat-message-list" class="h-96 overflow-y-auto border border-gray-100 rounded-lg p-4 bg-gray-50 space-y-3">
         @forelse ($this->roomMessages as $message)
             <article class="text-sm" data-testid="chat-message">
@@ -12,7 +12,7 @@
                 <p class="text-gray-700 whitespace-pre-wrap">{{ $message->body }}</p>
                 @if ($message->hasAttachment())
                     <p class="mt-1 text-xs">
-                        <a href="{{ $message->attachment_url }}" target="_blank" class="text-indigo-600 hover:text-indigo-900">
+                        <a href="{{ $message->attachment_url }}" target="_blank" class="text-seait-500 hover:text-seait-800">
                             Attachment ({{ $message->attachment_mime ?? 'file' }})
                         </a>
                     </p>
@@ -55,7 +55,7 @@
                 id="chat-body"
                 wire:model="body"
                 rows="2"
-                class="w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                class="w-full rounded-md border-gray-300 shadow-sm focus:border-seait-100 focus:ring focus:ring-seait-100 focus:ring-opacity-50"
                 placeholder="Type a message. Use @display_name to mention someone."
             ></textarea>
             @error('body') <span class="text-xs text-red-600">{{ $message }}</span> @enderror

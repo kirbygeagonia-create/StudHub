@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">Profile</h2>
     </x-slot>
@@ -72,7 +72,7 @@
                 </dl>
 
                 <div class="mt-6 flex items-center gap-3">
-                    <a href="{{ route('profile.edit') }}" class="text-sm text-indigo-600 hover:underline">
+                    <a href="{{ route('profile.edit') }}" class="text-sm text-seait-500 hover:underline">
                         Edit account settings
                     </a>
                     @if (auth()->id() !== ($user?->id ?? -1))

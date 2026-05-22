@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Search') }}
@@ -11,9 +11,9 @@
                 <div class="flex gap-3">
                     <input type="text" name="q" value="{{ $query }}"
                            placeholder="Search resources, requests, messages..."
-                           class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                           class="flex-1 rounded-md border-gray-300 shadow-sm focus:border-seait-400 focus:ring-seait-400">
                     <button type="submit"
-                            class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700">
+                            class="inline-flex items-center px-4 py-2 bg-seait-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-seait-600">
                         Search
                     </button>
                 </div>
@@ -34,8 +34,8 @@
                         <div class="space-y-3 mb-8">
                             @foreach ($resources as $resource)
                                 <a href="{{ route('resources.show', $resource) }}"
-                                   class="block p-4 bg-white rounded-lg border border-gray-200 hover:border-indigo-300 transition">
-                                    <div class="font-medium text-indigo-700">{{ $resource->title }}</div>
+                                   class="block p-4 bg-white rounded-lg border border-gray-200 hover:border-seait-100 transition">
+                                    <div class="font-medium text-seait-600">{{ $resource->title }}</div>
                                     <div class="text-sm text-gray-500 mt-1">
                                         {{ $resource->subject?->code }} &middot;
                                         {{ $resource->type->label() }} &middot;
@@ -51,8 +51,8 @@
                         <div class="space-y-3 mb-8">
                             @foreach ($requests as $request)
                                 <a href="{{ route('requests.show', $request) }}"
-                                   class="block p-4 bg-white rounded-lg border border-gray-200 hover:border-indigo-300 transition">
-                                    <div class="font-medium text-indigo-700">{{ $request->title }}</div>
+                                   class="block p-4 bg-white rounded-lg border border-gray-200 hover:border-seait-100 transition">
+                                    <div class="font-medium text-seait-600">{{ $request->title }}</div>
                                     <div class="text-sm text-gray-500 mt-1">
                                         {{ $request->subject?->code }} &middot;
                                         {{ $request->status->label() }} &middot;
@@ -68,7 +68,7 @@
                         <div class="space-y-3 mb-8">
                             @foreach ($messages as $message)
                                 <a href="{{ route('chat.show', $message->room) }}"
-                                   class="block p-4 bg-white rounded-lg border border-gray-200 hover:border-indigo-300 transition">
+                                   class="block p-4 bg-white rounded-lg border border-gray-200 hover:border-seait-100 transition">
                                     <div class="font-medium text-gray-800">{{ Str::limit($message->body, 120) }}</div>
                                     <div class="text-sm text-gray-500 mt-1">
                                         in {{ $message->room?->title }} &middot;

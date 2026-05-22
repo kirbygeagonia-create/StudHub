@@ -1,4 +1,4 @@
-<x-app-layout>
+﻿<x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Top Sharers') }}
@@ -11,7 +11,7 @@
                 <form method="GET" action="{{ route('leaderboard') }}" class="mb-6">
                     <label for="program_id" class="block text-xs font-medium text-gray-700 mb-1">Program</label>
                     <select id="program_id" name="program_id"
-                            class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm"
+                            class="w-full border-gray-300 rounded-md shadow-sm focus:ring-seait-400 focus:border-seait-400 text-sm"
                             onchange="this.form.submit()">
                         @foreach ($programs as $program)
                             <option value="{{ $program->id }}" @selected($selectedProgramId == $program->id)>

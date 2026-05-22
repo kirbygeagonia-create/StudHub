@@ -1,4 +1,4 @@
-<div class="space-y-4">
+﻿<div class="space-y-4">
     @if (session('status'))
         <div class="rounded-md bg-green-50 border border-green-200 p-3 text-sm text-green-800">
             {{ session('status') }}
@@ -10,7 +10,7 @@
             <div class="sm:col-span-2">
                 <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Title</label>
                 <input type="text" id="title" wire:model="title"
-                       class="w-full border-gray-300 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                       class="w-full border-gray-300 rounded-md text-sm focus:ring-seait-400 focus:border-seait-400"
                        placeholder="e.g. DSA midterm reviewer (sorting + trees)" />
                 @error('title') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
             </div>
@@ -19,18 +19,18 @@
                 <label for="subject_id_search" class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
                 <input type="text" id="subject_id_search" x-model="query" @input="search()" @focus="open = true" @click.away="open = false"
                        placeholder="Type to search subjects..."
-                       class="w-full border-gray-300 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                       class="w-full border-gray-300 rounded-md text-sm focus:ring-seait-400 focus:border-seait-400">
                 <ul x-show="open && filtered.length > 0 && !selectedId"
                     x-cloak
                     class="mt-1 max-h-48 overflow-y-auto bg-white border border-gray-300 rounded-md shadow-sm text-sm divide-y divide-gray-100">
                     <template x-for="subject in filtered" :key="subject.id">
                         <li @click="pick(subject)"
-                            class="px-3 py-2 hover:bg-indigo-50 cursor-pointer"
+                            class="px-3 py-2 hover:bg-seait-50 cursor-pointer"
                             x-text="subject.code + ' — ' + subject.name">
                         </li>
                     </template>
                 </ul>
-                <p x-show="selectedId" class="mt-1 text-xs text-indigo-600">
+                <p x-show="selectedId" class="mt-1 text-xs text-seait-500">
                     Selected: <span x-text="selectedLabel"></span>
                     <button @click="clear()" type="button" class="ml-1 text-red-500 hover:underline">Change</button>
                 </p>
@@ -82,7 +82,7 @@
             <div>
                 <label for="type" class="block text-sm font-medium text-gray-700 mb-1">Type</label>
                 <select id="type" wire:model="type"
-                        class="w-full border-gray-300 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                        class="w-full border-gray-300 rounded-md text-sm focus:ring-seait-400 focus:border-seait-400">
                     @foreach ($this->types as $type)
                         <option value="{{ $type->value }}">{{ $type->label() }}</option>
                     @endforeach
@@ -93,14 +93,14 @@
             <div>
                 <label for="course_code" class="block text-sm font-medium text-gray-700 mb-1">Course code <span class="text-gray-400">(optional)</span></label>
                 <input type="text" id="course_code" wire:model="course_code" placeholder="e.g. IT 211"
-                       class="w-full border-gray-300 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500" />
+                       class="w-full border-gray-300 rounded-md text-sm focus:ring-seait-400 focus:border-seait-400" />
                 @error('course_code') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
             </div>
 
             <div>
                 <label for="year_level" class="block text-sm font-medium text-gray-700 mb-1">Year level taken</label>
                 <select id="year_level" wire:model="year_level"
-                        class="w-full border-gray-300 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                        class="w-full border-gray-300 rounded-md text-sm focus:ring-seait-400 focus:border-seait-400">
                     <option value="">—</option>
                     @for ($y = 1; $y <= 5; $y++)
                         <option value="{{ $y }}">Year {{ $y }}</option>
@@ -112,7 +112,7 @@
             <div>
                 <label for="availability" class="block text-sm font-medium text-gray-700 mb-1">Availability</label>
                 <select id="availability" wire:model="availability"
-                        class="w-full border-gray-300 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                        class="w-full border-gray-300 rounded-md text-sm focus:ring-seait-400 focus:border-seait-400">
                     @foreach ($this->availabilities as $availability)
                         <option value="{{ $availability->value }}">{{ $availability->label() }}</option>
                     @endforeach
@@ -123,7 +123,7 @@
             <div>
                 <label for="visibility" class="block text-sm font-medium text-gray-700 mb-1">Visibility</label>
                 <select id="visibility" wire:model="visibility"
-                        class="w-full border-gray-300 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                        class="w-full border-gray-300 rounded-md text-sm focus:ring-seait-400 focus:border-seait-400">
                     @foreach ($this->visibilities as $visibility)
                         <option value="{{ $visibility->value }}">{{ $visibility->label() }}</option>
                     @endforeach
@@ -134,7 +134,7 @@
             <div class="sm:col-span-2">
                 <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Description <span class="text-gray-400">(optional)</span></label>
                 <textarea id="description" wire:model="description" rows="4"
-                          class="w-full border-gray-300 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500"
+                          class="w-full border-gray-300 rounded-md text-sm focus:ring-seait-400 focus:border-seait-400"
                           placeholder="What's inside? What topics does it cover?"></textarea>
                 @error('description') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
             </div>
@@ -151,7 +151,7 @@
         <div class="flex items-center justify-end gap-3 border-t border-gray-100 pt-4">
             <a href="{{ route('resources.index') }}" class="text-sm text-gray-500 hover:text-gray-700">Cancel</a>
             <button type="submit" wire:loading.attr="disabled"
-                    class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 disabled:opacity-50">
+                    class="inline-flex items-center px-4 py-2 bg-seait-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-seait-600 disabled:opacity-50">
                 <span wire:loading.remove>Post resource</span>
                 <span wire:loading>Posting…</span>
             </button>
