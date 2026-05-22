@@ -37,6 +37,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'last_seen_at',
         'onboarded_at',
         'suspended_until',
+        'student_number',
+        'notification_preferences',
     ];
 
     /**
@@ -61,6 +63,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'role' => UserRole::class,
             'year_level' => 'integer',
             'karma' => 'integer',
+            'notification_preferences' => 'array',
         ];
     }
 

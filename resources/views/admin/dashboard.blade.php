@@ -69,6 +69,60 @@
             </div>
 
             <div class="bg-white shadow-sm sm:rounded-lg p-6">
+                <h3 class="text-sm font-semibold text-gray-800 mb-4">Colleges Overview</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left">
+                        <thead>
+                            <tr class="border-b border-gray-200">
+                                <th class="py-2 pr-4 font-medium text-gray-600">College</th>
+                                <th class="py-2 pr-4 font-medium text-gray-600">Code</th>
+                                <th class="py-2 pr-4 font-medium text-gray-600">Programs</th>
+                                <th class="py-2 pr-4 font-medium text-gray-600">Active Users</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($collegeStats as $college)
+                                <tr class="border-b border-gray-100">
+                                    <td class="py-2 pr-4 text-gray-900">{{ $college->name }}</td>
+                                    <td class="py-2 pr-4 text-gray-600">{{ $college->code }}</td>
+                                    <td class="py-2 pr-4 text-gray-600">{{ $college->program_count }}</td>
+                                    <td class="py-2 pr-4 text-gray-600">{{ $college->active_user_count }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-white shadow-sm sm:rounded-lg p-6">
+                <h3 class="text-sm font-semibold text-gray-800 mb-4">Cross-Program Flow (Top 10)</h3>
+                @if ($crossProgramFlows->isEmpty())
+                    <p class="text-sm text-gray-500">No cross-program resource sharing yet.</p>
+                @else
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead>
+                                <tr class="border-b border-gray-200">
+                                    <th class="py-2 pr-4 font-medium text-gray-600">From Program</th>
+                                    <th class="py-2 pr-4 font-medium text-gray-600">To Program</th>
+                                    <th class="py-2 pr-4 font-medium text-gray-600">Resources Shared</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($crossProgramFlows as $flow)
+                                    <tr class="border-b border-gray-100">
+                                        <td class="py-2 pr-4 text-gray-900">{{ $flow->from_program }}</td>
+                                        <td class="py-2 pr-4 text-gray-900">{{ $flow->to_program }}</td>
+                                        <td class="py-2 pr-4 text-gray-600">{{ $flow->count }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+            </div>
+
+            <div class="bg-white shadow-sm sm:rounded-lg p-6">
                 <h3 class="text-sm font-semibold text-gray-800 mb-4">Assign Program Moderator</h3>
                 <form method="POST" action="{{ route('admin.moderators.assign') }}" class="space-y-3">
                     @csrf

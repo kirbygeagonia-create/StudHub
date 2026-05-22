@@ -24,6 +24,12 @@
         </div>
 
         <div>
+            <x-input-label for="student_number" :value="__('Student Number')" />
+            <x-text-input id="student_number" name="student_number" type="text" class="mt-1 block w-full" :value="old('student_number', $user->student_number)" maxlength="20" />
+            <x-input-error class="mt-2" :messages="$errors->get('student_number')" />
+        </div>
+
+        <div>
             <x-input-label for="email" :value="__('Email')" />
             <x-text-input id="email" name="email" type="email" class="mt-1 block w-full" :value="old('email', $user->email)" required autocomplete="username" />
             <x-input-error class="mt-2" :messages="$errors->get('email')" />

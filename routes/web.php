@@ -42,6 +42,9 @@ Route::middleware(['auth', 'verified', 'onboarded', 'not_suspended'])->group(fun
     Route::post('/resources/{resource}/toggle-save', [ResourceController::class, 'toggleSave'])
         ->middleware('throttle:30,1')
         ->name('resources.toggle-save');
+    Route::post('/resources/{resource}/mark-helpful', [ResourceController::class, 'markHelpful'])
+        ->middleware('throttle:30,1')
+        ->name('resources.mark-helpful');
     Route::get('/my-shelf', [ResourceController::class, 'shelf'])->name('resources.shelf');
 
     Route::get('/requests', [RequestController::class, 'index'])->name('requests.index');
@@ -73,6 +76,11 @@ Route::middleware(['auth', 'verified', 'onboarded', 'not_suspended'])->group(fun
     Route::patch('/profile', [ProfileController::class, 'update'])
         ->middleware('throttle:10,1')
         ->name('profile.update');
+    Route::get('/notification-preferences', [ProfileController::class, 'notificationPreferences'])
+        ->name('profile.notification-preferences');
+    Route::post('/notification-preferences', [ProfileController::class, 'updateNotificationPreferences'])
+        ->middleware('throttle:10,1')
+        ->name('profile.notification-preferences.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])
         ->middleware('throttle:5,1')
         ->name('profile.destroy');

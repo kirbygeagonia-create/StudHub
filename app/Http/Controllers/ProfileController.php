@@ -123,6 +123,48 @@ class ProfileController extends Controller
     }
 
     /**
+     * Show notification preferences form.
+     */
+    public function notificationPreferences(Request $request): View
+    {
+        $user = $request->user();
+        $prefs = $user?->notification_preferences;
+
+        return view('profile.notification-preferences', [
+            'user' => $user,
+            'prefs' => $prefs,
+        ]);
+    }
+
+    /**
+     * Update notification preferences.
+     */
+    public function updateNotificationPreferences(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+        abort_unless($user !== null, 403);
+
+        $validated = $request->validate([
+            'only_urgent' => ['nullable', 'boolean'],
+            'muted_programs' => ['nullable', 'array'],
+            'muted_programs.*' => ['integer', 'exists:programs,id'],
+            'digest_enabled' => ['nullable', 'boolean'],
+        ]);
+
+        $prefs = [
+            'only_urgent' => (bool) ($validated['only_urgent'] ?? false),
+            'muted_programs' => $validated['muted_programs'] ?? [],
+            'digest_enabled' => (bool) ($validated['digest_enabled'] ?? true),
+        ];
+
+        $user->fill(['notification_preferences' => $prefs])->save();
+
+        session()->flash('status', 'Notification preferences updated.');
+
+        return Redirect::route('profile.notification-preferences');
+    }
+
+    /**
      * Delete the user's account.
      */
     public function destroy(Request $request): RedirectResponse

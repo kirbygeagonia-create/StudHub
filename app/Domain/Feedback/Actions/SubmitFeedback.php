@@ -10,11 +10,11 @@ use RuntimeException;
 class SubmitFeedback
 {
     /**
-     * @param  array{b?: string, type?: string}  $data
+     * @param  array{body?: string, type?: string}  $data
      */
     public function handle(User $user, array $data): Feedback
     {
-        $body = trim($data['b'] ?? '');
+        $body = trim($data['body'] ?? '');
 
         if ($body === '' || mb_strlen($body) < 5) {
             throw new RuntimeException('Feedback must be at least 5 characters.');

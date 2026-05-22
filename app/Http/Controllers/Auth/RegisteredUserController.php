@@ -40,6 +40,7 @@ class RegisteredUserController extends Controller
                 new AllowedSchoolEmailDomain,
             ],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'student_number' => ['nullable', 'string', 'max:20'],
         ]);
 
         $school = School::where('code', 'SEAIT')->first();
@@ -50,6 +51,7 @@ class RegisteredUserController extends Controller
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'role' => UserRole::Student->value,
+            'student_number' => $validated['student_number'] ?? null,
         ]);
 
         event(new Registered($user));

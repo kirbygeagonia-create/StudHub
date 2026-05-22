@@ -9,6 +9,13 @@
             <x-input-error :messages="$errors->get('name')" class="mt-2" />
         </div>
 
+        <!-- Student Number -->
+        <div class="mt-4">
+            <x-input-label for="student_number" :value="__('Student Number (optional)')" />
+            <x-text-input id="student_number" class="block mt-1 w-full" type="text" name="student_number" :value="old('student_number')" maxlength="20" placeholder="e.g. SEAIT-2024-001" />
+            <x-input-error :messages="$errors->get('student_number')" class="mt-2" />
+        </div>
+
         <!-- Email Address -->
         <div class="mt-4">
             <x-input-label for="email" :value="__('Email')" />

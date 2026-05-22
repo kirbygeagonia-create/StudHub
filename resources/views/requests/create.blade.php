@@ -21,18 +21,61 @@
                         </div>
                     @endif
 
-                    <div>
+                    <div x-data="subjectAutocomplete()">
                         <label for="subject_id" class="block text-sm font-medium text-gray-700 mb-1">Subject *</label>
-                        <select id="subject_id" name="subject_id" required
-                                class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
-                            <option value="">Select a subject</option>
-                            @foreach ($subjects as $subject)
-                                <option value="{{ $subject->id }}" @selected(old('subject_id') == $subject->id)>
-                                    {{ $subject->code }} — {{ $subject->name }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <input type="text" x-model="query" @input="search()" @focus="open = true" @click.away="open = false"
+                               placeholder="Type to search subjects..."
+                               class="w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                        <input type="hidden" name="subject_id" x-model="selectedId">
+                        <ul x-show="open && filtered.length > 0 && !selectedId"
+                            x-cloak
+                            class="mt-1 max-h-48 overflow-y-auto bg-white border border-gray-300 rounded-md shadow-sm text-sm divide-y divide-gray-100">
+                            <template x-for="subject in filtered" :key="subject.id">
+                                <li @click="pick(subject)"
+                                    class="px-3 py-2 hover:bg-indigo-50 cursor-pointer"
+                                    x-text="subject.code + ' — ' + subject.name">
+                                </li>
+                            </template>
+                        </ul>
+                        <p x-show="selectedId" class="mt-1 text-xs text-indigo-600">
+                            Selected: <span x-text="selectedLabel"></span>
+                            <button @click="clear()" type="button" class="ml-1 text-red-500 hover:underline">Change</button>
+                        </p>
+                        @error('subject_id') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                     </div>
+
+                    @push('scripts')
+                    <script>
+                        function subjectAutocomplete() {
+                            return {
+                                subjects: @json($subjects->map(fn($s) => ['id' => $s->id, 'code' => $s->code, 'name' => $s->name])),
+                                query: '',
+                                selectedId: '',
+                                selectedLabel: '',
+                                open: false,
+                                get filtered() {
+                                    if (!this.query) return this.subjects;
+                                    const q = this.query.toLowerCase();
+                                    return this.subjects.filter(s =>
+                                        s.code.toLowerCase().includes(q) || s.name.toLowerCase().includes(q)
+                                    );
+                                },
+                                search() { this.open = true; },
+                                pick(subject) {
+                                    this.selectedId = subject.id;
+                                    this.selectedLabel = subject.code + ' — ' + subject.name;
+                                    this.query = '';
+                                    this.open = false;
+                                },
+                                clear() {
+                                    this.selectedId = '';
+                                    this.selectedLabel = '';
+                                    this.query = '';
+                                }
+                            }
+                        }
+                    </script>
+                    @endpush
 
                     <div>
                         <label for="type_wanted" class="block text-sm font-medium text-gray-700 mb-1">Type wanted *</label>

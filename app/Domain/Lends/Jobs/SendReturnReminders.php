@@ -31,6 +31,13 @@ class SendReturnReminders implements ShouldQueue
 
                 try {
                     $lend->toUser->notify(new ReturnReminder($lend));
+
+                    $lend->increment('reminder_count');
+
+                    if ($lend->needsEscalation()) {
+                        $lend->escalate();
+                        Log::info('Lend escalated after 3+ reminders.', ['lend_id' => $lend->id]);
+                    }
                 } catch (\Throwable $e) {
                     Log::error('Failed to send return reminder notification.', [
                         'lend_id' => $lend->id,

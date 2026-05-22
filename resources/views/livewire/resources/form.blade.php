@@ -15,17 +15,69 @@
                 @error('title') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
             </div>
 
-            <div>
-                <label for="subject_id" class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
-                <select id="subject_id" wire:model="subject_id"
-                        class="w-full border-gray-300 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500">
-                    <option value="">— pick a subject —</option>
-                    @foreach ($this->subjects as $subject)
-                        <option value="{{ $subject->id }}">{{ $subject->code }} — {{ $subject->name }}</option>
-                    @endforeach
-                </select>
+            <div x-data="subjectAutocomplete2()">
+                <label for="subject_id_search" class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                <input type="text" id="subject_id_search" x-model="query" @input="search()" @focus="open = true" @click.away="open = false"
+                       placeholder="Type to search subjects..."
+                       class="w-full border-gray-300 rounded-md text-sm focus:ring-indigo-500 focus:border-indigo-500">
+                <ul x-show="open && filtered.length > 0 && !selectedId"
+                    x-cloak
+                    class="mt-1 max-h-48 overflow-y-auto bg-white border border-gray-300 rounded-md shadow-sm text-sm divide-y divide-gray-100">
+                    <template x-for="subject in filtered" :key="subject.id">
+                        <li @click="pick(subject)"
+                            class="px-3 py-2 hover:bg-indigo-50 cursor-pointer"
+                            x-text="subject.code + ' — ' + subject.name">
+                        </li>
+                    </template>
+                </ul>
+                <p x-show="selectedId" class="mt-1 text-xs text-indigo-600">
+                    Selected: <span x-text="selectedLabel"></span>
+                    <button @click="clear()" type="button" class="ml-1 text-red-500 hover:underline">Change</button>
+                </p>
                 @error('subject_id') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
             </div>
+
+            @push('scripts')
+            <script>
+                function subjectAutocomplete2() {
+                    return {
+                        subjects: @json($this->subjects->map(fn($s) => ['id' => $s->id, 'code' => $s->code, 'name' => $s->name])),
+                        query: '',
+                        selectedId: @json($subject_id ?? ''),
+                        selectedLabel: '',
+                        open: false,
+                        init() {
+                            if (this.selectedId) {
+                                const s = this.subjects.find(x => x.id == this.selectedId);
+                                if (s) this.selectedLabel = s.code + ' — ' + s.name;
+                            }
+                            this.$watch('selectedId', v => { document.getElementById('subject_id_hidden').value = v; });
+                        },
+                        get filtered() {
+                            if (!this.query) return this.subjects.slice(0, 50);
+                            const q = this.query.toLowerCase();
+                            return this.subjects.filter(s =>
+                                s.code.toLowerCase().includes(q) || s.name.toLowerCase().includes(q)
+                            ).slice(0, 50);
+                        },
+                        search() { this.open = true; },
+                        pick(subject) {
+                            this.selectedId = subject.id;
+                            this.selectedLabel = subject.code + ' — ' + subject.name;
+                            this.query = '';
+                            this.open = false;
+                            setTimeout(() => { this.$el.closest('form').dispatchEvent(new Event('input', { bubbles: true })); }, 0);
+                        },
+                        clear() {
+                            this.selectedId = '';
+                            this.selectedLabel = '';
+                            this.query = '';
+                        }
+                    }
+                }
+            </script>
+            @endpush
+            <input type="hidden" id="subject_id_hidden" wire:model="subject_id" />
 
             <div>
                 <label for="type" class="block text-sm font-medium text-gray-700 mb-1">Type</label>

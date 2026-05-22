@@ -11,6 +11,7 @@ use App\Models\Program;
 use App\Models\Subject;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -133,5 +134,23 @@ class ResourceController extends Controller
         }
 
         return $downloader->handle($user, $resource);
+    }
+
+    public function markHelpful(Request $request, LearningResource $resource): RedirectResponse
+    {
+        $user = $request->user();
+        abort_unless($user !== null, 403);
+
+        if ($resource->school_id !== $user->school_id) {
+            throw new NotFoundHttpException;
+        }
+
+        DB::transaction(function () use ($resource): void {
+            $resource->increment('helpful_count');
+        });
+
+        session()->flash('status', 'Marked as helpful!');
+
+        return redirect()->back();
     }
 }

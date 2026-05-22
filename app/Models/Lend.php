@@ -9,6 +9,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @method Builder dueSoon(int $days = 2)
+ */
 class Lend extends Model
 {
     /** @use HasFactory<LendFactory> */
@@ -102,6 +105,26 @@ class Lend extends Model
         $dueIn = (int) now()->startOfDay()->diffInDays($this->return_by, false);
 
         return $dueIn >= 0 && $dueIn <= $days;
+    }
+
+    public function isEscalated(): bool
+    {
+        return $this->escalated_at !== null;
+    }
+
+    public function needsEscalation(): bool
+    {
+        return ! $this->isReturned()
+            && ! $this->isEscalated()
+            && ($this->reminder_count ?? 0) >= 3;
+    }
+
+    public function escalate(): void
+    {
+        if ($this->needsEscalation()) {
+            $this->escalated_at = now();
+            $this->save();
+        }
     }
 
     /**

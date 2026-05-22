@@ -7,6 +7,7 @@ use App\Domain\Moderation\Actions\LogAudit;
 use App\Domain\Moderation\Actions\SuspendUser;
 use App\Domain\Moderation\Enums\ReportStatus;
 use App\Models\ChatMessage;
+use App\Models\College;
 use App\Models\LearningResource;
 use App\Models\Lend;
 use App\Models\Program;
@@ -16,6 +17,7 @@ use App\Models\ResourceRequest;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request as HttpRequest;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class AdminController extends Controller
@@ -47,6 +49,29 @@ class AdminController extends Controller
             ->latest()
             ->get();
 
+        $collegeStats = College::withCount([
+            'programs as program_count',
+            'users as active_user_count' => function ($q): void {
+                $q->whereNotNull('onboarded_at')->whereNull('suspended_until');
+            },
+        ])->where('school_id', $user->school_id)
+            ->orderBy('name')
+            ->get(['id', 'code', 'name']);
+
+        $crossProgramFlows = DB::table('resources')
+            ->join('users as owners', 'resources.owner_user_id', '=', 'owners.id')
+            ->join('programs as owner_programs', 'owners.program_id', '=', 'owner_programs.id')
+            ->join('subjects', 'resources.subject_id', '=', 'subjects.id')
+            ->join('program_subjects', 'subjects.id', '=', 'program_subjects.subject_id')
+            ->join('programs as target_programs', 'program_subjects.program_id', '=', 'target_programs.id')
+            ->where('owner_programs.id', '!=', DB::raw('target_programs.id'))
+            ->where('resources.school_id', $user->school_id)
+            ->selectRaw('owner_programs.code as from_program, target_programs.code as to_program, COUNT(*) as count')
+            ->groupBy('owner_programs.code', 'target_programs.code')
+            ->orderByDesc('count')
+            ->limit(10)
+            ->get();
+
         return view('admin.dashboard', [
             'openReports' => $openReports,
             'totalModerators' => $totalModerators,
@@ -59,6 +84,8 @@ class AdminController extends Controller
             'dau' => $dau,
             'programs' => $programs,
             'moderators' => $moderators,
+            'collegeStats' => $collegeStats,
+            'crossProgramFlows' => $crossProgramFlows,
         ]);
     }
 
