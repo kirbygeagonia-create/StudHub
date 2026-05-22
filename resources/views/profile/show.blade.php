@@ -7,9 +7,15 @@
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8 space-y-6">
             <div class="bg-white p-6 shadow-sm sm:rounded-lg">
                 <div class="flex items-center gap-4 mb-6 pb-6 border-b border-gray-100">
+                    <div class="w-14 h-14 rounded-full bg-seait-500 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
+                        {{ strtoupper(substr($user?->preferredDisplayName() ?? '?', 0, 2)) }}
+                    </div>
                     <div class="flex-1">
                         <h3 class="text-lg font-semibold text-gray-900">{{ $user?->preferredDisplayName() ?? 'User' }}</h3>
                         <p class="text-sm text-gray-500">{{ $user?->program ? $user->program->code . ' · Year ' . $user->year_level : '' }}</p>
+                        @if ($user?->student_number)
+                            <p class="text-xs text-gray-400">{{ $user->student_number }}</p>
+                        @endif
                     </div>
                     <div class="text-right">
                         <div class="text-3xl font-bold text-gray-900" data-testid="karma-score">{{ $karma }}</div>

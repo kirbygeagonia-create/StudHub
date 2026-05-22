@@ -51,7 +51,10 @@
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white/70 bg-navy-900 hover:text-white focus:outline-none transition ease-in-out duration-150 dark:bg-navy-900 dark:text-white/70 dark:hover:text-white">
-                            <div>{{ Auth::user()?->name ?? 'Guest' }}</div>
+                            <div class="w-7 h-7 rounded-full bg-seait-500 flex items-center justify-center text-white text-xs font-bold mr-2">
+                                {{ strtoupper(substr(Auth::user()?->preferredDisplayName() ?? '?', 0, 2)) }}
+                            </div>
+                            <div class="hidden md:block">{{ Auth::user()?->preferredDisplayName() ?? 'Guest' }}</div>
 
                             <div class="ms-1">
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -118,6 +121,28 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('chat.index')" :active="request()->routeIs('chat.*')">
+                {{ __('Chat') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('resources.index')" :active="request()->routeIs('resources.*')">
+                {{ __('Resources') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('leaderboard')" :active="request()->routeIs('leaderboard')">
+                {{ __('Leaderboard') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('lends.index')" :active="request()->routeIs('lends.*')">
+                {{ __('Lends') }}
+            </x-responsive-nav-link>
+            @if (Auth::user()?->isModerator() || Auth::user()?->isAdmin())
+                <x-responsive-nav-link :href="route('moderation.dashboard')" :active="request()->routeIs('moderation.*')">
+                    {{ __('Moderation') }}
+                </x-responsive-nav-link>
+            @endif
+            @if (Auth::user()?->isAdmin())
+                <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.*')">
+                    {{ __('Admin') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->
@@ -134,6 +159,26 @@
                 <x-responsive-nav-link :href="route('profile.edit')">
                     {{ __('Account settings') }}
                 </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('profile.notification-preferences')">
+                    {{ __('Notification preferences') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('feedback.create')">
+                    {{ __('Feedback') }}
+                </x-responsive-nav-link>
+
+                <!-- Responsive Dark Mode Toggle -->
+                <div class="px-4 py-2 flex items-center gap-2">
+                    <button @click="dark = !dark" type="button"
+                            class="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 flex items-center gap-2">
+                        <template x-if="!dark">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                        </template>
+                        <template x-if="dark">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                        </template>
+                        <span x-text="dark ? 'Light mode' : 'Dark mode'"></span>
+                    </button>
+                </div>
 
                 <!-- Authentication -->
                 <form method="POST" action="{{ route('logout') }}">
