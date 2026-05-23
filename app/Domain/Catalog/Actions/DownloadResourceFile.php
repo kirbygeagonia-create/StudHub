@@ -6,12 +6,22 @@ use App\Models\LearningResource;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Drivers\Gd\Driver as GdDriver;
+use Intervention\Image\Drivers\Imagick\Driver as ImagickDriver;
+use Intervention\Image\ImageManager;
 use setasign\Fpdi\Fpdi;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class DownloadResourceFile
 {
+    /** @var list<string> */
+    private const WATERMARKABLE_IMAGE_MIMES = [
+        'image/jpeg',
+        'image/png',
+        'image/webp',
+    ];
+
     /**
      * Serve a watermarked copy of the resource file for the given user.
      * The watermarked copy is cached per-user for 24 hours.
@@ -33,30 +43,62 @@ class DownloadResourceFile
         $isPdf = strtolower($resource->file_mime ?? '') === 'application/pdf'
             || strtolower($extension) === 'pdf';
 
-        if ($isPdf && $resource->is_watermarked) {
-            $watermarkedPath = $this->watermarkedCachePath($user, $resource);
+        $isWatermarkableImage = in_array(
+            strtolower($resource->file_mime ?? ''),
+            self::WATERMARKABLE_IMAGE_MIMES,
+            true
+        );
 
-            if (! Storage::disk('local')->exists($watermarkedPath)) {
-                $this->generateWatermarkedCopy($user, $resource, $watermarkedPath);
+        if ($resource->is_watermarked) {
+            $cachePath = $isPdf
+                ? $this->watermarkedPdfCachePath($user, $resource)
+                : $this->watermarkedImageCachePath($user, $resource, $extension);
+
+            if (! Storage::disk('local')->exists($cachePath)) {
+                if ($isPdf) {
+                    $this->generateWatermarkedPdf($user, $resource, $cachePath);
+                } elseif ($isWatermarkableImage) {
+                    $this->generateWatermarkedImage($user, $resource, $cachePath);
+                }
             }
 
-            return Storage::disk('local')->download($watermarkedPath, $downloadName, [
-                'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'attachment; filename="' . $downloadName . '"',
-            ]);
+            if (Storage::disk('local')->exists($cachePath)) {
+                $mime = $isPdf ? 'application/pdf' : ($resource->file_mime ?? 'application/octet-stream');
+
+                return Storage::disk('local')->download($cachePath, $downloadName, [
+                    'Content-Type' => $mime,
+                    'Content-Disposition' => 'attachment; filename="' . $downloadName . '"',
+                ]);
+            }
         }
 
         return Storage::disk('public')->download($resource->file_url, $downloadName);
     }
 
-    private function watermarkedCachePath(User $user, LearningResource $resource): string
+    private function watermarkedPdfCachePath(User $user, LearningResource $resource): string
     {
         $hash = md5($resource->id . '_' . $user->id);
 
         return 'watermarked/' . $hash . '.pdf';
     }
 
-    private function generateWatermarkedCopy(User $user, LearningResource $resource, string $cachePath): void
+    private function watermarkedImageCachePath(User $user, LearningResource $resource, string $extension): string
+    {
+        $hash = md5($resource->id . '_' . $user->id);
+
+        return 'watermarked/' . $hash . '.' . $extension;
+    }
+
+    private function ensureCacheDir(string $cachePath): void
+    {
+        $outputPath = Storage::disk('local')->path($cachePath);
+        $cacheDir = dirname($outputPath);
+        if (! is_dir($cacheDir)) {
+            mkdir($cacheDir, 0755, true);
+        }
+    }
+
+    private function generateWatermarkedPdf(User $user, LearningResource $resource, string $cachePath): void
     {
         $originalPath = Storage::disk('public')->path($resource->file_url);
 
@@ -76,11 +118,8 @@ class DownloadResourceFile
         $watermarkText = 'Downloaded by ' . $user->preferredDisplayName()
             . ' (' . $user->email . ') — ' . now()->format('Y-m-d H:i:s T');
 
+        $this->ensureCacheDir($cachePath);
         $outputPath = Storage::disk('local')->path($cachePath);
-        $cacheDir = dirname($outputPath);
-        if (! is_dir($cacheDir)) {
-            mkdir($cacheDir, 0755, true);
-        }
 
         $watermarked = $this->stampPdfWithFpdi($originalPath, $watermarkText);
         file_put_contents($outputPath, $watermarked);
@@ -90,6 +129,75 @@ class DownloadResourceFile
             'user_id' => $user->id,
             'cache_path' => $cachePath,
         ]);
+    }
+
+    private function generateWatermarkedImage(User $user, LearningResource $resource, string $cachePath): void
+    {
+        $originalPath = Storage::disk('public')->path($resource->file_url);
+
+        if (! file_exists($originalPath)) {
+            throw new NotFoundHttpException('Original file not found.');
+        }
+
+        $this->ensureCacheDir($cachePath);
+        $outputPath = Storage::disk('local')->path($cachePath);
+
+        try {
+            $manager = $this->createImageManager();
+            $image = $manager->read($originalPath);
+
+            $width = $image->width();
+            $height = $image->height();
+
+            $stampText = 'Downloaded by ' . $user->preferredDisplayName()
+                . ' (' . $user->email . ')'
+                . ' — ' . now()->format('Y-m-d H:i:s T');
+
+            $image->text($stampText, (int) ($width * 0.05), (int) ($height * 0.95), function ($font) use ($height) {
+                $font->size((int) max(10, $height / 40));
+                $font->color('rgba(180, 180, 180, 0.5)');
+                $font->file($this->fallbackFontPath());
+            });
+
+            $image->save($outputPath);
+
+            Log::info('Watermarked image generated', [
+                'resource_id' => $resource->id,
+                'user_id' => $user->id,
+                'cache_path' => $cachePath,
+            ]);
+        } catch (\Exception $e) {
+            Log::warning('Image watermarking failed, serving original', [
+                'resource_id' => $resource->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    private function createImageManager(): ImageManager
+    {
+        if (extension_loaded('imagick')) {
+            return new ImageManager(new ImagickDriver);
+        }
+
+        return new ImageManager(new GdDriver);
+    }
+
+    private function fallbackFontPath(): string
+    {
+        $candidates = [
+            'C:\\Windows\\Fonts\\arial.ttf',
+            '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
+            '/usr/share/fonts/TTF/DejaVuSans.ttf',
+        ];
+
+        foreach ($candidates as $path) {
+            if (file_exists($path)) {
+                return $path;
+            }
+        }
+
+        return $candidates[0];
     }
 
     /**

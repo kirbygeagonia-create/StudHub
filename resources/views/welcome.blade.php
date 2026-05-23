@@ -1,16 +1,18 @@
 ﻿<!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="scroll-smooth" x-data="{ dark: localStorage.getItem('dark') === 'true' }" x-init="$watch('dark', v => { localStorage.setItem('dark', v); document.documentElement.classList.toggle('dark', v) }); document.documentElement.classList.toggle('dark', dark)" :class="{ 'dark': dark }">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>StudHub — SEAIT Academic Resource Exchange</title>
+
+    <meta name="color-scheme" content="light dark">
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=lexend:400,500,600,700|dm-sans:400,500" rel="stylesheet" />
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="antialiased bg-slate-50 font-sans">
+<body class="antialiased bg-slate-50 dark:bg-gray-900 font-sans">
     <div class="min-h-screen">
         {{-- Nav --}}
         <header class="bg-navy-900 border-b border-navy-500">
@@ -32,76 +34,84 @@
                             @endif
                         @endauth
                     @endif
+                    <button @click="dark = !dark" type="button" class="p-2 text-white/70 hover:text-white transition" aria-label="Toggle dark mode">
+                        <template x-if="!dark">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                        </template>
+                        <template x-if="dark">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                        </template>
+                    </button>
                 </div>
             </div>
         </header>
 
         {{-- Hero --}}
         <section class="max-w-4xl mx-auto px-6 pt-24 pb-16 text-center">
-            <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-seait-50 border border-seait-50 rounded-full text-xs font-medium text-seait-600 mb-6">
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-seait-50 dark:bg-seait-900/30 border border-seait-50 dark:border-seait-800 rounded-full text-xs font-medium text-seait-600 dark:text-seait-300 mb-6">
                 South East Asian Institute of Technology
             </div>
-            <h1 class="text-4xl sm:text-5xl font-bold text-slate-900 leading-tight mb-4" style="font-family: 'Lexend', sans-serif;">
+            <h1 class="text-4xl sm:text-5xl font-bold text-slate-900 dark:text-white leading-tight mb-4" style="font-family: 'Lexend', sans-serif;">
                 Your school's resource<br class="hidden sm:block"> exchange, not your inbox.
             </h1>
-            <p class="text-lg text-slate-500 max-w-xl mx-auto mb-8">
+            <p class="text-lg text-slate-600 dark:text-slate-300 max-w-xl mx-auto mb-8">
                 Share textbooks, e-modules, reviewers, and past exams across 6 colleges and 26 programs at SEAIT. Find what you need from someone who already took the subject.
             </p>
             <div class="flex justify-center gap-3">
                 @if (Route::has('register'))
                     <a href="{{ route('register') }}" class="px-6 py-3 bg-seait-500 text-white font-medium rounded-lg hover:bg-seait-600 transition shadow-sm">Get started</a>
                 @endif
-                <a href="#features" class="px-6 py-3 border border-navy-500 text-navy-900 font-medium rounded-lg hover:bg-navy-50 transition">Learn more</a>
+                <a href="#features" class="px-6 py-3 border border-navy-500 text-navy-900 dark:text-slate-200 font-medium rounded-lg hover:bg-navy-50 dark:hover:bg-navy-500/20 transition">Learn more</a>
             </div>
         </section>
 
         {{-- Features --}}
         <section id="features" class="max-w-6xl mx-auto px-6 py-20">
             <div class="grid sm:grid-cols-3 gap-8">
-                <div class="bg-white rounded-xl p-8 border border-slate-100 shadow-sm">
-                    <div class="w-10 h-10 bg-seait-50 rounded-lg flex items-center justify-center mb-4">
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-8 border border-slate-100 dark:border-gray-700 shadow-sm">
+                    <div class="w-10 h-10 bg-seait-50 dark:bg-seait-900/30 rounded-lg flex items-center justify-center mb-4">
                         <svg class="w-5 h-5 text-seait-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                     </div>
-                    <h3 class="font-semibold text-slate-900 mb-2" style="font-family: 'Lexend', sans-serif;">Smart Search</h3>
-                    <p class="text-sm text-slate-500">Search across resources, requests, and chat messages to find exactly what you need.</p>
+                    <h3 class="font-semibold text-slate-900 dark:text-white mb-2" style="font-family: 'Lexend', sans-serif;">Smart Search</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-300">Search across resources, requests, and chat messages to find exactly what you need.</p>
                 </div>
-                <div class="bg-white rounded-xl p-8 border border-slate-100 shadow-sm">
-                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-8 border border-slate-100 dark:border-gray-700 shadow-sm">
+                    <div class="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
                     </div>
-                    <h3 class="font-semibold text-slate-900 mb-2" style="font-family: 'Lexend', sans-serif;">Cross-Program</h3>
-                    <p class="text-sm text-slate-500">Resources are matched across programs. A BSIT reviewer might be exactly what a BSCE student needs.</p>
+                    <h3 class="font-semibold text-slate-900 dark:text-white mb-2" style="font-family: 'Lexend', sans-serif;">Cross-Program</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-300">Resources are matched across programs. A BSIT reviewer might be exactly what a BSCE student needs.</p>
                 </div>
-                <div class="bg-white rounded-xl p-8 border border-slate-100 shadow-sm">
-                    <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center mb-4">
-                        <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-8 border border-slate-100 dark:border-gray-700 shadow-sm">
+                    <div class="w-10 h-10 bg-amber-100 dark:bg-amber-900/30 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-5 h-5 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     </div>
-                    <h3 class="font-semibold text-slate-900 mb-2" style="font-family: 'Lexend', sans-serif;">Real-Time</h3>
-                    <p class="text-sm text-slate-500">Per-program chat rooms with @mentions and file sharing. Get help from seniors instantly.</p>
+                    <h3 class="font-semibold text-slate-900 dark:text-white mb-2" style="font-family: 'Lexend', sans-serif;">Real-Time</h3>
+                    <p class="text-sm text-slate-600 dark:text-slate-300">Per-program chat rooms with @mentions and file sharing. Get help from seniors instantly.</p>
                 </div>
             </div>
         </section>
 
         {{-- How it works --}}
-        <section class="bg-white border-t border-slate-100 py-20">
+        <section class="bg-white dark:bg-gray-800 border-t border-slate-100 dark:border-gray-700 py-20">
             <div class="max-w-4xl mx-auto px-6 text-center">
-                <h2 class="text-3xl font-bold text-slate-900 mb-4" style="font-family: 'Lexend', sans-serif;">How StudHub works</h2>
-                <p class="text-slate-500 mb-12">Three simple steps. No Facebook groups required.</p>
+                <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-4" style="font-family: 'Lexend', sans-serif;">How StudHub works</h2>
+                <p class="text-slate-600 dark:text-slate-300 mb-12">Three simple steps. No Facebook groups required.</p>
                 <div class="grid sm:grid-cols-3 gap-8 text-left">
                     <div class="relative">
                         <div class="w-8 h-8 bg-seait-500 text-white rounded-full flex items-center justify-center text-sm font-bold mb-4">1</div>
-                        <h4 class="font-semibold text-slate-900 mb-1">Post what you have</h4>
-                        <p class="text-sm text-slate-500">Upload reviewers, textbooks, e-modules, or past exams. They're available to your whole school.</p>
+                        <h4 class="font-semibold text-slate-900 dark:text-white mb-1">Post what you have</h4>
+                        <p class="text-sm text-slate-600 dark:text-slate-300">Upload reviewers, textbooks, e-modules, or past exams. They're available to your whole school.</p>
                     </div>
                     <div class="relative">
                         <div class="w-8 h-8 bg-seait-500 text-white rounded-full flex items-center justify-center text-sm font-bold mb-4">2</div>
-                        <h4 class="font-semibold text-slate-900 mb-1">Request what you need</h4>
-                        <p class="text-sm text-slate-500">Post a request for any subject. StudHub routes it to programs that teach that subject.</p>
+                        <h4 class="font-semibold text-slate-900 dark:text-white mb-1">Request what you need</h4>
+                        <p class="text-sm text-slate-600 dark:text-slate-300">Post a request for any subject. StudHub routes it to programs that teach that subject.</p>
                     </div>
                     <div class="relative">
                         <div class="w-8 h-8 bg-seait-500 text-white rounded-full flex items-center justify-center text-sm font-bold mb-4">3</div>
-                        <h4 class="font-semibold text-slate-900 mb-1">Lend & earn karma</h4>
-                        <p class="text-sm text-slate-500">Lend your resources, get karma points, and climb the leaderboard. The community grows together.</p>
+                        <h4 class="font-semibold text-slate-900 dark:text-white mb-1">Lend & earn karma</h4>
+                        <p class="text-sm text-slate-600 dark:text-slate-300">Lend your resources, get karma points, and climb the leaderboard. The community grows together.</p>
                     </div>
                 </div>
             </div>
@@ -111,32 +121,32 @@
         <section class="max-w-4xl mx-auto px-6 py-16 text-center">
             <div class="grid sm:grid-cols-3 gap-8">
                 <div>
-                    <p class="text-3xl font-bold text-slate-900" style="font-family: 'Lexend', sans-serif;">6</p>
-                    <p class="text-sm text-slate-500">Colleges</p>
+                    <p class="text-3xl font-bold text-slate-900 dark:text-white" style="font-family: 'Lexend', sans-serif;">6</p>
+                    <p class="text-sm text-slate-600 dark:text-slate-300">Colleges</p>
                 </div>
                 <div>
-                    <p class="text-3xl font-bold text-slate-900" style="font-family: 'Lexend', sans-serif;">26</p>
-                    <p class="text-sm text-slate-500">Programs</p>
+                    <p class="text-3xl font-bold text-slate-900 dark:text-white" style="font-family: 'Lexend', sans-serif;">26</p>
+                    <p class="text-sm text-slate-600 dark:text-slate-300">Programs</p>
                 </div>
                 <div>
-                    <p class="text-3xl font-bold text-slate-900" style="font-family: 'Lexend', sans-serif;">24/7</p>
-                    <p class="text-sm text-slate-500">Always available</p>
+                    <p class="text-3xl font-bold text-slate-900 dark:text-white" style="font-family: 'Lexend', sans-serif;">24/7</p>
+                    <p class="text-sm text-slate-600 dark:text-slate-300">Always available</p>
                 </div>
             </div>
         </section>
 
         {{-- Footer --}}
-        <footer class="border-t border-slate-100 py-8">
+        <footer class="border-t border-slate-100 dark:border-gray-700 py-8">
             <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4">
-                <p class="text-sm text-slate-400">StudHub &copy; {{ date('Y') }} &mdash; South East Asian Institute of Technology, Inc.</p>
+                <p class="text-sm text-slate-500 dark:text-slate-400">StudHub &copy; {{ date('Y') }} &mdash; South East Asian Institute of Technology, Inc.</p>
                 <div class="flex items-center gap-4">
-                    <a href="{{ route('help') }}" class="text-sm text-slate-400 hover:text-slate-600 transition">Help</a>
-                    <span class="text-slate-300">&middot;</span>
+                    <a href="{{ route('help') }}" class="text-sm text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition">Help</a>
+                    <span class="text-slate-300 dark:text-slate-600">&middot;</span>
                     @auth
-                        <a href="{{ route('feedback.create') }}" class="text-sm text-slate-400 hover:text-slate-600 transition">Feedback</a>
-                        <span class="text-slate-300">&middot;</span>
+                        <a href="{{ route('feedback.create') }}" class="text-sm text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition">Feedback</a>
+                        <span class="text-slate-300 dark:text-slate-600">&middot;</span>
                     @endauth
-                    <a href="{{ route('aup') }}" class="text-sm text-slate-400 hover:text-slate-600 transition">Acceptable Use Policy</a>
+                    <a href="{{ route('aup') }}" class="text-sm text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition">Acceptable Use Policy</a>
                 </div>
             </div>
         </footer>

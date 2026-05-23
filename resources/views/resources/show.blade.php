@@ -76,8 +76,8 @@
 
                     <form method="POST" action="{{ route('resources.toggle-save', $resource) }}" class="inline">
                         @csrf
-                        <button type="submit"
-                                class="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-xs font-semibold uppercase tracking-widest shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-seait-400 focus:ring-offset-2 transition ease-in-out duration-150">
+                        <button type="submit" onclick="this.disabled=true; this.form.submit();"
+                                class="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-xs font-semibold uppercase tracking-widest shadow-sm hover:bg-gray-50 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-seait-400 focus:ring-offset-2 transition ease-in-out duration-150">
                             @if ($isSaved)
                                 <svg class="w-4 h-4 mr-1 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
                                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
@@ -103,8 +103,8 @@
                 <div class="border-t border-gray-100 pt-3 flex items-center gap-3">
                     <form method="POST" action="{{ route('resources.mark-helpful', $resource) }}" class="inline">
                         @csrf
-                        <button type="submit"
-                                class="inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md text-xs font-semibold uppercase tracking-widest shadow-sm hover:bg-green-50 hover:text-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
+                        <button type="submit" onclick="this.disabled=true; this.form.submit();"
+                                class="inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md text-xs font-semibold uppercase tracking-widest shadow-sm hover:bg-green-50 hover:text-green-700 disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
                             <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
                             </svg>
@@ -129,10 +129,10 @@
                         </select>
                         <input type="text" name="notes" maxlength="1000" placeholder="Optional note"
                                class="text-xs border-gray-300 rounded-md shadow-sm w-full">
-                        <button type="submit"
-                                class="px-2 py-1 bg-red-500 border border-transparent rounded text-xs font-semibold text-white uppercase tracking-widest hover:bg-red-600">
-                            Submit Report
-                        </button>
+<button type="submit" onclick="this.disabled=true; this.form.submit();"
+                                                    class="px-2 py-1 bg-red-500 border border-transparent rounded text-xs font-semibold text-white uppercase tracking-widest hover:bg-red-600 disabled:opacity-50">
+                                                Submit Report
+                                            </button>
                     </form>
                 </div>
             </div>

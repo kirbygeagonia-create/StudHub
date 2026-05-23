@@ -70,6 +70,25 @@ class ModerationController extends Controller
         $user = $httpRequest->user();
         abort_unless($user !== null, 403);
 
+        if (! $user->isAdmin()) {
+            $moderatedProgramIds = ProgramModerator::where('user_id', $user->id)
+                ->pluck('program_id');
+
+            $reported = $report->reported;
+            $reportProgramId = null;
+
+            if ($reported instanceof ChatMessage) {
+                $reportProgramId = $reported->room?->program_id;
+            } elseif ($reported instanceof LearningResource || $reported instanceof User) {
+                $reportProgramId = $reported->program_id;
+            }
+
+            if ($moderatedProgramIds->isEmpty() || ! $moderatedProgramIds->contains($reportProgramId)) {
+                return redirect()->back()
+                    ->withErrors(['error' => 'You can only resolve reports for your moderated programs.']);
+            }
+        }
+
         $validated = $httpRequest->validate([
             'resolution' => ['required', 'string', 'in:actioned,dismissed'],
             'resolution_note' => ['nullable', 'string', 'max:1000'],
@@ -106,6 +125,16 @@ class ModerationController extends Controller
 
         $target = User::findOrFail((int) $validated['user_id']);
 
+        if (! $user->isAdmin()) {
+            $moderatedProgramIds = ProgramModerator::where('user_id', $user->id)
+                ->pluck('program_id');
+
+            if ($moderatedProgramIds->isEmpty() || ! $moderatedProgramIds->contains($target->program_id)) {
+                return redirect()->back()
+                    ->withErrors(['error' => 'You can only suspend users within your moderated programs.']);
+            }
+        }
+
         try {
             $suspendUser->handle($user, $target, (int) $validated['days'], $validated['reason'] ?? null);
         } catch (\RuntimeException $e) {
@@ -129,6 +158,16 @@ class ModerationController extends Controller
         ]);
 
         $target = User::findOrFail((int) $validated['user_id']);
+
+        if (! $user->isAdmin()) {
+            $moderatedProgramIds = ProgramModerator::where('user_id', $user->id)
+                ->pluck('program_id');
+
+            if ($moderatedProgramIds->isEmpty() || ! $moderatedProgramIds->contains($target->program_id)) {
+                return redirect()->back()
+                    ->withErrors(['error' => 'You can only unsuspend users within your moderated programs.']);
+            }
+        }
 
         try {
             $suspendUser->unsuspend($user, $target);

@@ -121,8 +121,8 @@
                            class="px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest shadow-sm hover:bg-gray-50">
                             Cancel
                         </a>
-                        <button type="submit"
-                                class="px-4 py-2 bg-seait-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-seait-600">
+                        <button type="submit" onclick="this.disabled=true; this.form.submit();"
+                                class="px-4 py-2 bg-seait-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-seait-600 disabled:opacity-50">
                             Post request
                         </button>
                     </div>

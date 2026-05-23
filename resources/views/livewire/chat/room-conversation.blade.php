@@ -35,10 +35,10 @@
                         <div class="flex items-center gap-1">
                             <input type="text" name="notes" maxlength="1000" placeholder="Optional note"
                                    class="text-xs border-gray-300 rounded-md shadow-sm flex-1">
-                            <button type="submit"
-                                    class="px-2 py-1 bg-red-500 border border-transparent rounded text-xs font-semibold text-white uppercase tracking-widest hover:bg-red-600">
-                                Submit
-                            </button>
+<button type="submit" onclick="this.disabled=true; this.form.submit();"
+                                            class="px-2 py-1 bg-red-500 border border-transparent rounded text-xs font-semibold text-white uppercase tracking-widest hover:bg-red-600 disabled:opacity-50">
+                                        Submit
+                                    </button>
                         </div>
                     </form>
                 </div>
@@ -66,7 +66,11 @@
                 <input type="file" wire:model="attachment" class="text-xs" accept="image/*,application/pdf" />
                 <span>≤ 25 MB · images / PDF</span>
             </label>
-            <x-primary-button type="submit">Send</x-primary-button>
+            <button type="submit" wire:loading.attr="disabled"
+                    class="inline-flex items-center px-4 py-2 bg-seait-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-seait-600 disabled:opacity-50">
+                <span wire:loading.remove.delay>Send</span>
+                <span wire:loading>Sending...</span>
+            </button>
         </div>
         @error('attachment') <span class="text-xs text-red-600">{{ $message }}</span> @enderror
     </form>

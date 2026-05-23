@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
             SeaitProgramsSeeder::class,
             SeaitSubjectsSeeder::class,
             ProvisionChatRoomsSeeder::class,
+            DevUsersSeeder::class,
         ]);
     }
 }

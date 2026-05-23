@@ -10,18 +10,9 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Intervention\Image\Drivers\Imagick\Driver;
+use Intervention\Image\ImageManager;
 
-/**
- * Watermarks a resource file after upload.
- *
- * For PDFs, this prepares the file for per-user watermarking on download
- * by analyzing the PDF structure and marking it as watermarked.
- * For images, it generates a thumbnail.
- *
- * The heavy per-user watermarking happens at download time in
- * DownloadResourceFile — this job marks the file as "ready for
- * watermarking" and generates a thumbnail preview.
- */
 class WatermarkResourceFile implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -55,67 +46,215 @@ class WatermarkResourceFile implements ShouldQueue
             || strtolower(pathinfo($resource->file_url, PATHINFO_EXTENSION)) === 'pdf';
 
         if ($isPdf) {
-            $this->generateThumbnail($resource, $storagePath);
+            $this->generatePdfThumbnail($resource, $storagePath);
+        } else {
+            $this->generateImageThumbnail($resource, $storagePath);
         }
 
-        $resource->forceFill(['is_watermarked' => $isPdf])->save();
+        $thumbFile = $this->resolveThumbnailPath($resource, $isPdf);
+        $resource->forceFill([
+            'is_watermarked' => true,
+            'thumbnail_url' => $thumbFile,
+        ])->save();
 
         Log::info('WatermarkResourceFile completed', [
             'resource_id' => $resource->id,
-            'is_watermarked' => $isPdf,
+            'is_watermarked' => true,
             'file_mime' => $resource->file_mime,
         ]);
     }
 
-    private function generateThumbnail(LearningResource $resource, string $storagePath): void
+    private function ensureThumbDir(): string
     {
-        $originalPath = Storage::disk('public')->path($storagePath);
         $thumbDir = Storage::disk('public')->path('thumbs');
-        $thumbPath = $thumbDir . '/' . $resource->id . '.svg';
 
         if (! is_dir($thumbDir)) {
             mkdir($thumbDir, 0755, true);
         }
 
+        return $thumbDir;
+    }
+
+    private function resolveThumbnailPath(LearningResource $resource, bool $isPdf): string
+    {
+        $thumbDir = Storage::disk('public')->path('thumbs');
+
+        $pngPath = $thumbDir . '/' . $resource->id . '.png';
+        if (file_exists($pngPath)) {
+            return 'thumbs/' . $resource->id . '.png';
+        }
+
+        $svgPath = $thumbDir . '/' . $resource->id . '.svg';
+        if (file_exists($svgPath)) {
+            return 'thumbs/' . $resource->id . '.svg';
+        }
+
+        return $isPdf
+            ? 'thumbs/' . $resource->id . '.svg'
+            : 'thumbs/' . $resource->id . '.png';
+    }
+
+    private function generatePdfThumbnail(LearningResource $resource, string $storagePath): void
+    {
+        $originalPath = Storage::disk('public')->path($storagePath);
+
         if (! file_exists($originalPath)) {
             return;
         }
 
-        try {
-            $pdfContent = file_get_contents($originalPath);
+        $thumbDir = $this->ensureThumbDir();
 
-            if ($pdfContent === false || strlen($pdfContent) < 20) {
-                return;
-            }
+        $gsPath = $this->ghostscriptBinary();
+        if ($gsPath === null) {
+            $this->generateSvgFallback($resource, $storagePath, $thumbDir);
 
-            $previewContent = substr($pdfContent, 0, min(2048, strlen($pdfContent)));
+            return;
+        }
 
-            $pageCount = 0;
-            preg_match_all('/\/Type\s*\/Page[^s]/i', $pdfContent, $pageMatches);
-            $pageCount = max(1, count($pageMatches[0]));
+        $thumbPath = $thumbDir . '/' . $resource->id . '.png';
+        $escapedInput = escapeshellarg($originalPath);
+        $escapedOutput = escapeshellarg($thumbPath);
 
-            $thumbnailSvg = $this->generatePdfThumbnailSvg($resource->title, $pageCount);
+        $command = sprintf(
+            '%s -dSAFER -dBATCH -dNOPAUSE -dFirstPage=1 -dLastPage=1 '
+            . '-sDEVICE=png16m -r150 -dTextAlphaBits=4 -dGraphicsAlphaBits=4 '
+            . '-dUseCropBox -dFIXEDMEDIA -dPDFFitPage '
+            . '-sOutputFile=%s %s 2>&1',
+            escapeshellcmd($gsPath),
+            $escapedOutput,
+            $escapedInput
+        );
 
-            file_put_contents($thumbPath, $thumbnailSvg);
+        $output = [];
+        $exitCode = 0;
+        exec($command, $output, $exitCode);
 
-            Log::info('PDF thumbnail generated', [
+        if ($exitCode !== 0 || ! file_exists($thumbPath)) {
+            Log::warning('Ghostscript PDF thumbnail failed', [
                 'resource_id' => $resource->id,
-                'pages' => $pageCount,
-                'thumb_path' => 'thumbs/' . $resource->id . '.svg',
+                'exit_code' => $exitCode,
+                'output' => implode("\n", array_slice($output, 0, 5)),
+            ]);
+
+            $this->generateSvgFallback($resource, $storagePath, $thumbDir);
+
+            return;
+        }
+
+        Log::info('PDF thumbnail generated via Ghostscript', [
+            'resource_id' => $resource->id,
+            'thumb_path' => 'thumbs/' . $resource->id . '.png',
+        ]);
+    }
+
+    private function generateImageThumbnail(LearningResource $resource, string $storagePath): void
+    {
+        $originalPath = Storage::disk('public')->path($storagePath);
+
+        if (! file_exists($originalPath)) {
+            return;
+        }
+
+        $thumbDir = $this->ensureThumbDir();
+        $thumbPath = $thumbDir . '/' . $resource->id . '.png';
+
+        try {
+            $manager = new ImageManager(
+                new Driver
+            );
+
+            $image = $manager->read($originalPath);
+
+            $image->scaleDown(width: 300, height: 400);
+
+            $image->toPng()->save($thumbPath);
+
+            Log::info('Image thumbnail generated', [
+                'resource_id' => $resource->id,
+                'thumb_path' => 'thumbs/' . $resource->id . '.png',
             ]);
         } catch (\Exception $e) {
-            Log::warning('Could not generate PDF thumbnail', [
+            Log::warning('Image thumbnail generation failed, using GD driver fallback', [
+                'resource_id' => $resource->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            $this->generateImageThumbnailFallback($resource, $originalPath, $thumbPath);
+        }
+    }
+
+    private function generateImageThumbnailFallback(LearningResource $resource, string $originalPath, string $thumbPath): void
+    {
+        try {
+            $manager = new ImageManager(
+                new \Intervention\Image\Drivers\Gd\Driver
+            );
+
+            $image = $manager->read($originalPath);
+            $image->scaleDown(width: 300, height: 400);
+            $image->toPng()->save($thumbPath);
+
+            Log::info('Image thumbnail generated via GD fallback', [
+                'resource_id' => $resource->id,
+            ]);
+        } catch (\Exception $e) {
+            Log::warning('Could not generate image thumbnail', [
                 'resource_id' => $resource->id,
                 'error' => $e->getMessage(),
             ]);
         }
     }
 
-    /**
-     * Generate a polished SVG thumbnail for PDF files.
-     * Shows title, page count, and a document icon.
-     * Ghostscript/Imagick rendering can replace this when installed.
-     */
+    private function generateSvgFallback(LearningResource $resource, string $storagePath, string $thumbDir): void
+    {
+        $thumbPath = $thumbDir . '/' . $resource->id . '.svg';
+
+        $originalPath = Storage::disk('public')->path($storagePath);
+        $pageCount = 0;
+        $pdfContent = @file_get_contents($originalPath);
+
+        if ($pdfContent !== false && strlen($pdfContent) > 20) {
+            preg_match_all('/\/Type\s*\/Page[^s]/i', $pdfContent, $pageMatches);
+            $pageCount = max(1, count($pageMatches[0]));
+        }
+
+        $thumbnailSvg = $this->generatePdfThumbnailSvg($resource->title, $pageCount);
+        file_put_contents($thumbPath, $thumbnailSvg);
+
+        Log::info('PDF thumbnail generated (SVG fallback)', [
+            'resource_id' => $resource->id,
+            'pages' => $pageCount,
+            'thumb_path' => 'thumbs/' . $resource->id . '.svg',
+        ]);
+    }
+
+    private function ghostscriptBinary(): ?string
+    {
+        $configured = config('services.ghostscript.path', 'gs');
+
+        if ($configured && $configured !== 'gs') {
+            return $configured;
+        }
+
+        $candidates = [
+            'gs',
+            'gswin64c',
+            'gswin32c',
+            '/usr/bin/gs',
+        ];
+
+        foreach ($candidates as $candidate) {
+            $output = [];
+            $exitCode = 0;
+            exec(escapeshellcmd($candidate) . ' --version 2>&1', $output, $exitCode);
+            if ($exitCode === 0) {
+                return $candidate;
+            }
+        }
+
+        return null;
+    }
+
     private function generatePdfThumbnailSvg(string $title, int $pages): string
     {
         $safeTitle = htmlspecialchars(mb_substr($title, 0, 60));

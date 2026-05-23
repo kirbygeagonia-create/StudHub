@@ -20,6 +20,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libonig-dev \
         libxml2-dev \
         default-mysql-client \
+        ghostscript \
+        libmagickwand-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # PHP extensions
@@ -34,7 +36,9 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
         zip \
         opcache \
     && pecl install redis \
-    && docker-php-ext-enable redis
+    && docker-php-ext-enable redis \
+    && pecl install imagick \
+    && docker-php-ext-enable imagick
 
 # Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer

@@ -1,4 +1,4 @@
-﻿<nav x-data="{ open: false }" class="bg-navy-900 border-b border-navy-500 dark:bg-navy-900 dark:border-navy-500">
+﻿<nav x-data="{ open: false }" class="bg-navy-900 border-b border-navy-500 dark:bg-navy-900 dark:border-navy-500" role="navigation" aria-label="Main navigation">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
@@ -42,15 +42,16 @@
 
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
-                <form method="GET" action="{{ route('search') }}" class="me-3">
-                    <input type="text" name="q" value="{{ request('q') }}"
+                <form method="GET" action="{{ route('search') }}" class="me-3" role="search">
+                    <label for="nav-search" class="sr-only">Search resources</label>
+                    <input type="text" id="nav-search" name="q" value="{{ request('q') }}"
                            placeholder="Search..."
-                           class="w-40 rounded-md border-navy-500 bg-navy-900 text-white placeholder-white/40 shadow-sm text-sm focus:border-seait-400 focus:ring-seait-400">
+                           class="w-40 rounded-md border-navy-500 bg-navy-900 text-white placeholder-white/50 shadow-sm text-sm focus:border-seait-400 focus:ring-seait-400">
                 </form>
 
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white/70 bg-navy-900 hover:text-white focus:outline-none transition ease-in-out duration-150 dark:bg-navy-900 dark:text-white/70 dark:hover:text-white">
+                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white/70 bg-navy-900 hover:text-white focus:outline-none focus:ring-2 focus:ring-seait-400 transition ease-in-out duration-150 dark:bg-navy-900 dark:text-white/70 dark:hover:text-white">
                             <div class="w-7 h-7 rounded-full bg-seait-500 flex items-center justify-center text-white text-xs font-bold mr-2">
                                 {{ strtoupper(substr(Auth::user()?->preferredDisplayName() ?? '?', 0, 2)) }}
                             </div>
@@ -105,7 +106,7 @@
 
             <!-- Hamburger -->
             <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:bg-gray-100 focus:text-gray-500 transition duration-150 ease-in-out">
+                <button @click="open = ! open" :aria-expanded="open" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-seait-400 transition duration-150 ease-in-out">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
                         <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                         <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />

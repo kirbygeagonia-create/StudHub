@@ -88,10 +88,10 @@
                             </select>
                             <input type="text" name="notes" maxlength="1000" placeholder="Optional note"
                                    class="text-xs border-gray-300 rounded-md shadow-sm w-full">
-                            <button type="submit"
-                                    class="px-2 py-1 bg-red-500 border border-transparent rounded text-xs font-semibold text-white uppercase tracking-widest hover:bg-red-600">
-                                Submit Report
-                            </button>
+<button type="submit" onclick="this.disabled=true; this.form.submit();"
+                                            class="px-2 py-1 bg-red-500 border border-transparent rounded text-xs font-semibold text-white uppercase tracking-widest hover:bg-red-600 disabled:opacity-50">
+                                        Submit Report
+                                    </button>
                         </form>
                     </div>
                 @endif

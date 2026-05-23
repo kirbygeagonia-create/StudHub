@@ -103,8 +103,8 @@
                                     @if ($request->isOpen() && auth()->id() === $request->requester_user_id && $offer->status?->value === 'pending')
                                         <form method="POST" action="{{ route('requests.offers.accept', [$request, $offer]) }}">
                                             @csrf
-                                            <button type="submit"
-                                                    class="px-2 py-1 bg-green-600 border border-transparent rounded text-xs font-semibold text-white uppercase tracking-widest hover:bg-green-700">
+                                            <button type="submit" onclick="this.disabled=true; this.form.submit();"
+                                                    class="px-2 py-1 bg-green-600 border border-transparent rounded text-xs font-semibold text-white uppercase tracking-widest hover:bg-green-700 disabled:opacity-50">
                                                 Accept
                                             </button>
                                         </form>
@@ -139,10 +139,10 @@
                     <input type="date" id="return_by" name="return_by"
                            class="border-gray-300 rounded-md shadow-sm focus:ring-seait-400 focus:border-seait-400 text-sm">
                 </div>
-                <button type="submit"
-                        class="px-4 py-2 bg-seait-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-seait-600">
-                    Record Lend
-                </button>
+<button type="submit" onclick="this.disabled=true; this.form.submit();"
+                                                        class="px-4 py-2 bg-seait-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-seait-600 disabled:opacity-50">
+                                                    Record Lend
+                                                </button>
             </form>
         </div>
     @endif
@@ -175,10 +175,10 @@
                         </div>
 
                         <div class="flex justify-end">
-                            <button type="submit"
-                                    class="px-4 py-2 bg-seait-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-seait-600">
-                                Make offer
-                            </button>
+<button type="submit" onclick="this.disabled=true; this.form.submit();"
+                                                            class="px-4 py-2 bg-seait-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-seait-600 disabled:opacity-50">
+                                                        Make offer
+                                                    </button>
                         </div>
                     </form>
                 @endif

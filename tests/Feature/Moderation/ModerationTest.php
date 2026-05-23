@@ -351,6 +351,11 @@ it('moderator can resolve a report via HTTP', function () {
         'program_id' => $owner->program_id,
     ]);
 
+    ProgramModerator::create([
+        'user_id' => $moderator->id,
+        'program_id' => $owner->program_id,
+    ]);
+
     $report = (new CreateReport)->handle($reporter, ReportedType::Resource, $resource->id, 'spam');
 
     $this->actingAs($moderator)
@@ -366,6 +371,11 @@ it('moderator can resolve a report via HTTP', function () {
 it('moderator can suspend a user via HTTP', function () {
     $moderator = User::factory()->onboarded()->create(['role' => UserRole::Moderator]);
     $target = User::factory()->onboarded()->create();
+
+    ProgramModerator::create([
+        'user_id' => $moderator->id,
+        'program_id' => $target->program_id,
+    ]);
 
     $this->actingAs($moderator)
         ->post(route('moderation.suspend'), [

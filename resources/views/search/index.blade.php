@@ -52,7 +52,7 @@
                             @foreach ($requests as $request)
                                 <a href="{{ route('requests.show', $request) }}"
                                    class="block p-4 bg-white rounded-lg border border-gray-200 hover:border-seait-100 transition">
-                                    <div class="font-medium text-seait-600">{{ $request->title }}</div>
+                                    <div class="font-medium text-seait-600">{{ $request->subject?->code ?? '' }} — {{ $request->type_wanted }}</div>
                                     <div class="text-sm text-gray-500 mt-1">
                                         {{ $request->subject?->code }} &middot;
                                         {{ $request->status->label() }} &middot;

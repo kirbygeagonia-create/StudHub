@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'ghostscript' => [
+        'path' => env('STUDHUB_GHOSTSCRIPT_PATH', 'gs'),
+    ],
+
 ];
