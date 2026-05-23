@@ -27,20 +27,22 @@ class AdminController extends Controller
         $user = $httpRequest->user();
         abort_unless($user !== null, 403);
 
-        $openReports = Report::where('status', ReportStatus::Open->value)->count();
-        $totalModerators = User::where('role', UserRole::Moderator->value)->count();
-        $activeUsers = User::whereNotNull('onboarded_at')->whereNull('suspended_until')->count();
-        $totalResources = LearningResource::whereNull('deleted_at')->count();
+        $openReports = Report::where('status', ReportStatus::Open->value)->where('school_id', $user->school_id)->count();
+        $totalModerators = User::where('role', UserRole::Moderator->value)->where('school_id', $user->school_id)->count();
+        $activeUsers = User::whereNotNull('onboarded_at')->whereNull('suspended_until')->where('school_id', $user->school_id)->count();
+        $totalResources = LearningResource::whereNull('deleted_at')->where('school_id', $user->school_id)->count();
         $totalRequests = ResourceRequest::count();
-        $activeLends = Lend::whereNull('returned_at')->count();
-        $messagesToday = ChatMessage::whereDate('created_at', now()->toDateString())->count();
+        $activeLends = Lend::whereNull('returned_at')->whereHas('resource', fn ($q) => $q->where('school_id', $user->school_id))->count();
+        $messagesToday = ChatMessage::whereDate('created_at', now()->toDateString())->whereHas('room', fn ($q) => $q->where('school_id', $user->school_id))->count();
 
         $recentSignups = User::whereNotNull('onboarded_at')
             ->where('onboarded_at', '>=', now()->subDays(7))
+            ->where('school_id', $user->school_id)
             ->count();
 
         $dau = User::whereNotNull('last_seen_at')
             ->where('last_seen_at', '>=', now()->startOfDay())
+            ->where('school_id', $user->school_id)
             ->count();
 
         $programs = Program::with('college')->orderBy('code')->get(['id', 'code', 'name', 'college_id']);
@@ -102,12 +104,14 @@ class AdminController extends Controller
         $userId = (int) $validated['user_id'];
         $programId = (int) $validated['program_id'];
 
-        ProgramModerator::firstOrCreate(
-            ['user_id' => $userId, 'program_id' => $programId],
-            ['assigned_by_user_id' => $admin->id]
-        );
+        DB::transaction(function () use ($userId, $programId, $admin): void {
+            ProgramModerator::firstOrCreate(
+                ['user_id' => $userId, 'program_id' => $programId],
+                ['assigned_by_user_id' => $admin->id]
+            );
 
-        User::where('id', $userId)->update(['role' => UserRole::Moderator]);
+            User::where('id', $userId)->update(['role' => UserRole::Moderator]);
+        });
 
         $logAudit->handle($admin, 'moderator.assign', 'User', $userId, ['program_id' => $programId]);
 
@@ -127,14 +131,16 @@ class AdminController extends Controller
 
         $moderator = ProgramModerator::findOrFail((int) $validated['moderator_id']);
 
-        $userId = $moderator->user_id;
-        $moderator->delete();
+        DB::transaction(function () use ($moderator, &$userId): void {
+            $userId = $moderator->user_id;
+            $moderator->delete();
 
-        if (! ProgramModerator::where('user_id', $userId)->exists()) {
-            User::where('id', $userId)
-                ->where('role', UserRole::Moderator)
-                ->update(['role' => UserRole::Student]);
-        }
+            if (! ProgramModerator::where('user_id', $userId)->exists()) {
+                User::where('id', $userId)
+                    ->where('role', UserRole::Moderator)
+                    ->update(['role' => UserRole::Student]);
+            }
+        });
 
         $logAudit->handle($admin, 'moderator.remove', 'User', $userId, []);
 

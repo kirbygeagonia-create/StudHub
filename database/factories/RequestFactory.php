@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Domain\Requests\Enums\RequestStatus;
 use App\Domain\Requests\Enums\RequestUrgency;
 use App\Models\ResourceRequest;
+use App\Models\Subject;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -22,7 +23,7 @@ class RequestFactory extends Factory
     {
         return [
             'requester_user_id' => User::factory(),
-            'subject_id' => null,
+            'subject_id' => Subject::factory(),
             'type_wanted' => 'reviewer',
             'urgency' => RequestUrgency::Normal->value,
             'needed_by' => null,

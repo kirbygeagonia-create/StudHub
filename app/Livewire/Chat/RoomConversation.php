@@ -31,7 +31,15 @@ class RoomConversation extends Component
     {
         $user = auth()->user();
 
-        if ($user === null || $room->school_id !== $user->school_id) {
+        if ($user === null) {
+            throw new AccessDeniedHttpException('You must be logged in to view this chat room.');
+        }
+
+        if ($user->isSuspended()) {
+            throw new AccessDeniedHttpException('Your account is currently suspended.');
+        }
+
+        if ($room->school_id !== $user->school_id) {
             throw new AccessDeniedHttpException('You cannot view this chat room.');
         }
 

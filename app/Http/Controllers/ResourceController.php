@@ -12,6 +12,7 @@ use App\Models\Subject;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -145,8 +146,16 @@ class ResourceController extends Controller
             throw new NotFoundHttpException;
         }
 
-        DB::transaction(function () use ($resource): void {
+        $key = 'helpful-vote-' . $resource->id . '-' . $user->id;
+        if (Session::has($key)) {
+            session()->flash('status', 'You already marked this as helpful!');
+
+            return redirect()->back();
+        }
+
+        DB::transaction(function () use ($resource, $key): void {
             $resource->increment('helpful_count');
+            Session::put($key, true);
         });
 
         session()->flash('status', 'Marked as helpful!');

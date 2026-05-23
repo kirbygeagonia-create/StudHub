@@ -8,6 +8,7 @@ use App\Models\ChatMessage;
 use App\Models\LearningResource;
 use App\Models\Report;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
 class CreateReport
@@ -18,7 +19,7 @@ class CreateReport
             throw new RuntimeException('You cannot report yourself.');
         }
 
-        $resource = $this->resolveReported($reportedType, $reportedId);
+        $resource = $this->resolveReported($reporter, $reportedType, $reportedId);
 
         if ($resource === null) {
             throw new RuntimeException('The reported entity does not exist.');
@@ -32,32 +33,41 @@ class CreateReport
             throw new RuntimeException('You cannot report your own resource.');
         }
 
-        $existing = Report::where('reporter_user_id', $reporter->id)
-            ->where('reported_type', $reportedType->value)
-            ->where('reported_id', $reportedId)
-            ->where('status', ReportStatus::Open->value)
-            ->exists();
+        return DB::transaction(function () use ($reporter, $reportedType, $reportedId, $reason, $notes): Report {
+            $existing = Report::where('reporter_user_id', $reporter->id)
+                ->where('reported_type', $reportedType->value)
+                ->where('reported_id', $reportedId)
+                ->where('status', ReportStatus::Open->value)
+                ->exists();
 
-        if ($existing) {
-            throw new RuntimeException('You have already reported this item.');
-        }
+            if ($existing) {
+                throw new RuntimeException('You have already reported this item.');
+            }
 
-        return Report::create([
-            'reporter_user_id' => $reporter->id,
-            'reported_type' => $reportedType->value,
-            'reported_id' => $reportedId,
-            'reason' => $reason,
-            'notes' => $notes,
-            'status' => ReportStatus::Open->value,
-        ]);
+            return Report::create([
+                'reporter_user_id' => $reporter->id,
+                'school_id' => $reporter->school_id,
+                'reported_type' => $reportedType->value,
+                'reported_id' => $reportedId,
+                'reason' => $reason,
+                'notes' => $notes,
+                'status' => ReportStatus::Open->value,
+            ]);
+        });
     }
 
-    private function resolveReported(ReportedType $type, int $id): ?object
+    private function resolveReported(User $reporter, ReportedType $type, int $id): ?object
     {
         return match ($type) {
-            ReportedType::Message => ChatMessage::find($id),
-            ReportedType::Resource => LearningResource::find($id),
-            ReportedType::User => User::find($id),
+            ReportedType::Message => ChatMessage::whereKey($id)
+                ->whereHas('room', fn ($q) => $q->where('school_id', $reporter->school_id))
+                ->first(),
+            ReportedType::Resource => LearningResource::whereKey($id)
+                ->where('school_id', $reporter->school_id)
+                ->first(),
+            ReportedType::User => User::whereKey($id)
+                ->where('school_id', $reporter->school_id)
+                ->first(),
         };
     }
 }

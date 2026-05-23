@@ -4,7 +4,9 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\Process\Process;
 
 class BackupDatabase extends Command
 {
@@ -14,57 +16,88 @@ class BackupDatabase extends Command
 
     public function handle(): int
     {
-        $connection = Config::get('database.default');
-        $config = Config::get("database.connections.{$connection}");
+        try {
+            $connection = Config::get('database.default');
+            $config = Config::get("database.connections.{$connection}");
 
-        $filename = 'backup-' . now()->format('Y-m-d-H-i-s') . '.sql.gz';
-        $tempPath = storage_path('app/' . $filename);
+            $filename = 'backup-' . now()->format('Y-m-d-H-i-s') . '.sql.gz';
+            $tempPath = storage_path('app/' . $filename);
 
-        if ($config['driver'] === 'sqlite') {
-            $dbPath = $config['database'];
-            if ($dbPath === ':memory:') {
-                $this->warn('Running in SQLite in-memory — no backup possible.');
+            if ($config['driver'] === 'sqlite') {
+                $dbPath = $config['database'];
+                if ($dbPath === ':memory:') {
+                    $this->warn('Running in SQLite in-memory — no backup possible.');
+                    Log::warning('Database backup skipped: SQLite in-memory');
+
+                    return self::FAILURE;
+                }
+
+                $process = Process::fromShellCommandline(
+                    sprintf('gzip -c %s > %s', escapeshellarg($dbPath), escapeshellarg($tempPath))
+                );
+            } else {
+                $commandParts = [
+                    'mysqldump',
+                    sprintf('--user=%s', escapeshellarg($config['username'] ?? '')),
+                    sprintf('--password=%s', escapeshellarg($config['password'] ?? '')),
+                    sprintf('--host=%s', escapeshellarg($config['host'] ?? '127.0.0.1')),
+                    sprintf('--port=%s', (string) ($config['port'] ?? 3306)),
+                    escapeshellarg($config['database'] ?? ''),
+                    '--single-transaction',
+                    '--routines',
+                    '--triggers',
+                    '--events',
+                    '--quick',
+                    '--skip-lock-tables',
+                ];
+
+                $commandStr = implode(' ', $commandParts) . ' | gzip > ' . escapeshellarg($tempPath);
+                $process = Process::fromShellCommandline($commandStr);
+            }
+
+            $process->run();
+
+            if (! $process->isSuccessful()) {
+                $this->error('Backup command failed with exit code ' . $process->getExitCode());
+                $this->line($process->getErrorOutput() ?: $process->getOutput());
+                Log::error('Database backup failed', [
+                    'exit_code' => $process->getExitCode(),
+                    'error' => $process->getErrorOutput(),
+                ]);
+
+                if (file_exists($tempPath)) {
+                    unlink($tempPath);
+                }
 
                 return self::FAILURE;
             }
 
-            $command = sprintf('gzip -c %s > %s 2>&1', escapeshellarg($dbPath), escapeshellarg($tempPath));
-        } else {
-            $command = sprintf(
-                'mysqldump --user=%s --password=%s --host=%s --port=%s %s --single-transaction --quick --skip-lock-tables 2>&1 | gzip > %s 2>&1',
-                escapeshellarg($config['username'] ?? ''),
-                escapeshellarg($config['password'] ?? ''),
-                escapeshellarg($config['host'] ?? '127.0.0.1'),
-                escapeshellarg((string) ($config['port'] ?? 3306)),
-                escapeshellarg($config['database'] ?? ''),
-                escapeshellarg($tempPath)
-            );
-        }
+            if (! file_exists($tempPath)) {
+                $this->error('Backup file was not created.');
+                Log::error('Database backup: file not created', ['path' => $tempPath]);
 
-        $output = [];
-        $exitCode = 0;
-        exec($command, $output, $exitCode);
+                return self::FAILURE;
+            }
 
-        if ($exitCode !== 0) {
-            $this->error('Backup command failed with exit code ' . $exitCode);
-            $this->line(implode("\n", $output));
-
-            return self::FAILURE;
-        }
-
-        if (file_exists($tempPath)) {
             $stored = Storage::disk('backups')->put($filename, fopen($tempPath, 'r'));
             unlink($tempPath);
 
             if ($stored) {
                 $this->info("Database backup saved: backups/{$filename}");
+                Log::info('Database backup created', ['file' => $filename]);
 
                 $this->cleanOldBackups();
             } else {
                 $this->error('Failed to store backup on backup disk.');
+                Log::error('Database backup: failed to store', ['file' => $filename]);
 
                 return self::FAILURE;
             }
+        } catch (\Throwable $e) {
+            $this->error('Backup failed: ' . $e->getMessage());
+            Log::error('Database backup exception', ['exception' => $e->getMessage()]);
+
+            return self::FAILURE;
         }
 
         return self::SUCCESS;
@@ -73,7 +106,7 @@ class BackupDatabase extends Command
     private function cleanOldBackups(): void
     {
         $files = Storage::disk('backups')->files();
-        $cutoff = now()->subDays(7);
+        $cutoff = now()->subDays((int) config('studhub.backup_retention_days', 7));
         $deleted = 0;
 
         foreach ($files as $file) {
@@ -88,6 +121,7 @@ class BackupDatabase extends Command
 
         if ($deleted > 0) {
             $this->info("Cleaned {$deleted} old backup(s) older than 7 days.");
+            Log::info('Old backups cleaned', ['deleted' => $deleted]);
         }
     }
 }

@@ -1,2 +1,14 @@
 User-agent: *
-Disallow:
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /chat
+Disallow: /requests
+Disallow: /resources/shelf
+Disallow: /lends
+Disallow: /leaderboard
+Disallow: /profile
+Disallow: /search
+Disallow: /reports
+Disallow: /moderation
+Disallow: /onboarding
+Disallow: /up

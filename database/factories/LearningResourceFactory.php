@@ -7,6 +7,7 @@ use App\Domain\Catalog\Enums\ResourceType;
 use App\Domain\Catalog\Enums\ResourceVisibility;
 use App\Models\LearningResource;
 use App\Models\School;
+use App\Models\Subject;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -25,7 +26,7 @@ class LearningResourceFactory extends Factory
         return [
             'school_id' => School::factory(),
             'owner_user_id' => User::factory(),
-            'subject_id' => null,
+            'subject_id' => Subject::factory(),
             'program_id' => null,
             'type' => ResourceType::Reviewer->value,
             'title' => fake()->words(4, true),

@@ -111,8 +111,7 @@
                             Helpful ({{ $resource->helpful_count }})
                         </button>
                     </form>
-
-                <div class="border-t border-gray-100 pt-3">
+                </div>
                     <button type="button" onclick="document.getElementById('report-form-resource').classList.toggle('hidden')"
                             class="text-xs text-red-400 hover:text-red-600">
                         Report this resource

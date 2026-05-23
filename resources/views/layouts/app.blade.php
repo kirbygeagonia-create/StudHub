@@ -46,6 +46,7 @@
                     Install
                 </button>
             </div>
+        @stack('scripts')
         </div>
     </body>
 </html>
