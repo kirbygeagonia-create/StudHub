@@ -404,4 +404,151 @@ The following findings were discovered during a second-pass re-audit of the same
 
 ---
 
-*End of audit report — updated 2026-05-23 with re-audit findings.*
+---
+
+## 17. PREVIOUSLY UNAUDITED AREAS — Complete Findings (2026-05-23)
+
+The following areas were NOT covered in the original 12-phase audit and have now been fully audited.
+
+### 17.1 Console/Artisan Commands (3 files — previously unaudited)
+
+| # | Severity | File | Finding |
+|---|----------|------|---------|
+| **CMD-1** | **CRITICAL** | `BackupDatabase.php` | `exec()` with shell commands — remote execution / command injection risk despite `escapeshellarg()`. |
+| **CMD-2** | **CRITICAL** | `BackupDatabase.php` | Synchronous `mysqldump` + `gzip` blocks request — should be a queued job. |
+| **CMD-3** | **CRITICAL** | `BackupDatabase.php` | No `try/catch` around any I/O — any failure silently kills command. |
+| **CMD-4** | **CRITICAL** | `BackupDatabase.php` | No `Log::error()` on failure — only `$this->error()` to stdout, invisible in production. |
+| **CMD-5** | **CRITICAL** | `RecalculateRoutingWeights.php` | Returns `void` instead of `int` — no exit code, scheduler treats failures as success. |
+| **CMD-6** | **MEDIUM** | `BackupDatabase.php` | `mysqldump` missing `--routines --triggers --events` — stored procedures silently lost. |
+| **CMD-7** | **MEDIUM** | `BackupDatabase.php` | 7-day retention hardcoded (line 76) — should be configurable. |
+| **CMD-8** | **MEDIUM** | `BackupDatabase.php` | `gzip` assumed on PATH — fails on Windows/XAMPP. |
+| **CMD-9** | **MEDIUM** | `BackupDatabase.php` | No disk space check before dump. |
+| **CMD-10** | **MEDIUM** | `ExpireRequests.php` | Missing composite index on `[status, needed_by]`. |
+| **CMD-11** | **MEDIUM** | `ExpireRequests.php` | No `try/catch`, no `Log::error()` on failure. |
+| **CMD-12** | **MEDIUM** | `RecalculateRoutingWeights.php` | Loop with individual `UPDATE` per program-subject — batch anti-pattern. |
+| **CMD-13** | **MEDIUM** | `RecalculateRoutingWeights.php` | Weight formula hardcoded (line 36) — should be configurable. |
+| **CMD-14** | **MEDIUM** | `RecalculateRoutingWeights.php` | No `try/catch`, no `Log::error()` on failure. |
+| **CMD-15** | **LOW** | `RecalculateRoutingWeights.php` | No progress bar for loop. |
+| **CMD-16** | **LOW** | `ExpireRequests.php` | No `--dry-run` flag or confirmation prompt. |
+
+### 17.2 Middleware Files (4 files — previously unaudited)
+
+| # | Severity | File | Finding |
+|---|----------|------|---------|
+| **MW-1** | **MEDIUM** | `EnsureUserIsOnboarded.php` | `hasCompletedOnboarding()` checks `program_id` and `year_level` but NOT `display_name`, `school_id`, or `college_id`. Defense-in-depth gap. |
+| **MW-2** | **MEDIUM** | All 4 middleware | No JSON response support. `abort(403)` returns HTML even to API/JSON clients. |
+| **MW-3** | **LOW** | `UpdateLastSeenAt.php` | Uses `Auth::user()` facade instead of `$request->user()`. Inconsistency, reduces testability. |
+| **MW-4** | **LOW** | `UpdateLastSeenAt.php` | Uses `forceFill()->save()` instead of `saveQuietly()` — model events may fire on every request. |
+| **MW-5** | **LOW** | `UpdateLastSeenAt.php` | Write-on-every-request pattern: for 1000 concurrent auth users at 1 req/min, ~16 writes/sec. Acceptable but should be monitored. |
+| **MW-6** | **LOW** | `EnsureNotSuspended.php` | No scheduled cleanup for expired `suspended_until` dates. Column stays populated with past values. |
+
+### 17.3 Seeders & Factories (26 files — previously unaudited)
+
+| # | Severity | File | Finding |
+|---|----------|------|---------|
+| **SF-1** | **CRITICAL** | `LearningResourceFactory.php` | `subject_id => null` but schema has NOT NULL FK — **factory cannot create valid records**. |
+| **SF-2** | **CRITICAL** | `LendFactory.php` | `resource_id => null`, `from_user_id => null`, `to_user_id => null` — all NOT NULL in schema. **Factory cannot create valid records.** |
+| **SF-3** | **CRITICAL** | `RequestFactory.php` | `subject_id => null` but schema has NOT NULL FK — **factory cannot create valid records**. |
+| **SF-4** | **HIGH** | `LendFactory.php` | No guard preventing `from_user_id === to_user_id` (self-lending) — data integrity issue. |
+| **SF-5** | **MEDIUM** | `UserFactory.php` | No `asModerator()` / `asAdmin()` state shortcuts. |
+| **SF-6** | **MEDIUM** | `UserFactory.php` | `onboarded()` does NOT set email to a valid SEAIT domain — tests may fail if domain validation is applied. |
+| **SF-7** | **LOW** | All seeders | Only `DevUsersSeeder` has progress output. Others are silent on re-run. |
+| **SF-8** | **LOW** | `DatabaseSeeder.php` | No progress output across 6 child seeders. |
+
+### 17.4 Providers, Mail, View Components (5 files — previously unaudited)
+
+| # | Severity | File | Finding |
+|---|----------|------|---------|
+| **PV-1** | **HIGH** | `bootstrap/app.php` | Empty exception handler (`//`) — domain-specific exceptions (`InsufficientKarmaException`, etc.) bubble up as raw 500 errors. |
+| **PV-2** | **MEDIUM** | `DailyDigest.php` | Uses `now()` for date stamp — if job is delayed and processed on a different day, subject line and email content are wrong. |
+| **PV-3** | **LOW** | `AppLayout.php` | No `@stack('scripts')` before `</body>` — duplicates earlier CRITICAL finding UI-1. |
+| **PV-4** | **LOW** | `AppLayout.php` + `GuestLayout.php` | No `@yield('title')` — all pages have static title from `config('app.name')`. |
+| **PV-5** | **LOW** | `GuestLayout.php` | Missing favicon, PWA manifest, theme-color meta — guest pages have different branding than authenticated pages. |
+| **PV-6** | **LOW** | `DailyDigest.php` | No explicit `->to()` recipient in `envelope()` — relies on caller. |
+
+### 17.5 Infrastructure / Config (19 files — previously unaudited)
+
+| # | Severity | File | Finding |
+|---|----------|------|---------|
+| **INF-1** | **CRITICAL** | `public/sw.js` | Precache paths `/js/app.js` and `/css/app.css` are WRONG for Vite builds — will always 404. Service worker installation fails silently. |
+| **INF-2** | **CRITICAL** | `public/sw.js` | Caches ALL GET requests indefinitely, including authenticated routes (`/dashboard` with user data). |
+| **INF-3** | **CRITICAL** | `docker-compose.yml` | MySQL (3306) and Redis (6379) ports exposed to host with plaintext passwords (`studhub`/`rootpass`). OK for dev but must never reach production. |
+| **INF-4** | **MEDIUM** | `public/robots.txt` | `Disallow:` (empty) allows crawling of ALL paths — `/dashboard`, `/requests`, `/admin`, `/reports` can be indexed by search engines. |
+| **INF-5** | **MEDIUM** | `public/manifest.json` | Icon paths reference Vite build output `/build/assets/icon-*.png` — broken if `npm run build` hasn't been run. |
+| **INF-6** | **MEDIUM** | `docker/nginx/default.conf` | No `client_max_body_size` (default 1MB too small for file uploads of PDFs/images). |
+| **INF-7** | **MEDIUM** | `docker/nginx/default.conf` | Missing HSTS, CSP, Referrer-Policy, Permissions-Policy security headers. |
+| **INF-8** | **MEDIUM** | `docker/php/Dockerfile` | Not multi-stage; no PHP ini overrides (`upload_max_filesize`, `memory_limit`, `post_max_size`). |
+| **INF-9** | **MEDIUM** | `docker/php/Dockerfile` | No OPCache settings configured — just the extension installed. |
+| **INF-10** | **MEDIUM** | `docker-compose.yml` | `app` and `web` services have no healthchecks. |
+| **INF-11** | **MEDIUM** | `Makefile` | `fresh` target drops all tables without confirmation. |
+| **INF-12** | **MEDIUM** | `.github/workflows/ci.yml` | No Dependabot config; only tests on PHP 8.3 (not 8.2 which is in `composer.json`). |
+| **INF-13** | **LOW** | `public/.htaccess` | No block on direct access to `.env` or `.git` paths (Nginx handles this, but Apache deployments are vulnerable). |
+| **INF-14** | **LOW** | `public/manifest.json` | No `purpose` field on icons (missing `maskable`). |
+| **INF-15** | **LOW** | `public/favicon.svg` | Brand color (`#4f46e5` indigo) doesn't match PWA theme (`#FF6B35` orange). |
+| **INF-16** | **LOW** | `tailwind.config.js` | `navy` palette only has 3 shades; `seait` palette missing 300 and 700 shades. |
+| **INF-17** | **LOW** | `vite.config.js` | No `build.rollupOptions.output.manualChunks` — no JS bundle splitting. |
+| **INF-18** | **LOW** | `.gitattributes` | Only `* text=auto` — no `export-ignore`, no Linguist hints. |
+
+---
+
+## 18. UPDATED GRAND TOTALS (All Areas Audited)
+
+| Category | Files Audited | Critical | High | Medium | Low | Total |
+|----------|:------------:|:--------:|:----:|:------:|:---:|:-----:|
+| Junk/Gitignore/Git | repo-wide | 0 | 0 | 0 | 0 | 0 |
+| Database/Migrations/Models | 28 migrations, 18 models | 0 | 2 | 10 | 16 | 28 |
+| Controllers/Routes | 21 controllers, 4 route files | 0 | 5 | 3 | 5 | 13 |
+| Domain (Actions/Jobs/Events/Notifications) | 42 files | 1 | 1 | 4 | 7 | 13 |
+| Tests | 36 files | 0 | 0 | 0 | 3 | 3 |
+| Frontend (Blade/Livewire) | 54 views, 2 components | 2 | 2 | 6 | 6 | 16 |
+| Configuration/Security | 13 config files, .env | 0 | 1 | 8 | 12 | 21 |
+| Code Quality | app/Domain + app/ | 0 | 0 | 3 | 9 | 12 |
+| **Console Commands** | 3 PHP files | **4** | 0 | 10 | 2 | **16** |
+| **Middleware** | 4 PHP files | 0 | 0 | 2 | 4 | **6** |
+| **Seeders & Factories** | 26 PHP files | **3** | **1** | 2 | 2 | **8** |
+| **Providers/Mail/View Components** | 5 PHP files | 0 | **1** | 1 | 4 | **6** |
+| **Infrastructure (Docker/CI/public)** | 19 files | **3** | 0 | 9 | 6 | **18** |
+| **TOTAL (ALL)** | **~338 tracked** | **13** | **13** | **58** | **76** | **160** |
+
+---
+
+## 19. UPDATED SCORES (Now covering ALL files)
+
+| Dimension | Score | Change | Notes |
+|-----------|-------|--------|-------|
+| **Architecture** | 8/10 | — | Clean Domain-driven design. No Policies directory. Missing exception handler. |
+| **Database Design** | 6/10 | — | Schema correct, 10+ missing indexes, 3 critical factory bugs. |
+| **Security** | 6/10 | -1 | Broadcast auth is solid. But: SW caches all routes, robots.txt allows full crawl, no security headers, `exec()` in backup command. |
+| **Code Quality** | 7/10 | -1 | Zero dead code still holds. New finds: trait inconsistency, enum bypass, `mixed` type hints. |
+| **Testing** | 9/10 | — | 231 tests, clean. BUT 3 factories can't create valid records — tests that rely on them break. |
+| **Frontend/UX** | 5/10 | — | SW broken, autocomplete broken, robots.txt full-open, DOM nesting bug, missing `@stack`. |
+| **Config/Ops** | 4/10 | -1 | Docker ports exposed with plaintext passwords, no healthchecks, no OPCache config, no SW caching strategy, no HSTS/CSP. |
+| **Console Commands** | 3/10 | NEW | 4 criticals: `exec()`, synchronous backup, no error handling, void return type. |
+| **Infrastructure** | 4/10 | NEW | SW broken, Docker security gaps, Nginx missing configs, CI missing version matrix. |
+| **Seeders/Factories** | 5/10 | NEW | 3 criticals: factories can't create valid records. |
+| **Overall** | **5.5/10** | **-1.3** | **160 total findings. 13 criticals + 13 highs. Needs significant hardening.** |
+
+---
+
+## 20. UPDATED TOP PRIORITY FIXES (Now covering ALL areas)
+
+1. **Fix broken service worker** — rewrite SW with correct Vite asset paths, network-first for pages, cache-first only for static assets
+2. **Fix broken autocomplete** — add `@stack('scripts')` to `layouts/app.blade.php`
+3. **Add `DB::transaction()`** to `CreateReport` action
+4. **Fix 3 critical factories** — `LearningResourceFactory`, `LendFactory`, `RequestFactory` set null FK columns where schema requires NOT NULL
+5. **Rewrite `BackupDatabase` command** — replace `exec()` with PHP-based backup (or `spatie/db-dumper`), add queued dispatch, add try/catch and logging
+6. **Fix `RecalculateRoutingWeights.php` return type** — change `void` to `int` with proper exit codes
+7. **Add exception handler** in `bootstrap/app.php` for domain-specific exceptions
+8. **Fix robots.txt** — block `/dashboard`, `/requests`, `/admin`, `/api`, `/reports`
+9. **Fix Docker security** — remove port exposure for MySQL/Redis in production, add healthchecks
+10. **Add suspended-user guard** to `RoomConversation::mount()`
+11. **Fix `wire:poll`** — add `.visible` guard and suspended check
+12. **Fix unclosed `<div>`** in `resources/show.blade.php`
+13. **Add missing database indexes** — lends `(returned_at, return_by)`, reports `school_id`, requests `requester_user_id`
+14. **Set `SESSION_SECURE_COOKIE=true`** and `APP_DEBUG=false` in `.env.example`
+15. **Add Nginx `client_max_body_size`** for file uploads
+16. **Add security response headers** (CSP, HSTS) via middleware or Nginx
+
+---
+
+*End of audit report — final edition 2026-05-23 covering all 338 tracked files across every layer.*
