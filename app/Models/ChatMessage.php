@@ -23,6 +23,8 @@ class ChatMessage extends Model
         'attachment_size',
         'pinned_at',
         'reply_to_message_id',
+        'is_helpful',
+        'marked_helpful_by_user_id',
     ];
 
     /**
@@ -33,6 +35,7 @@ class ChatMessage extends Model
         return [
             'pinned_at' => 'datetime',
             'attachment_size' => 'integer',
+            'is_helpful' => 'boolean',
         ];
     }
 

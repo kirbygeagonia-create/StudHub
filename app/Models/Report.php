@@ -22,6 +22,7 @@ class Report extends Model
     }
 
     protected $fillable = [
+        'school_id',
         'reporter_user_id',
         'reported_type',
         'reported_id',

@@ -62,6 +62,14 @@ class ChatRoom extends Model
     }
 
     /**
+     * @return BelongsTo<ResourceRequest, $this>
+     */
+    public function request(): BelongsTo
+    {
+        return $this->belongsTo(ResourceRequest::class, 'request_id');
+    }
+
+    /**
      * @return BelongsToMany<User, $this>
      */
     public function members(): BelongsToMany

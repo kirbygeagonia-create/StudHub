@@ -14,6 +14,9 @@ class EnsureNotSuspended
         $user = $request->user();
 
         if ($user instanceof User && $user->isSuspended()) {
+            if ($request->expectsJson()) {
+                abort(403, 'Your account has been suspended.');
+            }
             abort(403, 'Your account has been suspended.');
         }
 

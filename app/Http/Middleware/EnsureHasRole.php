@@ -15,6 +15,9 @@ class EnsureHasRole
         $user = $request->user();
 
         if (! ($user instanceof User)) {
+            if ($request->expectsJson()) {
+                abort(403, 'Unauthenticated.');
+            }
             abort(403);
         }
 
@@ -23,6 +26,9 @@ class EnsureHasRole
             : (string) $user->role;
 
         if (! in_array($roleValue, $roles, true)) {
+            if ($request->expectsJson()) {
+                abort(403, 'Insufficient role.');
+            }
             abort(403);
         }
 

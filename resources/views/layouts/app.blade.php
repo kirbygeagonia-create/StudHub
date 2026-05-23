@@ -10,7 +10,7 @@
         <meta name="theme-color" content="#FF6B35">
         <meta name="color-scheme" content="light dark">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+        <title>@yield('title', config('app.name', 'Laravel'))</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">

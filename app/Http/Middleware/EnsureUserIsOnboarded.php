@@ -13,6 +13,10 @@ class EnsureUserIsOnboarded
         $user = $request->user();
 
         if ($user !== null && ! $user->hasCompletedOnboarding()) {
+            if ($request->expectsJson()) {
+                abort(403, 'User has not completed onboarding.');
+            }
+
             if (! $request->routeIs('onboarding.*', 'logout', 'verification.*', 'password.confirm')) {
                 return redirect()->route('onboarding.show');
             }

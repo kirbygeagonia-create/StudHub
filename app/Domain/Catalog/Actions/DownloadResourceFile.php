@@ -40,7 +40,7 @@ class DownloadResourceFile
         $safeTitle = preg_replace('/[^a-zA-Z0-9_-]/', '_', $resource->title);
         $downloadName = $safeTitle . '_' . $resource->id . '.' . $extension;
 
-        $isPdf = strtolower($resource->file_mime ?? '') === 'application/pdf'
+        $isPdf = in_array(strtolower($resource->file_mime ?? ''), ['application/pdf', 'application/x-pdf', 'application/acrobat'], true)
             || strtolower($extension) === 'pdf';
 
         $isWatermarkableImage = in_array(
@@ -77,14 +77,14 @@ class DownloadResourceFile
 
     private function watermarkedPdfCachePath(User $user, LearningResource $resource): string
     {
-        $hash = md5($resource->id . '_' . $user->id);
+        $hash = hash('xxh3', $resource->id . '_' . $user->id);
 
         return 'watermarked/' . $hash . '.pdf';
     }
 
     private function watermarkedImageCachePath(User $user, LearningResource $resource, string $extension): string
     {
-        $hash = md5($resource->id . '_' . $user->id);
+        $hash = hash('xxh3', $resource->id . '_' . $user->id);
 
         return 'watermarked/' . $hash . '.' . $extension;
     }

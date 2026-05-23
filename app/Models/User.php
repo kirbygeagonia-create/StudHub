@@ -152,7 +152,10 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->onboarded_at !== null
             && $this->program_id !== null
-            && $this->year_level !== null;
+            && $this->year_level !== null
+            && $this->display_name !== null
+            && $this->school_id !== null
+            && $this->college_id !== null;
     }
 
     public function preferredDisplayName(): string

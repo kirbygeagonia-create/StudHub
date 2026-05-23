@@ -23,12 +23,17 @@ class ProfileController extends Controller
         $user = $request->user();
         abort_unless($user !== null, 403);
 
-        $programId = $request->get('program_id', $user->program_id);
+        $programId = $request->integer('program_id', $user->program_id);
 
         $programs = Program::where('school_id', $user->school_id)
             ->where('is_active', true)
             ->orderBy('code')
             ->get(['id', 'code', 'name']);
+
+        $validProgram = $programs->firstWhere('id', $programId);
+        if ($validProgram === null) {
+            $programId = $user->program_id;
+        }
 
         $topSharers = User::where('program_id', $programId)
             ->whereNotNull('onboarded_at')

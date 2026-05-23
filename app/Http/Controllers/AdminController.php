@@ -45,11 +45,11 @@ class AdminController extends Controller
             ->where('school_id', $user->school_id)
             ->count();
 
-        $programs = Program::with('college')->orderBy('code')->get(['id', 'code', 'name', 'college_id']);
+        $programs = Program::with('college')->orderBy('code')->paginate(50, ['id', 'code', 'name', 'college_id']);
 
         $moderators = ProgramModerator::with(['user:id,display_name,name,program_id', 'program:id,code,name'])
             ->latest()
-            ->get();
+            ->paginate(50);
 
         $collegeStats = College::withCount([
             'programs as program_count',

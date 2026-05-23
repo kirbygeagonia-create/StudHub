@@ -42,6 +42,7 @@ class LearningResource extends Model
         'thumbnail_url',
         'save_count',
         'lend_count',
+        'helpful_count',
         'published_at',
     ];
 
@@ -59,6 +60,7 @@ class LearningResource extends Model
             'file_size' => 'integer',
             'save_count' => 'integer',
             'lend_count' => 'integer',
+            'helpful_count' => 'integer',
             'is_watermarked' => 'boolean',
             'published_at' => 'datetime',
         ];

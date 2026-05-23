@@ -230,10 +230,16 @@ class WatermarkResourceFile implements ShouldQueue
 
     private function ghostscriptBinary(): ?string
     {
+        static $binary = null;
+
+        if ($binary !== null) {
+            return $binary;
+        }
+
         $configured = config('services.ghostscript.path', 'gs');
 
         if ($configured && $configured !== 'gs') {
-            return $configured;
+            return $binary = $configured;
         }
 
         $candidates = [
@@ -248,11 +254,11 @@ class WatermarkResourceFile implements ShouldQueue
             $exitCode = 0;
             exec(escapeshellcmd($candidate) . ' --version 2>&1', $output, $exitCode);
             if ($exitCode === 0) {
-                return $candidate;
+                return $binary = $candidate;
             }
         }
 
-        return null;
+        return $binary = null;
     }
 
     private function generatePdfThumbnailSvg(string $title, int $pages): string

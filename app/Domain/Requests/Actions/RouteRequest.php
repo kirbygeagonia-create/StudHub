@@ -2,6 +2,7 @@
 
 namespace App\Domain\Requests\Actions;
 
+use App\Domain\Requests\Enums\OfferStatus;
 use App\Domain\Requests\Enums\RequestUrgency;
 use App\Domain\Requests\Jobs\CrossPostRequest;
 use App\Domain\Requests\Jobs\NotifyRoutedUsers;
@@ -9,6 +10,7 @@ use App\Models\LearningResource;
 use App\Models\Program;
 use App\Models\RequestRoute;
 use App\Models\ResourceRequest;
+use App\Models\Subject;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -154,7 +156,7 @@ class RouteRequest
         ];
     }
 
-    private function routeToOwnProgramOnly(ResourceRequest $request, mixed $subject): void
+    private function routeToOwnProgramOnly(ResourceRequest $request, Subject $subject): void
     {
         $ownProgram = $request->requester->program;
 
@@ -178,7 +180,7 @@ class RouteRequest
         }
     }
 
-    private function normalizedResourceCount(Program $program, mixed $subject): float
+    private function normalizedResourceCount(Program $program, Subject $subject): float
     {
         $max = LearningResource::where('subject_id', $subject->id)
             ->where('availability', '!=', 'archived')
@@ -196,7 +198,7 @@ class RouteRequest
         return $max > 0 ? $programCount / $max : 0.0;
     }
 
-    private function historicalFulfillmentRate(Program $program, mixed $subject): float
+    private function historicalFulfillmentRate(Program $program, Subject $subject): float
     {
         static $cache = [];
 
@@ -217,7 +219,7 @@ class RouteRequest
         $fulfilled = DB::table('request_routes')
             ->join('offers', function ($join) {
                 $join->on('offers.request_id', '=', 'request_routes.request_id')
-                    ->where('offers.status', '=', 'accepted');
+                    ->where('offers.status', '=', OfferStatus::Accepted->value);
             })
             ->join('users', 'users.id', '=', 'offers.offerer_user_id')
             ->where('request_routes.program_id', $programId)
@@ -259,7 +261,7 @@ class RouteRequest
     /**
      * @return Collection<int, User>
      */
-    private function pickUsersToNotify(Program $program, mixed $subject, ResourceRequest $request, ?int $typicalYear): Collection
+    private function pickUsersToNotify(Program $program, Subject $subject, ResourceRequest $request, ?int $typicalYear): Collection
     {
         // Batch-load candidates with their karma + last_seen_at for scoring
         $candidates = User::where('program_id', $program->id)

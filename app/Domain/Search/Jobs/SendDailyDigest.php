@@ -42,13 +42,16 @@ class SendDailyDigest implements ShouldQueue
             ->groupBy('users.program_id')
             ->pluck('count', 'program_id');
 
+        $requestCounts = RequestRoute::query()
+            ->whereDate('created_at', now()->toDateString())
+            ->selectRaw('program_id, COUNT(*) as count')
+            ->groupBy('program_id')
+            ->pluck('count', 'program_id');
+
         foreach ($users as $user) {
             $programId = $user->program_id;
-            $requestCount = RequestRoute::query()
-                ->where('program_id', $programId)
-                ->whereDate('created_at', now()->toDateString())
-                ->count();
-            $chatActivity = $chatActivityByProgram[$programId] ?? 0;
+            $requestCount = (int) ($requestCounts[$programId] ?? 0);
+            $chatActivity = (int) ($chatActivityByProgram[$programId] ?? 0);
 
             if ($requestCount === 0 && $chatActivity === 0) {
                 continue;

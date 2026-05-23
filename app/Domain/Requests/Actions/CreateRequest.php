@@ -27,32 +27,32 @@ class CreateRequest
             throw new RuntimeException('Requester must belong to a school.');
         }
 
-        /** @var Subject|null $subject */
-        $subject = Subject::where('id', $data['subject_id'])
-            ->where('school_id', $requester->school_id)
-            ->first();
+        return DB::transaction(function () use ($requester, $data): ResourceRequest {
+            /** @var Subject|null $subject */
+            $subject = Subject::where('id', $data['subject_id'])
+                ->where('school_id', $requester->school_id)
+                ->first();
 
-        if ($subject === null) {
-            throw new RuntimeException('Subject does not exist for this school.');
-        }
+            if ($subject === null) {
+                throw new RuntimeException('Subject does not exist for this school.');
+            }
 
-        $openCount = ResourceRequest::where('requester_user_id', $requester->id)
-            ->whereIn('status', RequestStatus::openValues())
-            ->count();
+            $openCount = ResourceRequest::where('requester_user_id', $requester->id)
+                ->whereIn('status', RequestStatus::openValues())
+                ->count();
 
-        if ($openCount >= 5) {
-            throw new RuntimeException('You already have 5 open requests. Please resolve or withdraw some first.');
-        }
+            if ($openCount >= 5) {
+                throw new RuntimeException('You already have 5 open requests. Please resolve or withdraw some first.');
+            }
 
-        $recentRequest = ResourceRequest::where('requester_user_id', $requester->id)
-            ->where('created_at', '>=', now()->subMinutes(10))
-            ->first();
+            $recentRequest = ResourceRequest::where('requester_user_id', $requester->id)
+                ->where('created_at', '>=', now()->subMinutes(10))
+                ->first();
 
-        if ($recentRequest !== null) {
-            throw new RuntimeException('You can only post one request every 10 minutes. Please wait before posting again.');
-        }
+            if ($recentRequest !== null) {
+                throw new RuntimeException('You can only post one request every 10 minutes. Please wait before posting again.');
+            }
 
-        return DB::transaction(function () use ($requester, $subject, $data): ResourceRequest {
             $request = ResourceRequest::create([
                 'requester_user_id' => $requester->id,
                 'subject_id' => $subject->id,

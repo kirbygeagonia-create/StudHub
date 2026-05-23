@@ -40,19 +40,19 @@ class CreateOffer
             throw new RuntimeException('You have already made an offer on this request.');
         }
 
-        if (! empty($data['resource_id'])) {
-            /** @var LearningResource|null $resource */
-            $resource = LearningResource::where('id', $data['resource_id'])
-                ->where('owner_user_id', $offerer->id)
-                ->where('school_id', $offerer->school_id)
-                ->first();
-
-            if ($resource === null) {
-                throw new RuntimeException('Resource not found or does not belong to you.');
-            }
-        }
-
         return DB::transaction(function () use ($offerer, $request, $data): Offer {
+            if (! empty($data['resource_id'])) {
+                /** @var LearningResource|null $resource */
+                $resource = LearningResource::where('id', $data['resource_id'])
+                    ->where('owner_user_id', $offerer->id)
+                    ->where('school_id', $offerer->school_id)
+                    ->first();
+
+                if ($resource === null) {
+                    throw new RuntimeException('Resource not found or does not belong to you.');
+                }
+            }
+
             return Offer::create([
                 'request_id' => $request->id,
                 'offerer_user_id' => $offerer->id,

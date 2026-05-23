@@ -27,6 +27,8 @@ class Lend extends Model
         'return_by',
         'returned_at',
         'condition_on_return',
+        'reminder_count',
+        'escalated_at',
     ];
 
     /**
@@ -39,6 +41,8 @@ class Lend extends Model
             'returned_at' => 'datetime',
             'return_by' => 'date',
             'condition_on_return' => LendCondition::class,
+            'reminder_count' => 'integer',
+            'escalated_at' => 'datetime',
         ];
     }
 

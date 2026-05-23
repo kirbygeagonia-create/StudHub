@@ -9,9 +9,7 @@ Alpine.start();
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js').then((reg) => {
-            console.log('SW registered:', reg.scope);
         }).catch((err) => {
-            console.warn('SW registration failed:', err);
         });
     });
 }
@@ -30,8 +28,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
 window.installPwa = async () => {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
-    const result = await deferredPrompt.userChoice;
-    console.log('PWA install result:', result.outcome);
+    await deferredPrompt.userChoice;
     deferredPrompt = null;
     const banner = document.getElementById('pwa-install-banner');
     if (banner) {
