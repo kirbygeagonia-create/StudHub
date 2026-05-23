@@ -15,7 +15,7 @@ beforeEach(function () {
 });
 
 it('creates one program room plus year sub-rooms for every active program', function () {
-    (new EnsureProgramChatRooms)->run();
+    (new EnsureProgramChatRooms)->handle();
 
     $bsit = Program::where('code', 'BSIT')->firstOrFail();
 
@@ -29,15 +29,15 @@ it('creates one program room plus year sub-rooms for every active program', func
 });
 
 it('is idempotent — running twice does not duplicate rooms', function () {
-    $first = (new EnsureProgramChatRooms)->run();
-    $second = (new EnsureProgramChatRooms)->run();
+    $first = (new EnsureProgramChatRooms)->handle();
+    $second = (new EnsureProgramChatRooms)->handle();
 
     expect($second['rooms_created'])->toBe(0);
     expect($second['rooms_total'])->toBe($first['rooms_total']);
 });
 
 it('uses program slugs that include the program code', function () {
-    (new EnsureProgramChatRooms)->run();
+    (new EnsureProgramChatRooms)->handle();
     $bsit = Program::where('code', 'BSIT')->firstOrFail();
 
     $programRoom = ChatRoom::where('program_id', $bsit->id)

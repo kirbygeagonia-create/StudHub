@@ -33,7 +33,7 @@ class PostChatMessage
     /**
      * @param  AttachmentPayload|null  $attachment
      */
-    public function run(ChatRoom $room, User $sender, string $body, ?array $attachment = null, ?int $replyToMessageId = null): ChatMessage
+    public function handle(ChatRoom $room, User $sender, string $body, ?array $attachment = null, ?int $replyToMessageId = null): ChatMessage
     {
         $body = trim($body);
 
@@ -98,7 +98,8 @@ class PostChatMessage
             ->where(function ($query) use ($mentionedNames) {
                 $query->whereIn('display_name', $mentionedNames);
                 foreach ($mentionedNames as $name) {
-                    $query->orWhereRaw("REPLACE(display_name, ' ', '.') LIKE ?", ["%{$name}%"]);
+                    $escaped = str_replace(['%', '_'], ['\%', '\_'], $name);
+                    $query->orWhere(DB::raw("REPLACE(display_name, ' ', '.')"), 'like', "%{$escaped}%");
                 }
             })
             ->get();

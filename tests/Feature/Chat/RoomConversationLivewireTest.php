@@ -16,7 +16,7 @@ beforeEach(function () {
     $this->seed(SeaitSchoolSeeder::class);
     $this->seed(SeaitCollegesSeeder::class);
     $this->seed(SeaitProgramsSeeder::class);
-    (new EnsureProgramChatRooms)->run();
+    (new EnsureProgramChatRooms)->handle();
 
     $bsit = Program::where('code', 'BSIT')->firstOrFail();
 

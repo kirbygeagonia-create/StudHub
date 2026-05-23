@@ -3,12 +3,10 @@
 namespace App\Domain\Chat\Notifications;
 
 use App\Models\ChatMessage;
-use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 
 class ChatMentionNotification extends Notification
 {
-    use Queueable;
 
     public function __construct(public readonly ChatMessage $message) {}
 

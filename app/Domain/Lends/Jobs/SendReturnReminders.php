@@ -5,15 +5,12 @@ namespace App\Domain\Lends\Jobs;
 use App\Domain\Lends\Notifications\ReturnReminder;
 use App\Models\Lend;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
 class SendReturnReminders implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Queueable;
 
     public function handle(): void
     {

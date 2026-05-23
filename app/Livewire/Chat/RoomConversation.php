@@ -92,7 +92,7 @@ class RoomConversation extends Component
             ];
         }
 
-        $action->run($this->room, $user, $this->body, $attachmentPayload);
+        $action->handle($this->room, $user, $this->body, $attachmentPayload);
 
         $this->body = '';
         $this->attachment = null;

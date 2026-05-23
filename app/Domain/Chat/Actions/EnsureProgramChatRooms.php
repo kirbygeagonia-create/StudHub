@@ -17,7 +17,7 @@ class EnsureProgramChatRooms
     /**
      * @return array{rooms_created: int, rooms_total: int}
      */
-    public function run(?Program $only = null): array
+    public function handle(?Program $only = null): array
     {
         $query = Program::query()->where('is_active', true);
 

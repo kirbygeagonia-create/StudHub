@@ -2,6 +2,7 @@
 
 namespace App\Domain\Feedback\Actions;
 
+use App\Domain\Feedback\Enums\FeedbackType;
 use App\Models\Feedback;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -24,14 +25,12 @@ class SubmitFeedback
             throw new RuntimeException('Feedback is limited to 2000 characters.');
         }
 
-        $type = in_array($data['type'] ?? '', ['bug', 'feature', 'praise', 'other'], true)
-            ? $data['type']
-            : 'feedback';
+        $type = FeedbackType::tryFrom($data['type'] ?? '') ?? FeedbackType::General;
 
         return DB::transaction(function () use ($user, $body, $type): Feedback {
             return Feedback::create([
                 'user_id' => $user->id,
-                'type' => $type,
+                'type' => $type->value,
                 'body' => $body,
             ]);
         });

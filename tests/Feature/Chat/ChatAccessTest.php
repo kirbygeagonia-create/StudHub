@@ -16,7 +16,7 @@ beforeEach(function () {
     $this->seed(SeaitSchoolSeeder::class);
     $this->seed(SeaitCollegesSeeder::class);
     $this->seed(SeaitProgramsSeeder::class);
-    (new EnsureProgramChatRooms)->run();
+    (new EnsureProgramChatRooms)->handle();
 });
 
 it('lists only rooms scoped to the user\'s program and year', function () {
@@ -163,7 +163,7 @@ it('prevents multiple @mention of same user', function () {
     $sender = User::factory()->onboarded()->create(['display_name' => 'Alice']);
     $target = User::factory()->onboarded()->create(['display_name' => 'BobReviewer']);
 
-    $message = (new PostChatMessage)->run($room, $sender, 'Hey @BobReviewer @BobReviewer check this');
+    $message = (new PostChatMessage)->handle($room, $sender, 'Hey @BobReviewer @BobReviewer check this');
 
     expect($message->mentions)->toHaveCount(1);
 });
@@ -175,7 +175,7 @@ it('rejects attachment with disallowed MIME type', function () {
         ->firstOrFail();
     $sender = User::factory()->onboarded()->create();
 
-    expect(fn () => (new PostChatMessage)->run($room, $sender, 'check this', [
+    expect(fn () => (new PostChatMessage)->handle($room, $sender, 'check this', [
         'url' => 'file.exe',
         'mime' => 'application/x-msdownload',
     ]))

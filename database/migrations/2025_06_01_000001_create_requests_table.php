@@ -54,6 +54,10 @@ return new class extends Migration
             $table->timestamp('returned_at')->nullable();
             $table->string('condition_on_return', 16)->nullable();
             $table->timestamps();
+
+            $table->index('from_user_id');
+            $table->index('to_user_id');
+            $table->index(['returned_at', 'return_by']);
         });
 
         Schema::table('requests', function (Blueprint $table) {

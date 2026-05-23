@@ -17,7 +17,7 @@ beforeEach(function () {
     $this->seed(SeaitSchoolSeeder::class);
     $this->seed(SeaitCollegesSeeder::class);
     $this->seed(SeaitProgramsSeeder::class);
-    (new EnsureProgramChatRooms)->run();
+    (new EnsureProgramChatRooms)->handle();
 
     $this->bsit = Program::where('code', 'BSIT')->firstOrFail();
     $this->room = ChatRoom::where('program_id', $this->bsit->id)
@@ -30,7 +30,7 @@ it('persists the message and dispatches the broadcast event', function () {
 
     $sender = User::factory()->onboarded()->create();
 
-    $message = (new PostChatMessage)->run($this->room, $sender, 'Hello world');
+    $message = (new PostChatMessage)->handle($this->room, $sender, 'Hello world');
 
     expect($message->id)->not->toBeNull();
     expect($message->body)->toBe('Hello world');
@@ -45,7 +45,7 @@ it('persists the message and dispatches the broadcast event', function () {
 it('refuses to post an empty message without an attachment', function () {
     $sender = User::factory()->onboarded()->create();
 
-    expect(fn () => (new PostChatMessage)->run($this->room, $sender, '   '))
+    expect(fn () => (new PostChatMessage)->handle($this->room, $sender, '   '))
         ->toThrow(InvalidArgumentException::class);
 });
 
@@ -56,7 +56,7 @@ it('resolves @display_name mentions and sends a database notification', function
     $target = User::factory()->onboarded()->create(['display_name' => 'BobReviewer']);
     $other = User::factory()->onboarded()->create(['display_name' => 'Charlie']);
 
-    $message = (new PostChatMessage)->run($this->room, $sender, 'Hey @BobReviewer can you share the module?');
+    $message = (new PostChatMessage)->handle($this->room, $sender, 'Hey @BobReviewer can you share the module?');
 
     expect($message->mentions->pluck('id')->all())->toBe([$target->id]);
 
@@ -69,7 +69,7 @@ it('does not mention the sender themselves', function () {
 
     $sender = User::factory()->onboarded()->create(['display_name' => 'Selfie']);
 
-    $message = (new PostChatMessage)->run($this->room, $sender, 'note to self @Selfie remember the exam');
+    $message = (new PostChatMessage)->handle($this->room, $sender, 'note to self @Selfie remember the exam');
 
     expect($message->mentions)->toHaveCount(0);
     Notification::assertNothingSent();
@@ -78,7 +78,7 @@ it('does not mention the sender themselves', function () {
 it('broadcasts on the chat-room scoped private channel', function () {
     $sender = User::factory()->onboarded()->create();
 
-    $message = (new PostChatMessage)->run($this->room, $sender, 'channel check');
+    $message = (new PostChatMessage)->handle($this->room, $sender, 'channel check');
 
     $event = new ChatMessagePosted($message);
     $channels = collect($event->broadcastOn())->map(fn ($c) => $c->name)->all();

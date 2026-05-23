@@ -1,7 +1,7 @@
 ﻿<div class="space-y-4" wire:poll.10s.visible>
     <div data-testid="chat-message-list" class="h-96 overflow-y-auto border border-gray-100 rounded-lg p-4 bg-gray-50 space-y-3">
         @forelse ($this->roomMessages as $message)
-            <article class="text-sm" data-testid="chat-message">
+            <article class="text-sm" data-testid="chat-message" wire:key="message-{{ $message->id }}">
                 <header class="flex items-baseline gap-2 mb-0.5">
                     <span class="font-semibold text-gray-900">{{ $message->sender?->preferredDisplayName() ?? 'Unknown' }}</span>
                     @if ($message->sender?->program?->code)
