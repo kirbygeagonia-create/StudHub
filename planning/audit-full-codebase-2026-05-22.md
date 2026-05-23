@@ -301,4 +301,107 @@ See individual sections above for details.
 
 ---
 
-*End of audit report.*
+---
+
+## 13. NEW FINDINGS FROM RE-AUDIT (2026-05-23)
+
+The following findings were discovered during a second-pass re-audit of the same 4 audit areas (frontend, config, dead code, tests) that had been aborted in the original run.
+
+### 13.1 Frontend (Additional 8 findings beyond original UI-#)
+
+| # | Severity | Location | Finding |
+|---|----------|----------|---------|
+| **UI-10** | **HIGH** | `livewire/chat/room-conversation.blade.php` + `RoomConversation.php` | `wire:poll.10s` has **no suspended-user guard**. `mount()` checks program/year access but never checks `$user->isSuspended()`. Suspended users can still poll chat via Livewire. Per audit fix F7, suspended users must be blocked from all chat channels. |
+| **UI-11** | **HIGH** | `livewire/chat/room-conversation.blade.php` | `wire:poll.10s` has no `.visible` guard. Polls every 10s even in background tabs — wasted bandwidth and server load. Use `wire:poll.10s.visible`. |
+| **UI-12** | **MEDIUM** | `resources/show.blade.php` lines 103-138 | **Unclosed `<div>` nesting bug.** The `<div>` opened at line 103 (flex container) is never closed. The `</div>` at line 138 closes the outer resource card instead. DOM is structurally broken. |
+| **UI-13** | **MEDIUM** | 9 locations across 5 files | Inline `onclick="this.disabled=true; this.form.submit();"` for double-submit prevention is not CSP-friendly and may race with Livewire's `wire:submit` on chat report form. Use Alpine `@click` or `wire:loading.attr="disabled"` instead. |
+| **UI-14** | **MEDIUM** | `requests/create.blade.php` (line 47-78) + `resources/form.blade.php` (line 40-79) | **Duplicate Alpine.js code** — `subjectAutocomplete()` and `subjectAutocomplete2()` are nearly identical. Extract to shared include or Alpine plugin. |
+| **UI-15** | **LOW** | `layouts/navigation.blade.php` line 109-120 | Hamburger button has `aria-expanded` but **no `aria-controls`** and the responsive menu `div` has **no `id`** to target. |
+| **UI-16** | **LOW** | `livewire/chat/room-conversation.blade.php` | Chat message container has **no `role="log"`** or `aria-live="polite"` for screen reader announcements of new messages. |
+| **UI-17** | **LOW** | `welcome.blade.php` vs `layouts/app.blade.php` | **Mixed fonts:** `welcome.blade.php` loads Lexend + DM Sans; authenticated layouts load Figtree. Design inconsistency. |
+
+### 13.2 Config/Security (Additional 10 findings beyond original CFG-#)
+
+| # | Severity | Location | Finding |
+|---|----------|----------|---------|
+| **CFG-12** | **HIGH** | `config/session.php` line 172 | `SESSION_SECURE_COOKIE` has **no fallback default** — `'secure' => env('SESSION_SECURE_COOKIE')` with no second arg. If unset, cookie `secure` flag is `null` (falsy). Production must explicitly set this. |
+| **CFG-13** | **MEDIUM** | `.env.example` lines 33-34 | `DB_USERNAME=studhub`, `DB_PASSWORD=studhub` committed in repo — predictable dev credentials. |
+| **CFG-14** | **MEDIUM** | `.env.example` line 82 | Windows Ghostscript path `C:\Program Files\gs\gs10.07.1\bin\gswin64c.exe` in `.env.example` — will fail on Linux servers. Config fallback `gs` is correct. |
+| **CFG-15** | **MEDIUM** | `composer.json` line 14 | `laravel/tinker` in `require` (production) instead of `require-dev`. Interactive shell should not be deployed to production. |
+| **CFG-16** | **MEDIUM** | `config/queue.php` | `after_commit => false` for all queue connections — jobs dispatch before DB transaction commits. If transaction rolls back, dispatched job may still execute. Set to `true` for data-integrity. |
+| **CFG-17** | **LOW** | `.env.example` line 52 | `REDIS_PASSWORD=null` — Redis has no auth. OK for dev, should be set in production. |
+| **CFG-18** | **LOW** | `config/database.php` | No explicit MySQL SSL enforcement. For remote production DB, TLS must be mandated. |
+| **CFG-19** | **LOW** | `config/queue.php` line 59 | SQS prefix fallback: `https://sqs.us-east-1.amazonaws.com/your-account-id` — Laravel boilerplate placeholder. |
+| **CFG-20** | **LOW** | `composer.json` | 3 packages use `*` version constraints — also noted in CFG-6 but more detail: `blade-heroicons`, `fpdf`, `fpdi` all completely unpinned. |
+| **CFG-21** | **LOW** | `config/session.php` | `SESSION_ENCRYPT=false` — session data stored unencrypted in DB. Defense-in-depth gap. |
+
+### 13.3 Code Quality (Additional 5 findings beyond original CQ-#)
+
+| # | Severity | Location | Finding |
+|---|----------|----------|---------|
+| **CQ-8** | **MEDIUM** | `app/Domain/Lends/Jobs/SendReturnReminders.php` line 16 | **Redundant trait usage** — uses L11 `Queueable` (which bundles `Dispatchable, InteractsWithQueue, Queueable, SerializesModels`) but STILL individually lists all 4 traits. Also imports `Illuminate\Foundation\Bus\Dispatchable` redundantly. |
+| **CQ-9** | **MEDIUM** | `app/Domain/Chat/Notifications/ChatMentionNotification.php` lines 6, 10-11 | **Unused `Queueable` trait** — class does NOT implement `ShouldQueue`, so `Illuminate\Bus\Queueable` trait is dead code. |
+| **CQ-10** | **LOW** | `app/Domain/Requests/Actions/RouteRequest.php` line 220 | **Enum bypass in raw query** — `->where('offers.status', '=', 'accepted')` uses raw string instead of `OfferStatus::Accepted->value`. Enum value change would silently break this. |
+| **CQ-11** | **LOW** | `app/Domain/Catalog/Actions/DownloadResourceFile.php` lines 80, 87 | **`md5()` for cache keys** — cryptographically broken. Use `hash('sha256', ...)` or string concatenation. |
+| **CQ-12** | **LOW** | `app/Domain/Requests/Actions/RouteRequest.php` lines 157, 181, 199, 262 | **`mixed` type hints** on 4 private methods where `$subject` is always a `Subject` model. Replace with `Subject` type for better static analysis. |
+
+### 13.4 Tests (Additional 2 findings beyond original TST-#)
+
+| # | Severity | Location | Finding |
+|---|----------|----------|---------|
+| **TST-4** | **LOW** | 9 files use `test(` style, 25 files use `it(` style | Style inconsistency — `it(` is dominant (203 vs 28). Consider standardizing. |
+| **TST-5** | **LOW** | `tests/Feature/SmokeTest.php` lines 48-76 | Rate-limit test permanently `->skip()`ed. Either fix using `withoutMiddleware()` or remove as dead code. Also has `->markTestSkipped()` on line 58 (conditional skip — valid guard). |
+
+---
+
+## 14. UPDATED GRAND TOTALS (After Re-Audit)
+
+| Category | Critical | High | Medium | Low | Total |
+|----------|----------|------|--------|-----|-------|
+| Database/Migrations/Models | 0 | 2 | 10 | 16 | 28 |
+| Controllers/Routes | 0 | 5 | 3 | 5 | 13 |
+| Domain (Actions/Jobs/Events) | 1 | 1 | 4 | 7 | 13 |
+| Tests | 0 | 0 | 0 | 3 | 3 |
+| Frontend (Blade/Livewire) | 2 | 2 | 6 | 6 | 16 |
+| Configuration/Security | 0 | 1 | 8 | 12 | 21 |
+| Code Quality | 0 | 0 | 3 | 9 | 12 |
+| **TOTAL** | **3** | **11** | **34** | **58** | **106** |
+
+---
+
+## 15. UPDATED SCORES (After Re-Audit)
+
+| Dimension | Score | Change | Notes |
+|-----------|-------|--------|-------|
+| **Architecture** | 8/10 | — | Clean Domain-driven design. |
+| **Database Design** | 6/10 | — | Schema correct, many missing indexes. |
+| **Security** | 7/10 | — | Auth/Session/Broadcast solid. Missing headers, CORS, TrustProxies. |
+| **Code Quality** | 8/10 | -1 | Zero dead code! But `strict_types=1` missing everywhere, trait redundancy, enum bypass. |
+| **Testing** | 9/10 | — | 231 tests, zero `.only`, clean. |
+| **Frontend/UX** | 5/10 | -1 | 2 critical bugs (autocomplete + suspended polling). DOM nesting bug. |
+| **Config/Ops** | 5/10 | -1 | New findings: missing `SESSION_SECURE_COOKIE` default, `laravel/tinker` in production, `after_commit=false`, predictable DB creds in repo. |
+| **Performance** | 7/10 | — | Several unindexed paths, TOCTOU races. |
+| **Overall** | **6.8/10** | **-0.4** | **Pilot-ready but 106 findings. Priority: fix 3 criticals + 11 highs.** |
+
+---
+
+## 16. UPDATED TOP PRIORITY FIXES (Including Re-Audit)
+
+1. **Fix broken autocomplete** — add `@stack('scripts')` to `layouts/app.blade.php`
+2. **Add `DB::transaction()`** to `CreateReport` action
+3. **Add suspended-user guard** to `RoomConversation::mount()` — match F7 audit requirement
+4. **Fix `wire:poll`** to use `.visible` guard and check `isSuspended()`
+5. **Fix unclosed `<div>`** in `resources/show.blade.php` around lines 103-138
+6. **Add missing database indexes** — lends `(returned_at, return_by)`, reports `school_id`, requests `requester_user_id`
+7. **Add school_id scoping** to `AdminController.dashboard()` and `RequestController.index()` queries
+8. **Add duplicate-vote protection** to `ResourceController.markHelpful()`
+9. **Wrap admin writes in transactions** — `assignModerator()`, `removeModerator()`
+10. **Set `SESSION_SECURE_COOKIE=true`** and `APP_DEBUG=false` in `.env.example`
+11. **Add security response headers** via middleware
+12. **Move `laravel/tinker`** to `require-dev`
+13. **Set `after_commit => true`** for data-integrity queue jobs
+14. **Clean up redundant traits** — `SendReturnReminders`, `ChatMentionNotification`
+
+---
+
+*End of audit report — updated 2026-05-23 with re-audit findings.*
