@@ -11,6 +11,6 @@ class ProvisionChatRoomsSeeder extends Seeder
 
     public function run(): void
     {
-        $this->action->run();
+        $this->action->handle();
     }
 }

@@ -7,7 +7,6 @@ use Illuminate\Notifications\Notification;
 
 class ChatMentionNotification extends Notification
 {
-
     public function __construct(public readonly ChatMessage $message) {}
 
     /**
