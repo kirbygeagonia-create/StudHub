@@ -71,9 +71,10 @@
 
         <!-- PWA Install Banner -->
         <div id="pwa-install-banner"
-             x-data x-show="false"
-             x-init="setTimeout(() => { const e = document.getElementById('pwa-install-banner'); if (e.dataset.ready) e.__x.$data.show = true }, 3000)"
-             class="hidden fixed bottom-4 inset-x-4 z-50 card p-4 flex items-center justify-between gap-4 max-w-lg mx-auto shadow-card-lg">
+             x-data="{ show: false }"
+             x-show="show"
+             x-init="setTimeout(() => { const e = document.getElementById('pwa-install-banner'); if (e.dataset.ready) show = true }, 3000)"
+             class="fixed bottom-4 inset-x-4 z-50 card p-4 flex items-center justify-between gap-4 max-w-lg mx-auto shadow-card-lg">
             <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Install StudHub for quick access</p>
             <button onclick="installPwa()" class="btn-primary text-xs !px-4 !py-2">Install</button>
         </div>

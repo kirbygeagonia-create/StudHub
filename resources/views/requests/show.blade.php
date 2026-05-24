@@ -1,74 +1,54 @@
 ﻿<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ $request->subject->code }} — {{ $request->type_wanted }}
-        </h2>
-    </x-slot>
+    <x-page-header title="{{ $request->subject->code }} — {{ $request->type_wanted }}" />
 
     <div class="py-8">
-        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            @if (session('status'))
-                <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md text-sm">
-                    {{ session('status') }}
-                </div>
-            @endif
-
-            @if ($errors->any())
-                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
-                    <ul class="list-disc list-inside">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
-            <div class="bg-white shadow-sm sm:rounded-lg p-6 space-y-3">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            <div class="card p-6 space-y-3">
                 <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                     <div>
-                        <dt class="text-xs uppercase tracking-wide text-gray-500">Requested by</dt>
-                        <dd class="text-gray-900">
+                        <dt class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Requested by</dt>
+                        <dd class="text-gray-900 dark:text-gray-100">
                             {{ $request->requester->display_name ?: $request->requester->name }}
                         </dd>
                     </div>
                     <div>
-                        <dt class="text-xs uppercase tracking-wide text-gray-500">Subject</dt>
-                        <dd class="text-gray-900">{{ $request->subject->code }} · {{ $request->subject->name }}</dd>
+                        <dt class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Subject</dt>
+                        <dd class="text-gray-900 dark:text-gray-100">{{ $request->subject->code }} · {{ $request->subject->name }}</dd>
                     </div>
                     <div>
-                        <dt class="text-xs uppercase tracking-wide text-gray-500">Type wanted</dt>
-                        <dd class="text-gray-900">{{ ucfirst(str_replace('_', ' ', $request->type_wanted)) }}</dd>
+                        <dt class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Type wanted</dt>
+                        <dd class="text-gray-900 dark:text-gray-100">{{ ucfirst(str_replace('_', ' ', $request->type_wanted)) }}</dd>
                     </div>
                     <div>
-                        <dt class="text-xs uppercase tracking-wide text-gray-500">Urgency</dt>
-                        <dd class="text-gray-900">{{ $request->urgency?->label() ?? 'Normal' }}</dd>
+                        <dt class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Urgency</dt>
+                        <dd class="text-gray-900 dark:text-gray-100">{{ $request->urgency?->label() ?? 'Normal' }}</dd>
                     </div>
                     @if ($request->needed_by)
                         <div>
-                            <dt class="text-xs uppercase tracking-wide text-gray-500">Needed by</dt>
-                            <dd class="text-gray-900">{{ $request->needed_by->format('M d, Y') }}</dd>
+                            <dt class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Needed by</dt>
+                            <dd class="text-gray-900 dark:text-gray-100">{{ $request->needed_by->format('M d, Y') }}</dd>
                         </div>
                     @endif
                     <div>
-                        <dt class="text-xs uppercase tracking-wide text-gray-500">Status</dt>
-                        <dd class="text-gray-900">{{ $request->status?->label() ?? 'Open' }}</dd>
+                        <dt class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Status</dt>
+                        <dd class="text-gray-900 dark:text-gray-100">{{ $request->status?->label() ?? 'Open' }}</dd>
                     </div>
                 </dl>
 
                 @if ($request->description)
-                    <div class="border-t border-gray-100 pt-3">
-                        <h3 class="text-xs uppercase tracking-wide text-gray-500 mb-1">Description</h3>
-                        <p class="text-sm text-gray-800 whitespace-pre-line">{{ $request->description }}</p>
+                    <div class="border-t border-gray-100 dark:border-navy-700 pt-3">
+                        <h3 class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400 mb-1">Description</h3>
+                        <p class="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-line">{{ $request->description }}</p>
                     </div>
                 @endif
             </div>
 
             @if ($request->routes->isNotEmpty())
-                <div class="bg-white shadow-sm sm:rounded-lg p-6">
-                    <h3 class="text-sm font-semibold text-gray-800 mb-3">Routing</h3>
+                <div class="card p-6">
+                    <h3 class="section-title mb-3">Routing</h3>
                     <ul class="space-y-1 text-sm">
                         @foreach ($request->routes as $route)
-                            <li class="flex justify-between text-gray-600">
+                            <li class="flex justify-between text-gray-600 dark:text-gray-400">
                                 <span>{{ $route->program->code }}</span>
                                 <span>Score: {{ number_format($route->score, 3) }} · {{ $route->notified_user_count }} notified</span>
                             </li>
@@ -77,26 +57,26 @@
                 </div>
             @endif
 
-            <div class="bg-white shadow-sm sm:rounded-lg p-6">
-                <h3 class="text-sm font-semibold text-gray-800 mb-3">Offers ({{ $request->offers->count() }})</h3>
+            <div class="card p-6">
+                <h3 class="section-title mb-3">Offers ({{ $request->offers->count() }})</h3>
 
                 @if ($request->offers->isEmpty())
-                    <p class="text-sm text-gray-500">No offers yet.</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">No offers yet.</p>
                 @else
-                    <ul class="divide-y divide-gray-100">
+                    <ul class="divide-y divide-gray-100 dark:divide-navy-700">
                         @foreach ($request->offers as $offer)
                             <li class="py-3 flex items-start justify-between">
                                 <div>
-                                    <p class="text-sm font-medium text-gray-900">
+                                    <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
                                         {{ $offer->offerer->display_name ?: $offer->offerer->name }}
                                     </p>
                                     @if ($offer->resource)
-                                        <p class="text-xs text-gray-500">
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">
                                             Offering: {{ $offer->resource->title }}
                                         </p>
                                     @endif
                                     @if ($offer->message)
-                                        <p class="text-xs text-gray-600 mt-0.5">{{ $offer->message }}</p>
+                                        <p class="text-xs text-gray-600 dark:text-gray-400 mt-0.5">{{ $offer->message }}</p>
                                     @endif
                                 </div>
                                 <div class="flex items-center gap-2">
@@ -104,13 +84,13 @@
                                         <form method="POST" action="{{ route('requests.offers.accept', [$request, $offer]) }}">
                                             @csrf
                                             <button type="submit" onclick="this.disabled=true; this.form.submit();"
-                                                    class="px-2 py-1 bg-green-600 border border-transparent rounded text-xs font-semibold text-white uppercase tracking-widest hover:bg-green-700 disabled:opacity-50">
+                                                    class="btn-primary text-xs !px-2 !py-1 !bg-emerald-500 hover:!bg-emerald-600">
                                                 Accept
                                             </button>
                                         </form>
                                     @endif
                                     <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium
-                                        {{ $offer->status?->value === 'accepted' ? 'bg-green-100 text-green-800' : ($offer->status?->value === 'rejected' || $offer->status?->value === 'withdrawn' ? 'bg-gray-100 text-gray-800' : 'bg-yellow-100 text-yellow-800') }}">
+                                        {{ $offer->status?->value === 'accepted' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300' : ($offer->status?->value === 'rejected' || $offer->status?->value === 'withdrawn' ? 'bg-gray-100 text-gray-700 dark:bg-navy-700 dark:text-gray-300' : 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-300') }}">
                                         {{ $offer->status?->label() ?? 'Pending' }}
                                     </span>
                                 </div>
@@ -120,44 +100,44 @@
                 @endif
 
                 @if ($request->status?->value === 'matched' && auth()->id() === $request->requester_user_id && $request->fulfilled_offer_id)
-    @php
-        $acceptedOffer = $request->offers->firstWhere('id', $request->fulfilled_offer_id);
-    @endphp
-    @if ($acceptedOffer && $acceptedOffer->resource_id)
-        <div class="border-t border-gray-100 pt-4 mt-4">
-            <h3 class="text-sm font-semibold text-gray-800 mb-3">Record as Lend</h3>
-            <p class="text-xs text-gray-500 mb-2">
-                The offer from <strong>{{ $acceptedOffer->offerer->display_name ?: $acceptedOffer->offerer->name }}</strong> has been accepted.
-                Record the resource "{{ $acceptedOffer->resource->title }}" as lent.
-            </p>
-            <form method="POST" action="{{ route('lends.record', [$request, $acceptedOffer]) }}" class="space-y-3">
-                @csrf
-                <div>
-                    <label for="return_by" class="block text-sm font-medium text-gray-700 mb-1">
-                        Expected return date
-                    </label>
-                    <input type="date" id="return_by" name="return_by"
-                           class="border-gray-300 rounded-md shadow-sm focus:ring-seait-400 focus:border-seait-400 text-sm">
-                </div>
-<button type="submit" onclick="this.disabled=true; this.form.submit();"
-                                                        class="px-4 py-2 bg-seait-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-seait-600 disabled:opacity-50">
-                                                    Record Lend
-                                                </button>
-            </form>
-        </div>
-    @endif
-@endif
+                    @php
+                        $acceptedOffer = $request->offers->firstWhere('id', $request->fulfilled_offer_id);
+                    @endphp
+                    @if ($acceptedOffer && $acceptedOffer->resource_id)
+                        <div class="border-t border-gray-100 dark:border-navy-700 pt-4 mt-4">
+                            <h3 class="section-title mb-3">Record as Lend</h3>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                                The offer from <strong>{{ $acceptedOffer->offerer->display_name ?: $acceptedOffer->offerer->name }}</strong> has been accepted.
+                                Record the resource "{{ $acceptedOffer->resource->title }}" as lent.
+                            </p>
+                            <form method="POST" action="{{ route('lends.record', [$request, $acceptedOffer]) }}" class="space-y-3">
+                                @csrf
+                                <div>
+                                    <label for="return_by" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                                        Expected return date
+                                    </label>
+                                    <input type="date" id="return_by" name="return_by"
+                                           class="input-field text-sm">
+                                </div>
+                                <button type="submit" onclick="this.disabled=true; this.form.submit();"
+                                        class="btn-primary text-xs">
+                                    Record Lend
+                                </button>
+                            </form>
+                        </div>
+                    @endif
+                @endif
 
-@if ($request->isOpen() && auth()->id() !== $request->requester_user_id)
-                    <form method="POST" action="{{ route('requests.offers.store', $request) }}" class="mt-4 space-y-3 border-t border-gray-100 pt-4">
+                @if ($request->isOpen() && auth()->id() !== $request->requester_user_id)
+                    <form method="POST" action="{{ route('requests.offers.store', $request) }}" class="mt-4 space-y-3 border-t border-gray-100 dark:border-navy-700 pt-4">
                         @csrf
 
                         <div>
-                            <label for="resource_id" class="block text-sm font-medium text-gray-700 mb-1">
+                            <label for="resource_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                                 Your resource (optional)
                             </label>
                             <select id="resource_id" name="resource_id"
-                                    class="w-full border-gray-300 rounded-md shadow-sm focus:ring-seait-400 focus:border-seait-400 text-sm">
+                                    class="w-full input-field text-sm">
                                 <option value="">No resource — just a message</option>
                                 @foreach ($userResources as $resource)
                                     <option value="{{ $resource->id }}" @selected(old('resource_id') == $resource->id)>
@@ -168,17 +148,17 @@
                         </div>
 
                         <div>
-                            <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Message (optional)</label>
+                            <label for="message" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Message (optional)</label>
                             <textarea id="message" name="message" rows="2" maxlength="1000"
-                                      class="w-full border-gray-300 rounded-md shadow-sm focus:ring-seait-400 focus:border-seait-400 text-sm"
+                                      class="w-full input-field text-sm"
                                       placeholder="I have a reviewer that covers this topic…">{{ old('message') }}</textarea>
                         </div>
 
                         <div class="flex justify-end">
 <button type="submit" onclick="this.disabled=true; this.form.submit();"
-                                                            class="px-4 py-2 bg-seait-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-seait-600 disabled:opacity-50">
-                                                        Make offer
-                                                    </button>
+                                        class="btn-primary text-xs">
+                                    Make offer
+                                </button>
                         </div>
                     </form>
                 @endif

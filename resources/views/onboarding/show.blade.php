@@ -25,7 +25,7 @@
             <select id="program_id"
                     name="program_id"
                     required
-                    class="block mt-1 w-full border-gray-300 focus:border-seait-400 focus:ring-seait-400 rounded-md shadow-sm">
+                    class="block mt-1 w-full input-field">
                 <option value="">Select your program…</option>
                 @foreach ($programs as $program)
                     <option value="{{ $program->id }}"
@@ -42,7 +42,7 @@
             <select id="year_level"
                     name="year_level"
                     required
-                    class="block mt-1 w-full border-gray-300 focus:border-seait-400 focus:ring-seait-400 rounded-md shadow-sm">
+                    class="block mt-1 w-full input-field">
                 <option value="">Pick a year…</option>
                 @for ($y = $yearMin; $y <= $yearMax; $y++)
                     <option value="{{ $y }}" @selected(old('year_level') == $y)>Year {{ $y }}</option>

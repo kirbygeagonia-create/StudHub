@@ -1,19 +1,9 @@
 ﻿<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight dark:text-gray-100">
-            {{ __('Notification Preferences') }}
-        </h2>
-    </x-slot>
+    <x-page-header title="{{ __('Notification Preferences') }}" />
 
-    <div class="py-12">
-        <div class="max-w-xl mx-auto sm:px-6 lg:px-8">
-            @if (session('status'))
-                <div class="mb-6 rounded-lg bg-green-50 dark:bg-green-900 p-4 text-sm text-green-700 dark:text-green-300">
-                    {{ session('status') }}
-                </div>
-            @endif
-
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+    <div class="py-8">
+        <div class="max-w-xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="card overflow-hidden">
                 <div class="p-6">
                     <form method="POST" action="{{ route('profile.notification-preferences.update') }}">
                         @csrf

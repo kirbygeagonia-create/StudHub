@@ -1,36 +1,30 @@
 ﻿<x-app-layout>
-    <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('My Shelf') }}
-            </h2>
-            <a href="{{ route('resources.index') }}"
-               class="inline-flex items-center px-4 py-2 bg-seait-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-seait-600">
-                Browse resources
-            </a>
-        </div>
-    </x-slot>
+    <x-page-header title="{{ __('My Shelf') }}">
+        <x-slot name="actions">
+            <a href="{{ route('resources.index') }}" class="btn-primary text-xs">Browse resources</a>
+        </x-slot>
+    </x-page-header>
 
     <div class="py-8">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8 space-y-6">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
             @if ($shelf && $resources->isNotEmpty())
-                <div class="bg-white shadow-sm sm:rounded-lg">
+                <div class="card">
                     <div class="p-6">
-                        <h3 class="text-sm font-medium text-gray-700 mb-3">{{ $shelf->name }}</h3>
-                        <ul class="divide-y divide-gray-100">
+                        <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">{{ $shelf->name }}</h3>
+                        <ul class="divide-y divide-gray-100 dark:divide-navy-700">
                             @foreach ($resources as $resource)
                                 <li class="py-4 flex items-start justify-between gap-4">
                                     <div class="min-w-0">
                                         <a href="{{ route('resources.show', $resource) }}" class="font-medium text-seait-500 hover:text-seait-800 truncate block">
                                             {{ $resource->title }}
                                         </a>
-                                        <p class="text-xs text-gray-500 mt-0.5">
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                                             {{ $resource->subject->code }} · {{ $resource->type->label() }}
                                             @if ($resource->program)
                                                 · {{ $resource->program->code }}
                                             @endif
                                         </p>
-                                        <p class="text-xs text-gray-400 mt-0.5">
+                                        <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
                                             Saved {{ $resource->pivot->created_at?->diffForHumans() }}
                                         </p>
                                     </div>
@@ -49,9 +43,11 @@
                     </div>
                 </div>
             @else
-                <div class="bg-white shadow-sm sm:rounded-lg p-6 text-center">
-                    <p class="text-sm text-gray-500">Your shelf is empty.</p>
-                    <a href="{{ route('resources.index') }}" class="mt-2 inline-block text-sm text-seait-500 hover:underline">Browse resources to save some →</a>
+                <div class="card p-6 text-center py-12">
+                    <svg class="mx-auto h-12 w-12 text-gray-300 dark:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
+                    <h3 class="mt-2 text-sm font-semibold text-gray-900 dark:text-gray-100">Your shelf is empty</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Save resources to build your personal collection.</p>
+                    <a href="{{ route('resources.index') }}" class="mt-4 btn-primary text-xs">Browse resources</a>
                 </div>
             @endif
         </div>

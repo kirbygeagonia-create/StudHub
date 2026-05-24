@@ -22,8 +22,9 @@
             </p>
         @endif
         @if ($lend->isEscalated())
-            <p class="text-xs text-red-600 dark:text-red-400 font-semibold mt-1">
-                ⚠ Escalated — moderator has been notified
+            <p class="text-xs text-red-600 dark:text-red-400 font-semibold mt-1 flex items-center gap-1">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+                Escalated — moderator has been notified
             </p>
         @endif
     </div>
@@ -39,7 +40,7 @@
         @elseif ($variant === 'borrowed')
             <form method="POST" action="{{ route('lends.return', $lend) }}" class="inline-flex items-center gap-1">
                 @csrf
-                <select name="condition" class="text-xs border-gray-300 rounded-md shadow-sm dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200">
+                <select name="condition" class="text-xs input-field">
                     <option value="">No condition</option>
                     @foreach (\App\Domain\Lends\Enums\LendCondition::cases() as $cond)
                         <option value="{{ $cond->value }}">{{ $cond->label() }}</option>
