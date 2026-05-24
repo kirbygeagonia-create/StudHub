@@ -6,7 +6,6 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-        <link rel="manifest" href="/manifest.json">
         <meta name="theme-color" content="#FF6B35">
         <meta name="color-scheme" content="light dark">
 
