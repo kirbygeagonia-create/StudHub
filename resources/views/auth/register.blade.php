@@ -1,5 +1,13 @@
-﻿<x-guest-layout>
-    <form method="POST" action="{{ route('register') }}">
+﻿@php
+// Check if this is being loaded inside a modal context
+$isModal = request()->header('X-Requested-With') === 'XMLHttpRequest' || request()->query('modal') === '1';
+@endphp
+
+@if (!$isModal)
+<x-guest-layout :heading="__('Create your account')">
+@endif
+
+    <form method="POST" action="{{ route('register') }}" @if($isModal) @submit.prevent="submitModalForm($event)" @endif>
         @csrf
 
         <!-- Name -->
@@ -46,8 +54,8 @@
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-seait-400" href="{{ route('login') }}">
+        <div class="flex items-center justify-end mt-6">
+            <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-seait-400" href="{{ route('login') }}">
                 {{ __('Already registered?') }}
             </a>
 
@@ -56,4 +64,16 @@
             </x-primary-button>
         </div>
     </form>
+
+    <div class="mt-6 text-center">
+        <p class="text-sm text-gray-600 dark:text-gray-400">
+            {{ __('Already have an account?') }}
+            <a href="{{ route('login') }}" class="font-semibold text-seait-500 hover:text-seait-600 dark:hover:text-seait-400 underline underline-offset-2 transition">
+                {{ __('Log in') }}
+            </a>
+        </p>
+    </div>
+
+@if (!$isModal)
 </x-guest-layout>
+@endif

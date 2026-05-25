@@ -1,12 +1,12 @@
-﻿<nav x-data="{ open: false }" class="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-40 dark:bg-navy-900/80 dark:border-navy-700/50" role="navigation" aria-label="Main navigation">
+﻿<nav x-data="{ open: false }" class="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 dark:bg-navy-900/80 dark:border-navy-700/30 shadow-sm dark:shadow-navy-950/30" role="navigation" aria-label="Main navigation">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex items-center gap-1">
-                <a href="{{ route('dashboard') }}" class="flex items-center gap-2.5 mr-6">
-                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-seait-400 to-seait-600 flex items-center justify-center">
+                <a href="{{ route('dashboard') }}" class="flex items-center gap-2.5 mr-6 group">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-seait-400 to-seait-600 flex items-center justify-center shadow-sm group-hover:shadow-seait-500/30 group-hover:shadow-md transition-all duration-300">
                         <x-icon name="book" class="w-4 h-4 text-white" />
                     </div>
-                    <span class="text-lg font-bold text-gray-900 tracking-tight dark:text-gray-100">StudHub</span>
+                    <span class="text-lg font-bold text-gray-900 tracking-tight dark:text-gray-100 group-hover:text-seait-500 dark:group-hover:text-seait-400 transition-colors duration-200">StudHub</span>
                 </a>
 
                 <div class="hidden sm:flex sm:items-center sm:gap-0.5">
@@ -53,13 +53,13 @@
                     </div>
                     <input type="text" id="nav-search" name="q" value="{{ request('q') }}"
                            placeholder="Search resources…"
-                           class="w-48 pl-10 pr-3 py-2 text-sm rounded-xl border-gray-200 bg-gray-50 focus:bg-white focus:border-seait-400 focus:ring-2 focus:ring-seait-100 transition-all dark:bg-navy-800 dark:border-navy-700 dark:text-gray-200 dark:placeholder:text-gray-500">
+                           class="w-48 pl-10 pr-3 py-2 text-sm rounded-xl border-gray-200 bg-gray-50/80 focus:bg-white focus:border-seait-400 focus:ring-2 focus:ring-seait-100 transition-all placeholder:text-gray-400 dark:bg-navy-800/60 dark:border-navy-600/50 dark:text-gray-200 dark:placeholder:text-gray-500 dark:focus:border-seait-500 dark:focus:ring-seait-800/30">
                 </form>
 
                 <x-dropdown align="right" width="64">
                     <x-slot name="trigger">
-                        <button class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50 dark:hover:bg-navy-800 transition-colors">
-                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-seait-400 to-seait-600 flex items-center justify-center text-white text-xs font-bold ring-2 ring-seait-100 dark:ring-seait-800/50">
+                        <button class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50/80 dark:hover:bg-navy-800/60 transition-all duration-200">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-seait-400 to-seait-600 flex items-center justify-center text-white text-xs font-bold ring-2 ring-seait-100 dark:ring-seait-800/40 shadow-sm">
                                 {{ strtoupper(substr(Auth::user()?->preferredDisplayName() ?? '?', 0, 2)) }}
                             </div>
                             <span class="text-sm font-medium text-gray-700 dark:text-gray-300 hidden lg:block">{{ Auth::user()?->preferredDisplayName() ?? 'Guest' }}</span>
@@ -68,7 +68,7 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <div class="px-3 py-2.5 border-b border-gray-100 dark:border-gray-700">
+                        <div class="px-3 py-2.5 border-b border-gray-100 dark:border-navy-700/50">
                             <p class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ Auth::user()?->name }}</p>
                             <p class="text-xs text-gray-500 dark:text-gray-400">{{ Auth::user()?->email }}</p>
                         </div>
@@ -91,9 +91,9 @@
                             </x-dropdown-link>
                         </div>
 
-                        <div class="border-t border-gray-100 dark:border-gray-700 py-1">
+                        <div class="border-t border-gray-100 dark:border-navy-700/50 py-1">
                             <button @click="dark = !dark" type="button"
-                                    class="w-full text-left flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-navy-800 transition-colors">
+                                    class="w-full text-left flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50/80 dark:text-gray-300 dark:hover:bg-navy-800/60 transition-colors">
                                 <template x-if="!dark">
                                     <x-icon name="dark" class="w-4 h-4 mr-2" />
                                 </template>
@@ -104,7 +104,7 @@
                             </button>
                         </div>
 
-                        <div class="border-t border-gray-100 dark:border-gray-700 py-1">
+                        <div class="border-t border-gray-100 dark:border-navy-700/50 py-1">
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <x-dropdown-link :href="route('logout')"
@@ -119,7 +119,7 @@
             </div>
 
             <!-- Mobile hamburger -->
-            <div class="-me-2 flex items-center sm:hidden">
+            <div class="-me-2 flex items-center sm:hidden relative z-10">
                 <button @click="open = ! open" :aria-expanded="open" aria-controls="mobile-menu"
                         class="inline-flex items-center justify-center p-2 rounded-xl text-gray-500 hover:text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-seait-400 transition dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-navy-800">
                     <svg class="h-5 w-5" :class="{'hidden': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
@@ -130,39 +130,47 @@
     </div>
 
     <!-- Mobile menu -->
-    <div id="mobile-menu" :class="{'block': open, 'hidden': !open}" class="hidden sm:hidden border-t border-gray-100 dark:border-navy-700/50">
-        <div class="px-3 py-2 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">Home</x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('chat.index')" :active="request()->routeIs('chat.*')">Chat</x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('resources.index')" :active="request()->routeIs('resources.*')">Resources</x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('leaderboard')" :active="request()->routeIs('leaderboard')">Leaderboard</x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('lends.index')" :active="request()->routeIs('lends.*')">Lends</x-responsive-nav-link>
-            @if (Auth::user()?->isModerator() || Auth::user()?->isAdmin())
-                <x-responsive-nav-link :href="route('moderation.dashboard')" :active="request()->routeIs('moderation.*')">Moderation</x-responsive-nav-link>
-            @endif
-            @if (Auth::user()?->isAdmin())
-                <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.*')">Admin</x-responsive-nav-link>
-            @endif
-        </div>
-        <div class="border-t border-gray-100 dark:border-navy-700/50 px-3 py-3 space-y-1">
-            <div class="px-3 pb-2">
-                <p class="font-medium text-sm text-gray-900 dark:text-gray-100">{{ Auth::user()?->name ?? 'Guest' }}</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">{{ Auth::user()?->email ?? '' }}</p>
+    <div id="mobile-menu" :class="{'block': open, 'hidden': !open}" class="hidden sm:hidden relative">
+        <div class="bg-white/95 dark:bg-navy-900/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-navy-700/30 shadow-lg dark:shadow-navy-950/20">
+            <div class="px-3 py-2 space-y-1">
+                <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">Home</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('chat.index')" :active="request()->routeIs('chat.*')">Chat</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('resources.index')" :active="request()->routeIs('resources.*')">Resources</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('leaderboard')" :active="request()->routeIs('leaderboard')">Leaderboard</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('lends.index')" :active="request()->routeIs('lends.*')">Lends</x-responsive-nav-link>
+                @if (Auth::user()?->isModerator() || Auth::user()?->isAdmin())
+                    <x-responsive-nav-link :href="route('moderation.dashboard')" :active="request()->routeIs('moderation.*')">Moderation</x-responsive-nav-link>
+                @endif
+                @if (Auth::user()?->isAdmin())
+                    <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.*')">Admin</x-responsive-nav-link>
+                @endif
             </div>
-            <x-responsive-nav-link :href="route('profile.show')">Profile</x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('resources.shelf')">My Shelf</x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('profile.notification-preferences')">Notifications</x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('feedback.create')">Feedback</x-responsive-nav-link>
-            <div class="px-3 py-2">
-                <button @click="dark = !dark" type="button" class="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 flex items-center gap-2">
-                    <span x-text="dark ? 'Light mode' : 'Dark mode'"></span>
-                </button>
+            <div class="border-t border-gray-100 dark:border-navy-700/50 px-3 py-3 space-y-1">
+                <div class="px-3 pb-2">
+                    <p class="font-medium text-sm text-gray-900 dark:text-gray-100">{{ Auth::user()?->name ?? 'Guest' }}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ Auth::user()?->email ?? '' }}</p>
+                </div>
+                <x-responsive-nav-link :href="route('profile.show')">Profile</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('resources.shelf')">My Shelf</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('profile.notification-preferences')">Notifications</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('feedback.create')">Feedback</x-responsive-nav-link>
+                <div class="px-3 py-2">
+                    <button @click="dark = !dark" type="button" class="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 flex items-center gap-2 transition-colors">
+                        <template x-if="!dark">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                        </template>
+                        <template x-if="dark">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                        </template>
+                        <span x-text="dark ? 'Switch to light mode' : 'Switch to dark mode'"></span>
+                    </button>
+                </div>
+                <form method="POST" action="{{ route('logout') }}" class="px-3">
+                    @csrf
+                    <x-responsive-nav-link :href="route('logout')"
+                            onclick="event.preventDefault(); this.closest('form').submit();">Log Out</x-responsive-nav-link>
+                </form>
             </div>
-            <form method="POST" action="{{ route('logout') }}" class="px-3">
-                @csrf
-                <x-responsive-nav-link :href="route('logout')"
-                        onclick="event.preventDefault(); this.closest('form').submit();">Log Out</x-responsive-nav-link>
-            </form>
         </div>
     </div>
 </nav>

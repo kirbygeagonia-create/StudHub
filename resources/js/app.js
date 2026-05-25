@@ -1,4 +1,11 @@
 import './bootstrap';
+import Alpine from 'alpinejs';
+
+// Only start Alpine if Livewire hasn't already started it
+if (!window.Alpine) {
+    window.Alpine = Alpine;
+    Alpine.start();
+}
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
