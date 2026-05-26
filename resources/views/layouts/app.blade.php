@@ -11,14 +11,11 @@
 
         <title>@yield('title', config('app.name', 'Laravel'))</title>
 
-        <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
 
-        <!-- Flash of Wrong Theme fix: apply dark mode before render -->
         <script>if (localStorage.getItem('dark') === 'true') document.documentElement.classList.add('dark')</script>
 
-        <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @livewireStyles
     </head>
@@ -28,7 +25,7 @@
 
             @isset($header)
                 <header class="bg-white/60 backdrop-blur-sm border-b border-gray-100 dark:bg-navy-800/40 dark:border-navy-700/30">
-                    <div class="max-w-7xl mx-auto py-1.5 px-4 sm:px-6 lg:px-8">
+                    <div class="max-w-7xl mx-auto py-3 px-4 sm:px-6 lg:px-8">
                         {{ $header }}
                     </div>
                 </header>
@@ -37,21 +34,27 @@
             <!-- Flash Messages -->
             @if (session('status') || session('success'))
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-                    <div x-data="{ show: true }" x-show="show" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                    <div x-data="{ show: true }" x-show="show"
                          x-init="setTimeout(() => show = false, 5000)"
+                         x-transition:leave="transition ease-in duration-300"
+                         x-transition:leave-start="opacity-100 translate-y-0"
+                         x-transition:leave-end="opacity-0 -translate-y-1" 
                          class="flash-success">
                         <svg class="w-5 h-5 flex-shrink-0 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         <span>{{ session('status') ?? session('success') }}</span>
                         <button @click="show = false" class="ml-auto text-emerald-500 hover:text-emerald-700 dark:hover:text-emerald-300">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </div>
                 </div>
             @endif
             @if (session('error'))
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-                    <div x-data="{ show: true }" x-show="show" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                    <div x-data="{ show: true }" x-show="show"
                          x-init="setTimeout(() => show = false, 6000)"
+                         x-transition:leave="transition ease-in duration-300"
+                         x-transition:leave-start="opacity-100"
+                         x-transition:leave-end="opacity-0"
                          class="flash-error">
                         <svg class="w-5 h-5 flex-shrink-0 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         <span>{{ session('error') }}</span>
@@ -63,8 +66,11 @@
             @endif
             @if (session('warning'))
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-                    <div x-data="{ show: true }" x-show="show" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                    <div x-data="{ show: true }" x-show="show"
                          x-init="setTimeout(() => show = false, 7000)"
+                         x-transition:leave="transition ease-in duration-300"
+                         x-transition:leave-start="opacity-100"
+                         x-transition:leave-end="opacity-0"
                          class="flash-warning">
                         <svg class="w-5 h-5 flex-shrink-0 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.054 0 1.502-1.275.722-1.845l-6.928-5.013c-.752-.545-1.792-.545-2.544 0L5.094 17.155c-.78.57-.332 1.845.722 1.845z"/></svg>
                         <span>{{ session('warning') }}</span>
@@ -76,8 +82,11 @@
             @endif
             @if (session('info'))
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-                    <div x-data="{ show: true }" x-show="show" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                    <div x-data="{ show: true }" x-show="show"
                          x-init="setTimeout(() => show = false, 5000)"
+                         x-transition:leave="transition ease-in duration-300"
+                         x-transition:leave-start="opacity-100"
+                         x-transition:leave-end="opacity-0"
                          class="flash-info">
                         <svg class="w-5 h-5 flex-shrink-0 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         <span>{{ session('info') }}</span>
@@ -89,7 +98,11 @@
             @endif
             @if ($errors->any())
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-                    <div x-data="{ show: true }" x-show="show" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                    <div x-data="{ show: true }" x-show="show"
+                         x-init="setTimeout(() => show = false, 8000)"
+                         x-transition:leave="transition ease-in duration-300"
+                         x-transition:leave-start="opacity-100"
+                         x-transition:leave-end="opacity-0"
                          class="flash-error">
                         <svg class="w-5 h-5 flex-shrink-0 text-red-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         <div>
@@ -111,14 +124,25 @@
             </main>
         </div>
 
-        <!-- PWA Install Banner -->
+        <!-- PWA Install Banner — visibility controlled by app.js via classList, NOT Alpine x-show -->
         <div id="pwa-install-banner"
-             x-data="{ show: false }"
-             x-show="show"
-             x-init="setTimeout(() => { const e = document.getElementById('pwa-install-banner'); if (e.dataset.ready) show = true }, 3000)"
-             class="fixed bottom-4 inset-x-4 z-50 card p-4 flex items-center justify-between gap-4 max-w-lg mx-auto shadow-card-lg">
-            <p class="text-sm font-medium text-gray-700 dark:text-gray-300">Install StudHub for quick access</p>
-            <button onclick="installPwa()" class="btn-primary text-xs !px-4 !py-2">Install</button>
+             class="hidden fixed bottom-4 inset-x-4 z-50 card p-4 flex items-center justify-between gap-4 max-w-lg mx-auto shadow-card-lg">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-seait-100 dark:bg-seait-900/30 flex items-center justify-center flex-shrink-0">
+                    <x-application-logo class="w-7 h-7" />
+                </div>
+                <div>
+                    <p class="text-sm font-semibold text-gray-900 dark:text-gray-100">Install StudHub</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">Get faster access on your device</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+                <button onclick="installPwa()" class="btn-primary text-xs !px-4 !py-2">Install</button>
+                <button onclick="document.getElementById('pwa-install-banner').classList.add('hidden')"
+                        class="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
         </div>
 
         @stack('scripts')

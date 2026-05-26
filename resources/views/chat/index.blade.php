@@ -2,37 +2,61 @@
     <x-page-header title="{{ __('Chat') }}" />
 
     <div class="py-8">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="card">
-                <div class="p-6 text-gray-900 dark:text-gray-100 space-y-4">
-                    @if ($rooms->isEmpty())
-                        <div class="text-center py-12">
-                            <svg class="mx-auto h-12 w-12 text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.625 9.75a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H8.25m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0H12m4.125 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm0 0h-.375m-13.5 3.01c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.184-4.183a1.14 1.14 0 0 1 .778-.332 48.294 48.294 0 0 0 5.83-.498c1.585-.233 2.708-1.626 2.708-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"/>
-                            </svg>
-                            <h3 class="mt-2 text-sm font-semibold text-gray-900 dark:text-gray-100">No chat rooms yet</h3>
-                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Chat rooms are automatically created for your program.</p>
-                        </div>
-                    @else
-                        <p class="text-sm text-gray-500 dark:text-gray-400">
-                            Rooms scoped to your program{{ auth()->user()->program?->code ? ' (' . auth()->user()->program->code . ')' : '' }}.
-                        </p>
-                        <ul class="divide-y divide-gray-100 dark:divide-navy-700 border border-gray-100 dark:border-navy-700 rounded-lg">
-                            @foreach ($rooms as $room)
-                                <li class="px-4 py-3 flex items-center justify-between">
-                                    <div>
-                                        <a href="{{ route('chat.show', $room) }}" class="font-medium text-seait-500 hover:text-seait-800">
-                                            #{{ $room->slug }}
-                                        </a>
-                                        <p class="text-xs text-gray-500 dark:text-gray-400">{{ $room->title }}</p>
-                                    </div>
-                                    <span class="text-xs uppercase tracking-wide text-gray-400 dark:text-gray-500">{{ $room->kind->label() }}</span>
-                                </li>
-                            @endforeach
-                        </ul>
-                    @endif
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
+
+            @if ($rooms->isEmpty())
+                <div class="card p-12 text-center">
+                    <div class="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-navy-700/50 flex items-center justify-center mx-auto mb-4">
+                        <x-icon name="chat" class="w-8 h-8 text-gray-400 dark:text-gray-500" />
+                    </div>
+                    <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100">No chat rooms yet</h3>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Chat rooms are automatically created for your program.</p>
                 </div>
-            </div>
+            @else
+                <p class="text-sm text-gray-500 dark:text-gray-400 px-1">
+                    Rooms for
+                    <span class="font-semibold text-gray-700 dark:text-gray-300">{{ auth()->user()->program?->code ?? 'your program' }}</span>
+                </p>
+
+                <div class="space-y-2">
+                    @foreach ($rooms as $room)
+                        <a href="{{ route('chat.show', $room) }}"
+                           class="group flex items-center gap-4 p-4 card hover:shadow-md transition-all duration-200 hover:-translate-y-0.5">
+                            <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-seait-400 to-seait-600 flex items-center justify-center flex-shrink-0 shadow-sm group-hover:scale-105 transition-transform">
+                                <x-icon name="chat" class="w-5 h-5 text-white" />
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-sm font-bold text-gray-900 dark:text-gray-100">#{{ $room->slug }}</span>
+                                    <span class="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 dark:bg-navy-700 dark:text-gray-400 uppercase tracking-wide">
+                                        {{ $room->kind->label() }}
+                                    </span>
+                                </div>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">{{ $room->title }}</p>
+                            </div>
+                            <svg class="w-4 h-4 text-gray-300 dark:text-gray-600 group-hover:text-seait-400 group-hover:translate-x-1 transition-all flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </a>
+                    @endforeach
+                </div>
+
+                {{-- School chat etiquette notice --}}
+                <div class="card p-4 border-l-4 border-amber-400 dark:border-amber-500 bg-amber-50/40 dark:bg-amber-900/10">
+                    <div class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.054 0 1.502-1.275.722-1.845l-6.928-5.013c-.752-.545-1.792-.545-2.544 0L5.094 17.155c-.78.57-.332 1.845.722 1.845z"/>
+                        </svg>
+                        <div>
+                            <p class="text-sm font-semibold text-amber-800 dark:text-amber-300">School Chat — Keep it respectful</p>
+                            <p class="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
+                                Be kind, stay on topic, no spam. Inside any room tap the <strong>Rules</strong> button for the full etiquette guide.
+                                All activity is subject to the <a href="{{ route('aup') }}" class="underline hover:text-amber-900 dark:hover:text-amber-200">Acceptable Use Policy</a>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 </x-app-layout>

@@ -1,5 +1,12 @@
 # Server Startup Checklist
 
+## ⚠️ IMPORTANT: AI agents must NOT run these commands
+> The `planning/studhub-improvements-v2.md` guide explicitly states:
+> **"Do not run npm, vite, or artisan commands — only file writes."**
+> Running `npm run build`, `php artisan serve`, or any `php artisan` command
+> during a UI-only file-edit session can cause unintended side effects.
+> **Only a human should start the server.** AI agents should stop here after file edits.
+
 ## Before starting any server, ALWAYS:
 
 ### 1. Kill leftover processes
