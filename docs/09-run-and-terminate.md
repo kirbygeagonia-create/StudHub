@@ -1,201 +1,163 @@
-# StudHub — How to Run & Terminate
+# StudHub — Run & Termination Guide
 
-## Prerequisites
+## Requirements
 
-Before running the system, verify you have these installed:
+- **PHP 8.2+** at `C:\xampp\php\php.exe`
+- **Composer** at `C:\xampp\php\composer`
+- **Node.js** + npm
+- **Database:** SQLite (default, zero-config for dev) or MySQL
 
-```powershell
-php --version       # PHP 8.2.12 at C:\xampp\php\php.exe
-node --version      # Node v24.13.0+ needed for Vite
-npm --version       # npm 11.14.1+
-```
-
----
-
-## 1. First-Time Setup (already done for you)
+## Quick Start (Dev)
 
 ```powershell
-# Install PHP dependencies
+# 1. Open terminal in the project folder
+cd "C:\Users\ADMIN\OneDrive\Desktop\Another_Project"
+
+# 2. Add PHP to PATH for this session
 $env:Path = "C:\xampp\php;$env:Path"
-& "C:\xampp\php\php.exe" "C:\xampp\php\composer" install --no-interaction
 
-# Install frontend dependencies & build
+# 3. Install PHP dependencies
+php composer install
+
+# 4. Copy .env (skip if .env already exists)
+copy .env.example .env
+
+# 5. Generate app key (skip if already set)
+php artisan key:generate
+
+# 6. Run database migrations
+php artisan migrate
+
+# 7. Seed SEAIT data (school, colleges, programs, subjects)
+php artisan db:seed
+
+# 8. Build frontend assets (CSS/JS)
 npm install
 npm run build
 
-# Copy .env if not already present
-if (!(Test-Path ".env")) { Copy-Item ".env.example" ".env" }
-
-# Generate app key & create SQLite database
-php artisan key:generate
-New-Item -ItemType File -Path "database\database.sqlite" -Force
-php artisan migrate --force
-php artisan db:seed --force
+# 9. Start the dev server
+php artisan serve --port=8000
 ```
 
----
+Then open **http://127.0.0.1:8000** in your browser.
 
-## 2. Running the System
+### Dev login credentials (after seeding `DevUsersSeeder`)
 
-### 2a. Start the Dev Server (HTTP only — simplest)
+| Role | Email | Password |
+|------|-------|----------|
+| Student | `student@seait.edu.ph` | `password` |
+| Moderator | `moderator@seait.edu.ph` | `password` |
+| Admin | `admin@seait.edu.ph` | `password` |
 
-```powershell
-$env:Path = "C:\xampp\php;$env:Path"
-php artisan serve
-```
+> If `DevUsersSeeder` hasn't been run: `php artisan db:seed --class=DevUsersSeeder`
 
-The app will be available at **http://localhost:8000**
-
-> Press `Ctrl+C` in the terminal to stop.
-
-### 2b. Start with Live Frontend Reloading (recommended for development)
-
-Open **two separate PowerShell terminals**:
-
-**Terminal 1** — Laravel backend:
-```powershell
-$env:Path = "C:\xampp\php;$env:Path"
-php artisan serve
-```
-
-**Terminal 2** — Vite frontend (rebuilds CSS/JS on file changes):
-```powershell
-npm run dev
-```
-
-### 2c. Start with WebSocket Chat (full stack)
-
-If you need real-time chat with Reverb, open **three terminals**:
-
-**Terminal 1** — Laravel backend:
-```powershell
-$env:Path = "C:\xampp\php;$env:Path"
-php artisan serve
-```
-
-**Terminal 2** — Vite + Reverb listener:
-```powershell
-npm run dev
-```
-
-**Terminal 3** — Reverb WebSocket server:
-```powershell
-$env:Path = "C:\xampp\php;$env:Path"
-php artisan reverb:start
-```
-
----
-
-## 3. Login Credentials (local dev SQLite)
-
-| Role       | Email               | Password   |
-|------------|---------------------|------------|
-| Student    | `test@seait.edu.ph` | `password` |
-| Moderator  | `mod@seait.edu.ph`  | `password` |
-| Admin      | `admin@seait.edu.ph`| `password` |
-
-> Database is at `database/database.sqlite` — no MySQL needed for local dev.
-
----
-
-## 4. How to Terminate
-
-### Stop the dev server(s):
-Press **`Ctrl+C`** in each open terminal window.
-
-### Kill leftover PHP processes (if any hang):
-```powershell
-Get-Process -Name "php" -ErrorAction SilentlyContinue | Stop-Process -Force
-```
-
-### Kill leftover Node processes:
-```powershell
-Get-Process -Name "node" -ErrorAction SilentlyContinue | Stop-Process -Force
-```
-
----
-
-## 5. Running Tests
+## Running Tests
 
 ```powershell
 $env:Path = "C:\xampp\php;$env:Path"
 
-# Full test suite (SQLite in-memory, no database needed)
+# All tests (SQLite in-memory, no MySQL needed)
 php vendor/bin/pest
 
-# Compact output
-php vendor/bin/pest --compact
+# Specific test file
+php vendor/bin/pest tests/Feature/Chat/ChatAccessTest.php
 
-# Filter by test name
-php vendor/bin/pest --filter="Moderation"
-
-# Single test file
-php vendor/bin/pest tests/Feature/Reputation/KarmaTest.php
+# Filter by name
+php vendor/bin/pest --filter="SmokeTest"
 ```
 
----
-
-## 6. Running the Linters
+## Running Linters
 
 ```powershell
 $env:Path = "C:\xampp\php;$env:Path"
 
-# Code style (PSR-12)
-php vendor/bin/pint --test        # Check only
-php vendor/bin/pint               # Auto-fix
+# PHPStan Level 6
+php vendor/bin/phpstan analyse --level 6 app/ --memory-limit=1G
 
-# Static analysis (Level 6)
-php vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+# Laravel Pint (code style) — dry run
+php vendor/bin/pint --test
+
+# Laravel Pint — auto-fix
+php vendor/bin/pint
 ```
 
----
-
-## 7. Quick Reference — All in One
+## CI Pipeline (local simulation)
 
 ```powershell
-# Start, test, and terminate — the full cycle:
-
-# 1. START
-Start-Process powershell -ArgumentList "-NoExit", "-Command `"`$env:Path='C:\xampp\php;`$env:Path'; php artisan serve`"" 
-Start-Process powershell -ArgumentList "-NoExit", "-Command `"npm run dev`""
-
-# 2. TEST (in another terminal)
-$env:Path = "C:\xampp\php;$env:Path"; php vendor/bin/pest --compact
-
-# 3. TERMINATE
-Get-Process -Name "php" -ErrorAction SilentlyContinue | Stop-Process -Force
-Get-Process -Name "node" -ErrorAction SilentlyContinue | Stop-Process -Force
+$env:Path = "C:\xampp\php;$env:Path"
+php composer run ci
+# Runs: pint --test → phpstan → pest
 ```
 
----
+## How to Terminate the System
 
-## 8. URL Map
+### Stop the dev server
 
-| Page           | URL                                   |
-|----------------|---------------------------------------|
-| Home / Welcome | http://localhost:8000                 |
-| Login          | http://localhost:8000/login           |
-| Register       | http://localhost:8000/register        |
-| Dashboard      | http://localhost:8000/dashboard       |
-| Chat           | http://localhost:8000/chat            |
-| Resources      | http://localhost:8000/resources       |
-| Requests       | http://localhost:8000/requests        |
-| Leaderboard    | http://localhost:8000/leaderboard     |
-| Lends          | http://localhost:8000/lends           |
-| My Shelf       | http://localhost:8000/my-shelf        |
-| Profile        | http://localhost:8000/profile         |
-| Admin          | http://localhost:8000/admin           |
-| Moderation     | http://localhost:8000/moderation      |
-| Health Check   | http://localhost:8000/up              |
+```powershell
+# Find the PHP process
+Get-Process -Name "php" | Format-Table Id, ProcessName, StartTime
 
----
+# Kill it
+Stop-Process -Name "php" -Force
+```
 
-## 9. Troubleshooting
+Or press **Ctrl+C** in the terminal window where `php artisan serve` is running.
+
+### Stop background PHP processes (if started via PowerShell `Start-Process`)
+
+```powershell
+Get-Process -Name "php" -ErrorAction SilentlyContinue | Stop-Process -Force
+```
+
+### Clean up
+
+```powershell
+# Clear caches
+php artisan cache:clear
+php artisan view:clear
+php artisan config:clear
+
+# Reset database (optional — destroys all data)
+php artisan migrate:fresh
+php artisan db:seed
+```
+
+## Dev Watch Mode (for editing CSS/JS)
+
+Instead of `npm run build`, use:
+
+```powershell
+npm run dev
+```
+
+This starts Vite HMR — changes to `resources/css/*.css` or `resources/js/*.js` will hot-reload in the browser without a manual rebuild.
+
+## Switching to MySQL
+
+In `.env`, comment out SQLite and uncomment MySQL:
+
+```env
+# DB_CONNECTION=sqlite
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=studhub
+DB_USERNAME=studhub
+DB_PASSWORD=studhub
+```
+
+Then run:
+```powershell
+php artisan migrate:fresh
+php artisan db:seed
+```
+
+## Common Issues
 
 | Problem | Fix |
 |---------|-----|
-| `php artisan` not found | Add PHP to PATH first: `$env:Path = "C:\xampp\php;$env:Path"` |
-| Vite fails to start | Run `npm install && npm run build` first |
-| Test database errors | Delete `database/database.sqlite` and re-run `php artisan migrate --force` |
-| "Class not found" | Run `$env:Path = "C:\xampp\php;$env:Path"; & "C:\xampp\php\php.exe" "C:\xampp\php\composer" dump-autoload` |
-| `npm run dev` fails | Run `npm ci` to clean-install, then `npm run build` |
+| "Pusher key" error in console | Already fixed — Echo lazily loads only when Reverb env vars are set |
+| "Got it" button unresponsive | Run `npm run build` after pulling latest code |
+| Livewire components not working | Ensure `@livewireStyles` and `@livewireScripts` are in layout (they are) |
+| Blank page / 500 error | Run `php artisan view:clear` and `npm run build` |
+| "intl" extension error | Install PHP `intl` extension or avoid `Number::ordinal()` |

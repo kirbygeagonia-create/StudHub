@@ -101,7 +101,9 @@ Route::middleware(['auth', 'verified', 'onboarded', 'not_suspended'])->group(fun
 
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/fetch', [NotificationController::class, 'fetch'])->name('notifications.fetch');
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 });
 
 Route::middleware(['auth', 'verified', 'onboarded', 'role:moderator,admin'])->group(function () {

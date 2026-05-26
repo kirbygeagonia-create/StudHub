@@ -45,11 +45,9 @@ class AuthenticatedSessionController extends Controller
     {
         Auth::guard('web')->logout();
 
-        $request->session()->flash('status', 'You have been logged out.');
-
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/');
+        return redirect('/')->with('status', 'You have been logged out.');
     }
 }

@@ -9,9 +9,9 @@
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                     <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">Notifications</h1>
-                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ $notifications->where('read_at', null)->count() }} unread</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ $unreadCount }} unread</p>
                 </div>
-                @if ($notifications->where('read_at', null)->count() > 0)
+                @if ($unreadCount > 0)
                     <form method="POST" action="{{ route('notifications.read-all') }}">
                         @csrf
                         <button type="submit" class="btn-secondary text-xs">
@@ -36,19 +36,30 @@
                             @php
                                 $data = $notification->data;
                                 $type = $data['type'] ?? 'info';
-                                $title = $data['badge_label'] ?? $data['title'] ?? 'Notification';
+                                $title = $data['badge_label'] ?? $data['title'] ?? $data['message'] ?? 'Notification';
                                 $description = $data['badge_desc'] ?? $data['message'] ?? '';
                                 $icon = $data['badge_icon'] ?? '';
                                 $link = match ($type) {
                                     'badge_earned' => route('profile.show'),
-                                    default => '#',
+                                    'chat.mention' => route('chat.index'),
+                                    'request_routed' => route('resources.index'),
+                                    'return_reminder' => route('lends.index'),
+                                    default => route('notifications.index'),
                                 };
                                 $isUnread = $notification->read_at === null;
+                                $colorClass = match ($type) {
+                                    'badge_earned' => 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-300',
+                                    'chat.mention' => 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300',
+                                    'request_routed' => 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-300',
+                                    'return_reminder' => 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-300',
+                                    default => 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
+                                };
                             @endphp
                             <a href="{{ $link }}"
+                               onclick="event.preventDefault(); fetch('{{ route('notifications.read', $notification) }}', { method: 'POST', headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'X-Requested-With': 'XMLHttpRequest' } }).then(() => { window.location.href = '{{ $link }}'; });"
                                class="flex items-start gap-4 p-4 rounded-xl transition-all duration-200 hover:bg-gray-50 dark:hover:bg-navy-700/30 {{ $isUnread ? 'bg-seait-50/50 dark:bg-seait-900/10 border border-seait-100 dark:border-seait-800/20' : 'border border-transparent' }}">
                                 <!-- Icon -->
-                                <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 {{ $type === 'badge_earned' ? 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-300' : 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300' }}">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 {{ $colorClass }}">
                                     @if ($icon)
                                         <span class="text-lg">{{ $icon }}</span>
                                     @else
