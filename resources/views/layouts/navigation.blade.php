@@ -154,10 +154,6 @@
                                 <x-icon name="notifications" class="w-4 h-4 mr-2" />
                                 Notifications
                             </x-dropdown-link>
-                            <x-dropdown-link :href="route('profile.notification-preferences')">
-                                <x-icon name="settings" class="w-4 h-4 mr-2" />
-                                Notification Settings
-                            </x-dropdown-link>
                             <x-dropdown-link :href="route('feedback.create')">
                                 <x-icon name="feedback" class="w-4 h-4 mr-2" />
                                 Feedback
@@ -180,11 +176,11 @@
                         <div class="border-t border-gray-100 dark:border-navy-700/50 py-1">
                             <form method="POST" action="{{ route('logout') }}" x-data="{ showLogoutModal: false }">
                                 @csrf
-                                <x-dropdown-link :href="route('logout')"
-                                        onclick="event.preventDefault(); showLogoutModal = true">
+                                <button type="button" @click="showLogoutModal = true"
+                                        class="w-full text-left flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50/80 dark:text-gray-300 dark:hover:bg-navy-800/60 transition-colors">
                                     <x-icon name="logout" class="w-4 h-4 mr-2" />
                                     Log Out
-                                </x-dropdown-link>
+                                </button>
                                 <!-- Logout Confirmation Modal -->
                                 <div x-show="showLogoutModal" class="fixed inset-0 z-[100]" x-cloak>
                                     <!-- Backdrop -->
@@ -249,7 +245,6 @@
                 <x-responsive-nav-link :href="route('profile.show')">Profile</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('resources.shelf')">My Shelf</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('notifications.index')">Notifications</x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('profile.notification-preferences')">Notification Settings</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('feedback.create')">Feedback</x-responsive-nav-link>
                 <div class="px-3 py-2">
                     <button @click="dark = !dark" type="button" class="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 flex items-center gap-2 transition-colors">
@@ -264,8 +259,11 @@
                 </div>
                 <form method="POST" action="{{ route('logout') }}" class="px-3">
                     @csrf
-                    <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault(); this.closest('form').submit();">Log Out</x-responsive-nav-link>
+                    <button type="submit"
+                            class="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-navy-800/60">
+                        <x-icon name="logout" class="w-4 h-4" />
+                        Log Out
+                    </button>
                 </form>
             </div>
         </div>
