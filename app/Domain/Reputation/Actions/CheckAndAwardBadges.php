@@ -8,6 +8,7 @@ use App\Domain\Reputation\Notifications\BadgeEarned;
 use App\Models\User;
 use App\Models\UserBadge;
 use Carbon\Carbon;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -48,7 +49,6 @@ class CheckAndAwardBadges
     // ── Candidate selection ──────────────────────────────────────────────────
 
     /**
-     * @param string $trigger
      * @return Badge[]
      */
     private function candidatesFor(string $trigger): array
@@ -76,30 +76,26 @@ class CheckAndAwardBadges
 
             Badge::VaultKeeper => $this->resourceCount($user) >= 50,
 
-            Badge::ModuleMaster =>
-                DB::table('learning_resources')
-                    ->where('owner_user_id', $user->id)
-                    ->where('type', ResourceType::EModule->value)
-                    ->count() >= 10,
+            Badge::ModuleMaster => DB::table('learning_resources')
+                ->where('owner_user_id', $user->id)
+                ->where('type', ResourceType::EModule->value)
+                ->count() >= 10,
 
-            Badge::ReviewerRoyale =>
-                DB::table('learning_resources')
-                    ->where('owner_user_id', $user->id)
-                    ->where('type', ResourceType::Reviewer->value)
-                    ->count() >= 10,
+            Badge::ReviewerRoyale => DB::table('learning_resources')
+                ->where('owner_user_id', $user->id)
+                ->where('type', ResourceType::Reviewer->value)
+                ->count() >= 10,
 
-            Badge::ContentMill =>
-                DB::table('learning_resources')
-                    ->where('owner_user_id', $user->id)
-                    ->where('created_at', '>=', now()->subDays(7))
-                    ->count() >= 10,
+            Badge::ContentMill => DB::table('learning_resources')
+                ->where('owner_user_id', $user->id)
+                ->where('created_at', '>=', now()->subDays(7))
+                ->count() >= 10,
 
-            Badge::CrossPollinator =>
-                DB::table('learning_resources')
-                    ->where('owner_user_id', $user->id)
-                    ->where('program_id', '!=', $user->program_id)
-                    ->whereNotNull('program_id')
-                    ->exists(),
+            Badge::CrossPollinator => DB::table('learning_resources')
+                ->where('owner_user_id', $user->id)
+                ->where('program_id', '!=', $user->program_id)
+                ->whereNotNull('program_id')
+                ->exists(),
 
             Badge::LegacyHolder =>
                 // Resource was published 30+ days ago and has at least one save
@@ -167,22 +163,19 @@ class CheckAndAwardBadges
                 // Streak is approximated via karma_events dates.
                 $this->karmaEventStreak($user) >= 7,
 
-            Badge::HabitFormer =>
-                $this->karmaEventStreak($user) >= 30,
+            Badge::HabitFormer => $this->karmaEventStreak($user) >= 30,
 
             Badge::SemesterStrong =>
                 // Active (karma event) in every ISO week of the past 18 weeks (~1 semester)
                 $this->activeWeeksInLast($user, 18) >= 18,
 
-            Badge::IronCommitment =>
-                $this->karmaEventStreak($user) >= 60,
+            Badge::IronCommitment => $this->karmaEventStreak($user) >= 60,
 
             // ── Community ────────────────────────────────────────────────────
 
-            Badge::Chatterbox =>
-                DB::table('chat_messages')
-                    ->where('sender_id', $user->id)
-                    ->count() >= 50,
+            Badge::Chatterbox => DB::table('chat_messages')
+                ->where('sender_id', $user->id)
+                ->count() >= 50,
 
             Badge::ThreadStarter =>
                 // Posted the chronologically first message in a chat room at least 10 times.
@@ -206,7 +199,7 @@ class CheckAndAwardBadges
                 DB::table('chat_messages as reply')
                     ->join('chat_messages as prev', function ($join): void {
                         $join->on('reply.chat_room_id', '=', 'prev.chat_room_id')
-                             ->whereColumn('reply.id', '>', 'prev.id');
+                            ->whereColumn('reply.id', '>', 'prev.id');
                     })
                     ->where('reply.sender_id', $user->id)
                     ->where('prev.sender_id', '!=', $user->id)
@@ -261,7 +254,7 @@ class CheckAndAwardBadges
                 DB::table('karma_events as ke1')
                     ->join('karma_events as ke2', function ($join): void {
                         $join->on('ke2.user_id', '=', 'ke1.user_id')
-                             ->whereRaw('ke2.created_at > ke1.created_at');
+                            ->whereRaw('ke2.created_at > ke1.created_at');
                     })
                     ->where('ke1.user_id', $user->id)
                     ->whereRaw('DATEDIFF(ke2.created_at, ke1.created_at) >= 30')
@@ -293,13 +286,13 @@ class CheckAndAwardBadges
     {
         try {
             $userBadge = UserBadge::create([
-                'user_id'   => $user->id,
-                'badge'     => $badge->value,
+                'user_id' => $user->id,
+                'badge' => $badge->value,
                 'earned_at' => now(),
             ]);
 
             $user->notify(new BadgeEarned($userBadge));
-        } catch (\Illuminate\Database\UniqueConstraintViolationException) {
+        } catch (UniqueConstraintViolationException) {
             // Race condition — another request already awarded it. Safe to ignore.
         }
     }

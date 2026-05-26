@@ -19,7 +19,7 @@ class UserBadge extends Model
     protected function casts(): array
     {
         return [
-            'badge'     => Badge::class,
+            'badge' => Badge::class,
             'earned_at' => 'datetime',
         ];
     }

@@ -27,13 +27,13 @@ class BadgeEarned extends Notification implements ShouldQueue
         $badge = $this->userBadge->badge;
 
         return [
-            'type'        => 'badge_earned',
-            'badge'       => $badge->value,
+            'type' => 'badge_earned',
+            'badge' => $badge->value,
             'badge_label' => $badge->label(),
-            'badge_icon'  => $badge->icon(),
-            'badge_desc'  => $badge->description(),
-            'rarity'      => $badge->rarity()->value,
-            'earned_at'   => $this->userBadge->earned_at?->toIso8601String(), // @phpstan-ignore-line — cast to datetime in UserBadge model
+            'badge_icon' => $badge->icon(),
+            'badge_desc' => $badge->description(),
+            'rarity' => $badge->rarity()->value,
+            'earned_at' => $this->userBadge->earned_at?->toIso8601String(), // @phpstan-ignore-line — cast to datetime in UserBadge model
         ];
     }
 }

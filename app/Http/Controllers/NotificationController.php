@@ -6,7 +6,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
@@ -44,20 +43,20 @@ class NotificationController extends Controller
                 $type = $data['type'] ?? 'info';
 
                 return [
-                    'id'           => $notification->id,
-                    'type'         => $type,
-                    'title'        => $data['badge_label'] ?? $data['title'] ?? $data['message'] ?? 'Notification',
-                    'time'         => $notification->created_at->diffForHumans(),
-                    'read'         => $notification->read_at !== null,
-                    'link'         => $this->notificationLink($type, $data),
-                    'icon'         => $this->notificationIcon($type),
-                    'color'        => $this->notificationColor($type),
+                    'id' => $notification->id,
+                    'type' => $type,
+                    'title' => $data['badge_label'] ?? $data['title'] ?? $data['message'] ?? 'Notification',
+                    'time' => $notification->created_at->diffForHumans(),
+                    'read' => $notification->read_at !== null,
+                    'link' => $this->notificationLink($type, $data),
+                    'icon' => $this->notificationIcon($type),
+                    'color' => $this->notificationColor($type),
                 ];
             });
 
         return response()->json([
             'notifications' => $notifications,
-            'unread_count'  => $user->unreadNotifications->count(), // @phpstan-ignore-line — magic relation from Notifiable trait
+            'unread_count' => $user->unreadNotifications->count(), // @phpstan-ignore-line — magic relation from Notifiable trait
         ]);
     }
 
@@ -89,16 +88,16 @@ class NotificationController extends Controller
     /**
      * Determine the link for a notification based on its type.
      *
-     * @param array<string, mixed> $data
+     * @param  array<string, mixed>  $data
      */
     private function notificationLink(string $type, array $data): string
     {
         return match ($type) {
-            'badge_earned'    => route('profile.show'),
-            'chat.mention'    => route('chat.index'),
-            'request_routed'  => route('resources.index'),
+            'badge_earned' => route('profile.show'),
+            'chat.mention' => route('chat.index'),
+            'request_routed' => route('resources.index'),
             'return_reminder' => route('lends.index'),
-            default           => route('notifications.index'),
+            default => route('notifications.index'),
         };
     }
 
@@ -108,11 +107,11 @@ class NotificationController extends Controller
     private function notificationIcon(string $type): string
     {
         return match ($type) {
-            'badge_earned'   => 'star',
-            'chat.mention'   => 'chat',
+            'badge_earned' => 'star',
+            'chat.mention' => 'chat',
             'request_routed' => 'check',
             'return_reminder' => 'clock',
-            default          => 'bell',
+            default => 'bell',
         };
     }
 
@@ -122,11 +121,11 @@ class NotificationController extends Controller
     private function notificationColor(string $type): string
     {
         return match ($type) {
-            'badge_earned'    => 'amber',
-            'chat.mention'    => 'blue',
-            'request_routed'  => 'emerald',
+            'badge_earned' => 'amber',
+            'chat.mention' => 'blue',
+            'request_routed' => 'emerald',
             'return_reminder' => 'purple',
-            default           => 'gray',
+            default => 'gray',
         };
     }
 }
