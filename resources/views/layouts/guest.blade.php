@@ -27,7 +27,7 @@
                 <svg class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
                     <defs>
                         <pattern id="auth-dots" x="0" y="0" width="32" height="32" patternUnits="userSpaceOnUse">
-                            <circle cx="1.5" cy="1.5" r="1" class="fill-gray-300 dark:fill-navy-600" />
+                            <circle cx="1.5" cy="1.5" r="1" class="fill-gray-300 dark:fill-navy-500" />
                         </pattern>
                     </defs>
                     <rect width="100%" height="100%" fill="url(#auth-dots)" />

@@ -81,14 +81,15 @@ it('awards -5 karma for a confirmed report', function () {
 });
 
 it('assigns the correct badge tier based on karma', function () {
-    expect(BadgeTier::fromKarmaOrNull(0))->toBeNull();
-    expect(BadgeTier::fromKarmaOrNull(24))->toBeNull();
-    expect(BadgeTier::fromKarmaOrNull(25))->toBe(BadgeTier::Bronze);
-    expect(BadgeTier::fromKarmaOrNull(74))->toBe(BadgeTier::Bronze);
-    expect(BadgeTier::fromKarmaOrNull(75))->toBe(BadgeTier::Silver);
-    expect(BadgeTier::fromKarmaOrNull(149))->toBe(BadgeTier::Silver);
-    expect(BadgeTier::fromKarmaOrNull(150))->toBe(BadgeTier::Gold);
-    expect(BadgeTier::fromKarmaOrNull(500))->toBe(BadgeTier::Gold);
+    expect(BadgeTier::fromKarma(0))->toBe(BadgeTier::Seedling);
+    expect(BadgeTier::fromKarma(24))->toBe(BadgeTier::Seedling);
+    expect(BadgeTier::fromKarma(25))->toBe(BadgeTier::Bookworm);
+    expect(BadgeTier::fromKarma(74))->toBe(BadgeTier::Bookworm);
+    expect(BadgeTier::fromKarma(75))->toBe(BadgeTier::Scribe);
+    expect(BadgeTier::fromKarma(149))->toBe(BadgeTier::Scribe);
+    expect(BadgeTier::fromKarma(150))->toBe(BadgeTier::Scholar);
+    expect(BadgeTier::fromKarma(500))->toBe(BadgeTier::Pathfinder);
+    expect(BadgeTier::fromKarma(6000))->toBe(BadgeTier::StudHubLegend);
 });
 
 it('renders the profile page with karma and badge', function () {
@@ -99,7 +100,7 @@ it('renders the profile page with karma and badge', function () {
         ->assertOk()
         ->assertSee('Karma')
         ->assertSee('80')
-        ->assertSee('Silver');
+        ->assertSee('Scribe');
 });
 
 it('renders the leaderboard for the user\'s program', function () {
@@ -142,22 +143,42 @@ it('KarmaEventReason values returns all cases', function () {
 });
 
 it('BadgeTier labels are correct', function () {
-    expect(BadgeTier::Bronze->label())->toBe('Bronze');
-    expect(BadgeTier::Silver->label())->toBe('Silver');
-    expect(BadgeTier::Gold->label())->toBe('Gold');
+    expect(BadgeTier::Seedling->label())->toBe('Seedling');
+    expect(BadgeTier::Bookworm->label())->toBe('Bookworm');
+    expect(BadgeTier::Scribe->label())->toBe('Scribe');
+    expect(BadgeTier::Scholar->label())->toBe('Scholar');
+    expect(BadgeTier::Illuminator->label())->toBe('Illuminator');
+    expect(BadgeTier::Pathfinder->label())->toBe('Pathfinder');
+    expect(BadgeTier::Sage->label())->toBe('Sage');
+    expect(BadgeTier::Luminary->label())->toBe('Luminary');
+    expect(BadgeTier::Archivist->label())->toBe('Archivist');
+    expect(BadgeTier::Oracle->label())->toBe('Oracle');
+    expect(BadgeTier::Custodian->label())->toBe('Custodian');
+    expect(BadgeTier::StudHubLegend->label())->toBe('StudHub Legend');
 });
 
 it('BadgeTier threshold returns correct karma requirements', function () {
-    expect(BadgeTier::Bronze->threshold())->toBe(25);
-    expect(BadgeTier::Silver->threshold())->toBe(75);
-    expect(BadgeTier::Gold->threshold())->toBe(150);
+    expect(BadgeTier::Seedling->threshold())->toBe(0);
+    expect(BadgeTier::Bookworm->threshold())->toBe(25);
+    expect(BadgeTier::Scribe->threshold())->toBe(75);
+    expect(BadgeTier::Scholar->threshold())->toBe(150);
+    expect(BadgeTier::Illuminator->threshold())->toBe(300);
+    expect(BadgeTier::Pathfinder->threshold())->toBe(500);
+    expect(BadgeTier::Sage->threshold())->toBe(750);
+    expect(BadgeTier::Luminary->threshold())->toBe(1000);
+    expect(BadgeTier::Archivist->threshold())->toBe(1500);
+    expect(BadgeTier::Oracle->threshold())->toBe(2500);
+    expect(BadgeTier::Custodian->threshold())->toBe(4000);
+    expect(BadgeTier::StudHubLegend->threshold())->toBe(6000);
 });
 
 it('BadgeTier fromKarma correctly resolves tiers', function () {
-    expect(BadgeTier::fromKarma(25))->toBe(BadgeTier::Bronze);
-    expect(BadgeTier::fromKarma(74))->toBe(BadgeTier::Bronze);
-    expect(BadgeTier::fromKarma(75))->toBe(BadgeTier::Silver);
-    expect(BadgeTier::fromKarma(149))->toBe(BadgeTier::Silver);
-    expect(BadgeTier::fromKarma(150))->toBe(BadgeTier::Gold);
-    expect(BadgeTier::fromKarma(500))->toBe(BadgeTier::Gold);
+    expect(BadgeTier::fromKarma(0))->toBe(BadgeTier::Seedling);
+    expect(BadgeTier::fromKarma(25))->toBe(BadgeTier::Bookworm);
+    expect(BadgeTier::fromKarma(74))->toBe(BadgeTier::Bookworm);
+    expect(BadgeTier::fromKarma(75))->toBe(BadgeTier::Scribe);
+    expect(BadgeTier::fromKarma(149))->toBe(BadgeTier::Scribe);
+    expect(BadgeTier::fromKarma(150))->toBe(BadgeTier::Scholar);
+    expect(BadgeTier::fromKarma(500))->toBe(BadgeTier::Pathfinder);
+    expect(BadgeTier::fromKarma(6000))->toBe(BadgeTier::StudHubLegend);
 });

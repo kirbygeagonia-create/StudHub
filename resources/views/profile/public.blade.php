@@ -17,7 +17,7 @@
                         <div class="text-xs text-gray-500 dark:text-gray-400">Karma</div>
                         @if ($badge)
                             <span class="inline-flex items-center gap-1 mt-1 px-2.5 py-0.5 rounded-full text-xs font-medium
-                                {{ $badge->value === 'gold' ? 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-300' : ($badge->value === 'silver' ? 'bg-gray-200 text-gray-700 dark:bg-navy-600 dark:text-gray-300' : 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-300') }}"
+                                {{ $badge->value === 'gold' ? 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-300' : ($badge->value === 'silver' ? 'bg-gray-200 text-gray-700 dark:bg-navy-700 dark:text-gray-300' : 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-300') }}"
                                 data-testid="badge-tier">
                                 {{ $badge->label() }}
                             </span>

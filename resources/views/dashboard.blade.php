@@ -18,7 +18,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
             <!-- Stats row -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="stat-card animate-fade-in opacity-0" style="animation-delay: 0ms; animation-fill-mode: forwards">
+                <div class="stat-card animate-fade-in" style="animation-delay: 0ms">
                     <div class="flex items-center gap-3 mb-3">
                         <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-seait-400 to-seait-500 flex items-center justify-center">
                             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
@@ -29,7 +29,7 @@
                     <p class="text-xs text-gray-400 mt-1 dark:text-gray-500">points earned</p>
                 </div>
 
-                <div class="stat-card animate-fade-in opacity-0" style="animation-delay: 100ms; animation-fill-mode: forwards">
+                <div class="stat-card animate-fade-in" style="animation-delay: 100ms">
                     <div class="flex items-center gap-3 mb-3">
                         <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center">
                             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
@@ -43,7 +43,7 @@
                     <p class="text-xs text-gray-400 mt-1 dark:text-gray-500">{{ $badge ? $badge->name : 'No badge yet' }}</p>
                 </div>
 
-                <div class="stat-card animate-fade-in opacity-0" style="animation-delay: 200ms; animation-fill-mode: forwards">
+                <div class="stat-card animate-fade-in" style="animation-delay: 200ms">
                     <div class="flex items-center gap-3 mb-3">
                         <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center">
                             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
@@ -54,7 +54,7 @@
                     <p class="text-xs text-gray-400 mt-1 dark:text-gray-500">{{ Auth::user()?->program?->college?->code ?? '' }}</p>
                 </div>
 
-                <div class="stat-card animate-fade-in opacity-0" style="animation-delay: 300ms; animation-fill-mode: forwards">
+                <div class="stat-card animate-fade-in" style="animation-delay: 300ms">
                     <div class="flex items-center gap-3 mb-3">
                         <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-500 flex items-center justify-center">
                             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
@@ -72,7 +72,7 @@
             <div>
                 <h3 class="section-title mb-4">Quick Actions</h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <a href="{{ route('resources.create') }}" class="card-hover group p-6 animate-fade-in opacity-0" style="animation-delay: 400ms; animation-fill-mode: forwards">
+                    <a href="{{ route('resources.create') }}" class="card-hover group p-6 animate-fade-in" style="animation-delay: 400ms">
                         <div class="flex items-start gap-4">
                             <div class="flex-shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-seait-400 to-seait-500 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"/></svg>
@@ -84,7 +84,7 @@
                         </div>
                     </a>
 
-                    <a href="{{ route('requests.create') }}" class="card-hover group p-6 animate-fade-in opacity-0" style="animation-delay: 500ms; animation-fill-mode: forwards">
+                    <a href="{{ route('requests.create') }}" class="card-hover group p-6 animate-fade-in" style="animation-delay: 500ms">
                         <div class="flex items-start gap-4">
                             <div class="flex-shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-400 to-blue-500 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
@@ -96,7 +96,7 @@
                         </div>
                     </a>
 
-                    <a href="{{ route('chat.index') }}" class="card-hover group p-6 animate-fade-in opacity-0" style="animation-delay: 600ms; animation-fill-mode: forwards">
+                    <a href="{{ route('chat.index') }}" class="card-hover group p-6 animate-fade-in" style="animation-delay: 600ms">
                         <div class="flex items-start gap-4">
                             <div class="flex-shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-500 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
@@ -111,7 +111,7 @@
             </div>
 
             <!-- Getting started -->
-            <div class="card p-6 animate-fade-in opacity-0" style="animation-delay: 700ms; animation-fill-mode: forwards">
+            <div class="card p-6 animate-fade-in" style="animation-delay: 700ms">
                 <h3 class="section-title mb-4">How StudHub Works</h3>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="flex gap-3">

@@ -1,10 +1,43 @@
-﻿<nav x-data="{ open: false }" class="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 dark:bg-navy-900/80 dark:border-navy-700/30 shadow-sm dark:shadow-navy-950/30" role="navigation" aria-label="Main navigation">
+﻿<nav x-data="{ open: false, scrolled: false }" @scroll.window="scrolled = window.scrollY > 10" :class="{'shadow-md': scrolled}" class="sticky top-0 z-40 bg-white/95 dark:bg-navy-900/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-navy-700/30" role="navigation" aria-label="Main navigation">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex items-center gap-1">
                 <a href="{{ route('dashboard') }}" class="flex items-center gap-2.5 mr-6 group">
-                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-seait-400 to-seait-600 flex items-center justify-center shadow-sm group-hover:shadow-seait-500/30 group-hover:shadow-md transition-all duration-300">
-                        <x-icon name="book" class="w-4 h-4 text-white" />
+                    <!-- StudHub Brand Logo -->
+                    <div class="w-8 h-8 flex items-center justify-center flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" class="w-8 h-8">
+                            <defs>
+                                <linearGradient id="shLogoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#FF6B35"/>
+                                    <stop offset="100%" style="stop-color:#E5512A"/>
+                                </linearGradient>
+                                <linearGradient id="shLogoGradLight" x1="0%" y1="100%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#FF8C5A"/>
+                                    <stop offset="100%" style="stop-color:#FF6B35"/>
+                                </linearGradient>
+                            </defs>
+                            <!-- Outer glow ring -->
+                            <circle cx="16" cy="16" r="14" stroke="url(#shLogoGrad)" stroke-width="0.5" fill="none" opacity="0.2"/>
+                            <!-- Main book shape -->
+                            <path d="M9 7h14c1.105 0 2 .895 2 2v16c0 1.105-.895 2-2 2H9c-1.105 0-2-.895-2-2V9c0-1.105.895-2 2-2z" fill="url(#shLogoGrad)" opacity="0.95"/>
+                            <!-- Book spine -->
+                            <path d="M16 7v20" stroke="white" stroke-width="0.5" opacity="0.3"/>
+                            <!-- Left page lines -->
+                            <line x1="10.5" y1="11" x2="14" y2="11" stroke="white" stroke-width="0.75" opacity="0.5" stroke-linecap="round"/>
+                            <line x1="10.5" y1="14" x2="14" y2="14" stroke="white" stroke-width="0.75" opacity="0.5" stroke-linecap="round"/>
+                            <line x1="10.5" y1="17" x2="13" y2="17" stroke="white" stroke-width="0.75" opacity="0.4" stroke-linecap="round"/>
+                            <!-- Right page lines -->
+                            <line x1="18" y1="11" x2="21.5" y2="11" stroke="white" stroke-width="0.75" opacity="0.5" stroke-linecap="round"/>
+                            <line x1="18" y1="14" x2="21.5" y2="14" stroke="white" stroke-width="0.75" opacity="0.5" stroke-linecap="round"/>
+                            <line x1="18" y1="17" x2="20.5" y2="17" stroke="white" stroke-width="0.75" opacity="0.4" stroke-linecap="round"/>
+                            <!-- Bookmark ribbon -->
+                            <path d="M16 7l-1 3h2z" fill="#FF8C5A"/>
+                            <!-- Decorative dots -->
+                            <circle cx="16" cy="4" r="1" fill="url(#shLogoGradLight)"/>
+                            <circle cx="27" cy="10" r="1" fill="url(#shLogoGradLight)"/>
+                            <circle cx="5" cy="10" r="1" fill="url(#shLogoGradLight)"/>
+                            <circle cx="16" cy="28" r="1" fill="url(#shLogoGradLight)"/>
+                        </svg>
                     </div>
                     <span class="text-lg font-bold text-gray-900 tracking-tight dark:text-gray-100 group-hover:text-seait-500 dark:group-hover:text-seait-400 transition-colors duration-200">StudHub</span>
                 </a>
@@ -53,8 +86,44 @@
                     </div>
                     <input type="text" id="nav-search" name="q" value="{{ request('q') }}"
                            placeholder="Search resources…"
-                           class="w-48 pl-10 pr-3 py-2 text-sm rounded-xl border-gray-200 bg-gray-50/80 focus:bg-white focus:border-seait-400 focus:ring-2 focus:ring-seait-100 transition-all placeholder:text-gray-400 dark:bg-navy-800/60 dark:border-navy-600/50 dark:text-gray-200 dark:placeholder:text-gray-500 dark:focus:border-seait-500 dark:focus:ring-seait-800/30">
+                           class="w-48 pl-10 pr-3 py-2 text-sm rounded-xl border-gray-200 bg-gray-50/80 focus:bg-white focus:border-seait-400 focus:ring-2 focus:ring-seait-100 transition-all placeholder:text-gray-400 dark:bg-navy-800/60 dark:border-navy-700/50 dark:text-gray-200 dark:placeholder:text-gray-500 dark:focus:border-seait-500 dark:focus:ring-seait-800/30">
                 </form>
+
+                <!-- Notifications Bell -->
+                <div class="relative" x-data="{ notifOpen: false, notifications: [
+                    { id: 1, type: 'badge', title: 'New badge earned: First Review', time: '2 min ago', icon: 'star', color: 'amber', read: false },
+                    { id: 2, type: 'request', title: 'Your request was accepted', time: '15 min ago', icon: 'check', color: 'emerald', read: false },
+                    { id: 3, type: 'lend', title: 'Return reminder: Calculus Notes', time: '1 hr ago', icon: 'clock', color: 'blue', read: true }
+                ] }">
+                    <button @click="notifOpen = !notifOpen" @click.away="notifOpen = false" class="relative p-2 rounded-xl hover:bg-gray-50/80 dark:hover:bg-navy-800/60 transition-all duration-200" aria-label="Notifications">
+                        <x-icon name="notifications" class="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                        <span class="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center ring-2 ring-white dark:ring-navy-900">3</span>
+                    </button>
+                    <!-- Notifications Dropdown -->
+                    <div x-show="notifOpen" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="absolute right-0 mt-2 w-80 bg-white dark:bg-navy-800 rounded-2xl shadow-xl border border-gray-100 dark:border-navy-700/50 z-50 overflow-hidden" x-cloak>
+                        <div class="px-4 py-3 border-b border-gray-100 dark:border-navy-700/50 flex items-center justify-between">
+                            <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">Notifications</h3>
+                            <span class="text-xs text-gray-500 dark:text-gray-400">3 unread</span>
+                        </div>
+                        <div class="max-h-72 overflow-y-auto">
+                            <template x-for="notif in notifications" :key="notif.id">
+                                <a href="#" class="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-navy-700/50 transition-colors border-b border-gray-50 dark:border-navy-700/30 last:border-b-0">
+                                    <div :class="`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${notif.color === 'amber' ? 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-300' : notif.color === 'emerald' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-300' : 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-300'}`">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" x-html="notif.icon === 'star' ? '<path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z\'/>' : notif.icon === 'check' ? '<path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z\'/>' : '<path stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z\'/>'"></svg>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-medium text-gray-900 dark:text-gray-100" x-text="notif.title"></p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5" x-text="notif.time"></p>
+                                    </div>
+                                    <div x-show="!notif.read" class="w-2 h-2 bg-seait-500 rounded-full flex-shrink-0 mt-1.5"></div>
+                                </a>
+                            </template>
+                        </div>
+                        <div class="px-4 py-2.5 border-t border-gray-100 dark:border-navy-700/50 bg-gray-50/50 dark:bg-navy-800/50">
+                            <a href="{{ route('notifications.index') }}" class="text-xs font-medium text-seait-600 hover:text-seait-700 dark:text-seait-400 dark:hover:text-seait-300 transition-colors">View all notifications</a>
+                        </div>
+                    </div>
+                </div>
 
                 <x-dropdown align="right" width="64">
                     <x-slot name="trigger">
@@ -81,9 +150,13 @@
                                 <x-icon name="shelf" class="w-4 h-4 mr-2" />
                                 My Shelf
                             </x-dropdown-link>
-                            <x-dropdown-link :href="route('profile.notification-preferences')">
+                            <x-dropdown-link :href="route('notifications.index')">
                                 <x-icon name="notifications" class="w-4 h-4 mr-2" />
                                 Notifications
+                            </x-dropdown-link>
+                            <x-dropdown-link :href="route('profile.notification-preferences')">
+                                <x-icon name="settings" class="w-4 h-4 mr-2" />
+                                Notification Settings
                             </x-dropdown-link>
                             <x-dropdown-link :href="route('feedback.create')">
                                 <x-icon name="feedback" class="w-4 h-4 mr-2" />
@@ -105,13 +178,36 @@
                         </div>
 
                         <div class="border-t border-gray-100 dark:border-navy-700/50 py-1">
-                            <form method="POST" action="{{ route('logout') }}">
+                            <form method="POST" action="{{ route('logout') }}" x-data="{ showLogoutModal: false }">
                                 @csrf
                                 <x-dropdown-link :href="route('logout')"
-                                        onclick="event.preventDefault(); this.closest('form').submit();">
+                                        onclick="event.preventDefault(); showLogoutModal = true">
                                     <x-icon name="logout" class="w-4 h-4 mr-2" />
                                     Log Out
                                 </x-dropdown-link>
+                                <!-- Logout Confirmation Modal -->
+                                <div x-show="showLogoutModal" class="fixed inset-0 z-[100]" x-cloak>
+                                    <!-- Backdrop -->
+                                    <div x-show="showLogoutModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-black/40 backdrop-blur-sm"></div>
+                                    <!-- Modal -->
+                                    <div class="fixed inset-0 z-10 flex items-center justify-center p-4">
+                                        <div x-show="showLogoutModal" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" class="bg-white dark:bg-navy-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-navy-700/50 w-full max-w-sm p-6" @click.away="showLogoutModal = false">
+                                            <div class="flex items-center gap-3 mb-4">
+                                                <div class="w-10 h-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center flex-shrink-0">
+                                                    <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                                                </div>
+                                                <div>
+                                                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">Log Out</h3>
+                                                    <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">You will be redirected to the login page.</p>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center justify-end gap-3 mt-6">
+                                                <button type="button" @click="showLogoutModal = false" class="btn-secondary text-xs">Cancel</button>
+                                                <button type="submit" onclick="this.closest('form').submit()" class="btn-danger text-xs">Log Out</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </form>
                         </div>
                     </x-slot>
@@ -130,8 +226,8 @@
     </div>
 
     <!-- Mobile menu -->
-    <div id="mobile-menu" :class="{'block': open, 'hidden': !open}" class="hidden sm:hidden relative">
-        <div class="bg-white/95 dark:bg-navy-900/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-navy-700/30 shadow-lg dark:shadow-navy-950/20">
+    <div id="mobile-menu" :class="{'block': open, 'hidden': !open}" class="hidden sm:hidden relative" x-cloak>
+        <div class="bg-white/95 dark:bg-navy-900/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-navy-700/30 shadow-lg">
             <div class="px-3 py-2 space-y-1">
                 <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">Home</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('chat.index')" :active="request()->routeIs('chat.*')">Chat</x-responsive-nav-link>
@@ -152,7 +248,8 @@
                 </div>
                 <x-responsive-nav-link :href="route('profile.show')">Profile</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('resources.shelf')">My Shelf</x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('profile.notification-preferences')">Notifications</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('notifications.index')">Notifications</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('profile.notification-preferences')">Notification Settings</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('feedback.create')">Feedback</x-responsive-nav-link>
                 <div class="px-3 py-2">
                     <button @click="dark = !dark" type="button" class="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 flex items-center gap-2 transition-colors">

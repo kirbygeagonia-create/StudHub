@@ -73,9 +73,9 @@ export default {
                 'card-lg': '0 8px 30px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04)',
             },
             animation: {
-                'fade-in': 'fadeIn 0.4s ease-out',
-                'slide-up': 'slideUp 0.5s ease-out',
-                'scale-in': 'scaleIn 0.3s ease-out',
+                'fade-in': 'fadeIn 0.5s ease-out both',
+                'slide-up': 'slideUp 0.5s ease-out both',
+                'scale-in': 'scaleIn 0.3s ease-out both',
             },
             keyframes: {
                 fadeIn: {

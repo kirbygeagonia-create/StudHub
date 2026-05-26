@@ -5,6 +5,7 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\LendController;
 use App\Http\Controllers\ModerationController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
@@ -97,6 +98,10 @@ Route::middleware(['auth', 'verified', 'onboarded', 'not_suspended'])->group(fun
     Route::post('/feedback', [FeedbackController::class, 'store'])
         ->middleware('throttle:10,1')
         ->name('feedback.store');
+
+    // Notifications
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
 });
 
 Route::middleware(['auth', 'verified', 'onboarded', 'role:moderator,admin'])->group(function () {

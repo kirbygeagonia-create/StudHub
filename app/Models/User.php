@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Domain\Identity\Enums\UserRole;
+use App\Domain\Reputation\Enums\BadgeTier;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -131,6 +132,22 @@ class User extends Authenticatable implements MustVerifyEmail
     public function offers(): HasMany
     {
         return $this->hasMany(Offer::class, 'offerer_user_id');
+    }
+
+    /**
+     * @return HasMany<UserBadge, $this>
+     */
+    public function badges(): HasMany
+    {
+        return $this->hasMany(UserBadge::class);
+    }
+
+    /**
+     * Returns the current karma-based tier.
+     */
+    public function currentTier(): BadgeTier
+    {
+        return BadgeTier::fromKarma($this->karma ?? 0);
     }
 
     /**
