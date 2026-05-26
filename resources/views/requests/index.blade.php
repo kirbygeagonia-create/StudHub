@@ -1,4 +1,4 @@
-﻿<x-app-layout>
+<x-app-layout>
     <x-page-header title="{{ __('Request Board') }}">
         <x-slot name="actions">
             <a href="{{ route('requests.create') }}" class="btn-primary text-xs">+ New request</a>

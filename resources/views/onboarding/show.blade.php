@@ -1,4 +1,4 @@
-﻿<x-guest-layout>
+<x-guest-layout>
     <h1 class="text-xl font-semibold text-gray-800 mb-2">Welcome to StudHub</h1>
     <p class="text-sm text-gray-600 mb-6">
         Tell us which program you're in so we can route resources and requests

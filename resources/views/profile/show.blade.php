@@ -1,4 +1,4 @@
-﻿<x-app-layout>
+<x-app-layout>
     <x-page-header title="Profile" />
 
     <div class="py-8">

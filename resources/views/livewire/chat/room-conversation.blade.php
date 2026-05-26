@@ -1,4 +1,4 @@
-﻿<div class="space-y-4" wire:poll.10s.visible>
+<div class="space-y-4" wire:poll.10s.visible>
     <div role="log" aria-live="polite" data-testid="chat-message-list"
          class="h-[28rem] overflow-y-auto rounded-2xl p-4 bg-gradient-to-b from-gray-50 to-white space-y-4 scroll-smooth dark:from-navy-850 dark:to-navy-800">
         @forelse ($this->roomMessages as $message)

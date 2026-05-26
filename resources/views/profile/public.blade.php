@@ -1,4 +1,4 @@
-﻿<x-app-layout>
+<x-app-layout>
     <x-page-header title="{{ $user?->preferredDisplayName() ?? 'User' }}'s Profile" />
 
     <div class="py-8">

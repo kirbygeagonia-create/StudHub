@@ -1,4 +1,4 @@
-﻿@php
+@php
 // Check if this is being loaded inside a modal context
 $isModal = request()->header('X-Requested-With') === 'XMLHttpRequest' || request()->query('modal') === '1';
 @endphp

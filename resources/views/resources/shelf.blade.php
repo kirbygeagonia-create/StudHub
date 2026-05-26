@@ -1,4 +1,4 @@
-﻿<x-app-layout>
+<x-app-layout>
     <x-page-header title="{{ __('My Shelf') }}">
         <x-slot name="actions">
             <a href="{{ route('resources.index') }}" class="btn-primary text-xs">Browse resources</a>

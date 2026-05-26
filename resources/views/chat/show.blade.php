@@ -1,4 +1,4 @@
-﻿<x-app-layout>
+<x-app-layout>
     <x-page-header title="#{{ $room->slug }}">
         <x-slot name="actions">
             <a href="{{ route('chat.index') }}" class="text-sm text-seait-500 hover:text-seait-800">All rooms</a>

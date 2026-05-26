@@ -1,4 +1,4 @@
-﻿<x-app-layout>
+<x-app-layout>
     <x-page-header title="{{ $request->subject->code }} — {{ $request->type_wanted }}" />
 
     <div class="py-8">
