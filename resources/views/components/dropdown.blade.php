@@ -9,6 +9,7 @@ $alignmentClasses = match ($align) {
 
 $width = match ($width) {
     '48' => 'w-48',
+    '56' => 'w-56',
     default => $width,
 };
 @endphp
@@ -28,7 +29,7 @@ $width = match ($width) {
             class="absolute z-50 mt-2 {{ $width }} rounded-md shadow-lg {{ $alignmentClasses }}"
             x-cloak
             @click="open = false">
-        <div class="rounded-md ring-1 ring-black ring-opacity-5 dark:bg-navy-800 {{ $contentClasses }}">
+        <div class="rounded-md ring-1 ring-black ring-opacity-5 dark:bg-navy-800 overflow-hidden {{ $contentClasses }}">
             {{ $content }}
         </div>
     </div>

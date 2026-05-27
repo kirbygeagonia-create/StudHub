@@ -39,7 +39,7 @@ class CrossPostRequest implements ShouldQueue
         $chatRoom->messages()->create([
             'sender_id' => $request->requester_user_id,
             'body' => sprintf(
-                '📌 Routed request: %s needs a **%s** for *%s*. [Open request →](%s)',
+                'Routed request: %s needs a **%s** for *%s*. [Open request →](%s)',
                 $requesterName,
                 str_replace('_', ' ', $request->type_wanted),
                 $subjectName,

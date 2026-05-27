@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth" x-data="{ dark: localStorage.getItem('dark') === 'true', showLoginModal: false, showRegisterModal: false }" x-init="$watch('dark', v => { localStorage.setItem('dark', v); document.documentElement.classList.toggle('dark', v) }); document.documentElement.classList.toggle('dark', dark)" :class="{ 'dark': dark }">
+<html lang="en" class="scroll-smooth" x-data="{ dark: localStorage.getItem('dark') === 'true', showLoginModal: false, showRegisterModal: false, showForgotPasswordModal: false }" x-init="$watch('dark', v => { localStorage.setItem('dark', v); document.documentElement.classList.toggle('dark', v) }); document.documentElement.classList.toggle('dark', dark)" :class="{ 'dark': dark }">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -45,8 +45,27 @@
         <header class="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-gray-200/50 dark:bg-navy-900/80 dark:border-navy-700/30 shadow-sm">
             <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
                 <a href="/" class="flex items-center gap-2 group">
-                    <div class="w-8 h-8 bg-gradient-to-br from-seait-400 to-seait-600 rounded-xl flex items-center justify-center shadow-sm group-hover:shadow-md transition-all duration-300">
-                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <div class="w-8 h-8 flex items-center justify-center flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" class="w-8 h-8">
+                            <defs>
+                                <linearGradient id="wG" x1="0" y1="0" x2="1" y2="1">
+                                    <stop offset="0%" stop-color="#FF6B35"/>
+                                    <stop offset="100%" stop-color="#C94B15"/>
+                                </linearGradient>
+                                <linearGradient id="wA" x1="0" y1="1" x2="1" y2="0">
+                                    <stop offset="0%" stop-color="#FFB347"/>
+                                    <stop offset="100%" stop-color="#FF8C5A"/>
+                                </linearGradient>
+                            </defs>
+                            <path d="M100 18 C68 18 38 30 24 52 C10 74 10 100 10 100 C10 132 12 152 30 166 C48 180 72 182 100 182 C128 182 152 180 170 166 C188 152 190 132 190 100 C190 100 190 74 176 52 C162 30 132 18 100 18Z" fill="url(#wG)"/>
+                            <path d="M100 52 C88 54 66 62 54 74 L54 148 C66 138 88 132 100 132 Z" fill="white" opacity="0.16"/>
+                            <path d="M100 52 C112 54 134 62 146 74 L146 148 C134 138 112 132 100 132 Z" fill="white" opacity="0.10"/>
+                            <line x1="100" y1="52" x2="100" y2="148" stroke="white" stroke-width="2" opacity="0.28" stroke-linecap="round"/>
+                            <rect x="72" y="94" width="56" height="8" rx="4" fill="white" opacity="0.95"/>
+                            <path d="M100 70 L118 91 L100 99 L82 91 Z" fill="white" opacity="0.95"/>
+                            <line x1="116" y1="97" x2="116" y2="122" stroke="url(#wA)" stroke-width="3" stroke-linecap="round"/>
+                            <circle cx="116" cy="126" r="4.5" fill="url(#wA)"/>
+                        </svg>
                     </div>
                     <span class="font-bold text-lg text-gray-900 dark:text-gray-100 group-hover:text-seait-500 dark:group-hover:text-seait-400 transition-colors duration-200">StudHub</span>
                 </a>
@@ -213,8 +232,27 @@
             </button>
             <div class="p-5">
                 <div class="text-center mb-4">
-                    <div class="w-10 h-10 bg-gradient-to-br from-seait-400 to-seait-600 rounded-xl flex items-center justify-center mx-auto mb-2">
-                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <div class="w-10 h-10 flex items-center justify-center mx-auto mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" class="w-10 h-10">
+                            <defs>
+                                <linearGradient id="wLG" x1="0" y1="0" x2="1" y2="1">
+                                    <stop offset="0%" stop-color="#FF6B35"/>
+                                    <stop offset="100%" stop-color="#C94B15"/>
+                                </linearGradient>
+                                <linearGradient id="wLA" x1="0" y1="1" x2="1" y2="0">
+                                    <stop offset="0%" stop-color="#FFB347"/>
+                                    <stop offset="100%" stop-color="#FF8C5A"/>
+                                </linearGradient>
+                            </defs>
+                            <path d="M100 18 C68 18 38 30 24 52 C10 74 10 100 10 100 C10 132 12 152 30 166 C48 180 72 182 100 182 C128 182 152 180 170 166 C188 152 190 132 190 100 C190 100 190 74 176 52 C162 30 132 18 100 18Z" fill="url(#wLG)"/>
+                            <path d="M100 52 C88 54 66 62 54 74 L54 148 C66 138 88 132 100 132 Z" fill="white" opacity="0.16"/>
+                            <path d="M100 52 C112 54 134 62 146 74 L146 148 C134 138 112 132 100 132 Z" fill="white" opacity="0.10"/>
+                            <line x1="100" y1="52" x2="100" y2="148" stroke="white" stroke-width="2" opacity="0.28" stroke-linecap="round"/>
+                            <rect x="72" y="94" width="56" height="8" rx="4" fill="white" opacity="0.95"/>
+                            <path d="M100 70 L118 91 L100 99 L82 91 Z" fill="white" opacity="0.95"/>
+                            <line x1="116" y1="97" x2="116" y2="122" stroke="url(#wLA)" stroke-width="3" stroke-linecap="round"/>
+                            <circle cx="116" cy="126" r="4.5" fill="url(#wLA)"/>
+                        </svg>
                     </div>
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">Welcome back</h2>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Log in to your StudHub account</p>
@@ -236,9 +274,7 @@
                             <input id="remember_me" type="checkbox" class="rounded border-gray-300 dark:border-gray-600 text-seait-500 shadow-sm focus:ring-seait-400 dark:bg-navy-700 dark:checked:bg-seait-500" name="remember">
                             <span class="ms-2 text-xs text-gray-600 dark:text-gray-400">Remember me</span>
                         </label>
-                        @if (Route::has('password.request'))
-                            <a href="{{ route('password.request') }}" class="text-xs text-seait-500 hover:text-seait-600 dark:hover:text-seait-400 transition">Forgot password?</a>
-                        @endif
+                        <button type="button" @click="showLoginModal = false; showForgotPasswordModal = true" class="text-xs text-seait-500 hover:text-seait-600 dark:hover:text-seait-400 transition">Forgot password?</button>
                     </div>
                     <button type="submit" class="btn-primary w-full mt-4 !py-2.5">Log in</button>
                 </form>
@@ -275,8 +311,27 @@
             </button>
             <div class="p-5">
                 <div class="text-center mb-4">
-                    <div class="w-10 h-10 bg-gradient-to-br from-seait-400 to-seait-600 rounded-xl flex items-center justify-center mx-auto mb-2">
-                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                    <div class="w-10 h-10 flex items-center justify-center mx-auto mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" class="w-10 h-10">
+                            <defs>
+                                <linearGradient id="wRG" x1="0" y1="0" x2="1" y2="1">
+                                    <stop offset="0%" stop-color="#FF6B35"/>
+                                    <stop offset="100%" stop-color="#C94B15"/>
+                                </linearGradient>
+                                <linearGradient id="wRA" x1="0" y1="1" x2="1" y2="0">
+                                    <stop offset="0%" stop-color="#FFB347"/>
+                                    <stop offset="100%" stop-color="#FF8C5A"/>
+                                </linearGradient>
+                            </defs>
+                            <path d="M100 18 C68 18 38 30 24 52 C10 74 10 100 10 100 C10 132 12 152 30 166 C48 180 72 182 100 182 C128 182 152 180 170 166 C188 152 190 132 190 100 C190 100 190 74 176 52 C162 30 132 18 100 18Z" fill="url(#wRG)"/>
+                            <path d="M100 52 C88 54 66 62 54 74 L54 148 C66 138 88 132 100 132 Z" fill="white" opacity="0.16"/>
+                            <path d="M100 52 C112 54 134 62 146 74 L146 148 C134 138 112 132 100 132 Z" fill="white" opacity="0.10"/>
+                            <line x1="100" y1="52" x2="100" y2="148" stroke="white" stroke-width="2" opacity="0.28" stroke-linecap="round"/>
+                            <rect x="72" y="94" width="56" height="8" rx="4" fill="white" opacity="0.95"/>
+                            <path d="M100 70 L118 91 L100 99 L82 91 Z" fill="white" opacity="0.95"/>
+                            <line x1="116" y1="97" x2="116" y2="122" stroke="url(#wRA)" stroke-width="3" stroke-linecap="round"/>
+                            <circle cx="116" cy="126" r="4.5" fill="url(#wRA)"/>
+                        </svg>
                     </div>
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">Create your account</h2>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Join the SEAIT resource exchange</p>
@@ -313,6 +368,73 @@
                     <p class="text-xs text-gray-600 dark:text-gray-400">
                         Already have an account?
                         <button @click="showRegisterModal = false; showLoginModal = true" class="font-semibold text-seait-500 hover:text-seait-600 dark:hover:text-seait-400 transition">Log in</button>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Forgot Password Modal --}}
+    <div x-show="showForgotPasswordModal"
+         x-cloak
+         x-transition:enter="ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="absolute inset-0 bg-navy-950/50 backdrop-blur-sm" @click="showForgotPasswordModal = false"></div>
+        <div x-transition:enter="ease-out duration-300"
+             x-transition:enter-start="opacity-0 translate-y-4 scale-95"
+             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+             x-transition:leave="ease-in duration-200"
+             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+             x-transition:leave-end="opacity-0 translate-y-4 scale-95"
+             class="relative w-full max-w-sm bg-white dark:bg-navy-800 rounded-2xl shadow-card-lg border border-gray-100 dark:border-navy-700/50 overflow-hidden">
+            <button @click="showForgotPasswordModal = false" class="absolute top-3 right-3 p-1.5 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition rounded-lg hover:bg-gray-100 dark:hover:bg-navy-700 z-10">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+            <div class="p-5">
+                <div class="text-center mb-4">
+                    <div class="w-10 h-10 flex items-center justify-center mx-auto mb-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" class="w-10 h-10">
+                            <defs>
+                                <linearGradient id="fpG" x1="0" y1="0" x2="1" y2="1">
+                                    <stop offset="0%" stop-color="#FF6B35"/>
+                                    <stop offset="100%" stop-color="#C94B15"/>
+                                </linearGradient>
+                                <linearGradient id="fpA" x1="0" y1="1" x2="1" y2="0">
+                                    <stop offset="0%" stop-color="#FFB347"/>
+                                    <stop offset="100%" stop-color="#FF8C5A"/>
+                                </linearGradient>
+                            </defs>
+                            <path d="M100 18 C68 18 38 30 24 52 C10 74 10 100 10 100 C10 132 12 152 30 166 C48 180 72 182 100 182 C128 182 152 180 170 166 C188 152 190 132 190 100 C190 100 190 74 176 52 C162 30 132 18 100 18Z" fill="url(#fpG)"/>
+                            <path d="M100 52 C88 54 66 62 54 74 L54 148 C66 138 88 132 100 132 Z" fill="white" opacity="0.16"/>
+                            <path d="M100 52 C112 54 134 62 146 74 L146 148 C134 138 112 132 100 132 Z" fill="white" opacity="0.10"/>
+                            <line x1="100" y1="52" x2="100" y2="148" stroke="white" stroke-width="2" opacity="0.28" stroke-linecap="round"/>
+                            <rect x="72" y="94" width="56" height="8" rx="4" fill="white" opacity="0.95"/>
+                            <path d="M100 70 L118 91 L100 99 L82 91 Z" fill="white" opacity="0.95"/>
+                            <line x1="116" y1="97" x2="116" y2="122" stroke="url(#fpA)" stroke-width="3" stroke-linecap="round"/>
+                            <circle cx="116" cy="126" r="4.5" fill="url(#fpA)"/>
+                        </svg>
+                    </div>
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white">Reset your password</h2>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Enter your email and we'll send you a reset link.</p>
+                </div>
+                <form method="POST" action="{{ route('password.email') }}">
+                    @csrf
+                    <div>
+                        <label for="fp-email" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                        <input id="fp-email" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="email" class="input-field text-sm" placeholder="you@seait.edu.ph">
+                        @error('email')<p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
+                    </div>
+                    <button type="submit" class="btn-primary w-full mt-4 !py-2.5">Send Reset Link</button>
+                </form>
+                <div class="mt-3 text-center">
+                    <p class="text-xs text-gray-600 dark:text-gray-400">
+                        Remember your password?
+                        <button @click="showForgotPasswordModal = false; showLoginModal = true" class="font-semibold text-seait-500 hover:text-seait-600 dark:hover:text-seait-400 transition">Log in</button>
                     </p>
                 </div>
             </div>

@@ -1,4 +1,5 @@
-<nav x-data="{ open: false, scrolled: false, logoutOpen: false }" @scroll.window="scrolled = window.scrollY > 10" :class="{'shadow-md': scrolled}" class="sticky top-0 z-40 bg-white/95 dark:bg-navy-900/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-navy-700/30" role="navigation" aria-label="Main navigation">
+<div x-data="{ open: false, scrolled: false, logoutOpen: false }">
+<nav @scroll.window="scrolled = window.scrollY > 10" :class="{'shadow-md': scrolled}" class="sticky top-0 z-40 bg-white/95 dark:bg-navy-900/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-navy-700/30" role="navigation" aria-label="Main navigation">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex items-center gap-1">
@@ -156,7 +157,7 @@
                     </div>
                 </div>
 
-                <x-dropdown align="right" width="64">
+                <x-dropdown align="right" width="56">
                     <x-slot name="trigger">
                         <button class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50/80 dark:hover:bg-navy-800/60 transition-all duration-200">
                             <div class="w-8 h-8 rounded-full bg-gradient-to-br from-seait-400 to-seait-600 flex items-center justify-center text-white text-xs font-bold ring-2 ring-seait-100 dark:ring-seait-800/40 shadow-sm">
@@ -283,45 +284,47 @@
         </div>
     </div>
 
-    <!-- Logout Confirmation Modal -->
-    <div x-show="logoutOpen"
-         x-cloak
-         class="fixed inset-0 z-[9999] flex items-center justify-center p-4"
-         @keydown.escape.window="logoutOpen = false">
-        <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"
-             @click="logoutOpen = false"
-             x-transition:enter="transition ease-out duration-200"
-             x-transition:enter-start="opacity-0"
-             x-transition:enter-end="opacity-100"
-             x-transition:leave="transition ease-in duration-150"
-             x-transition:leave-start="opacity-100"
-             x-transition:leave-end="opacity-0"></div>
-        <div class="relative bg-white dark:bg-navy-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-navy-700/50 w-full max-w-sm p-6"
-             x-transition:enter="transition ease-out duration-200"
-             x-transition:enter-start="opacity-0 scale-95 translate-y-2"
-             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-             x-transition:leave="transition ease-in duration-150"
-             x-transition:leave-start="opacity-100 scale-100"
-             x-transition:leave-end="opacity-0 scale-95 translate-y-2">
-            <div class="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center mx-auto mb-4">
-                <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                </svg>
-            </div>
-            <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 text-center mb-1">Log out of StudHub?</h3>
-            <p class="text-sm text-gray-500 dark:text-gray-400 text-center mb-6">You'll need to sign in again to access your resources, chats, and lends.</p>
-            <div class="flex gap-3">
-                <button type="button"
-                        @click="logoutOpen = false"
-                        class="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-navy-700 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-700 transition-colors">
-                    Stay logged in
-                </button>
-                <button type="button"
-                        @click="document.getElementById('logout-form').submit()"
-                        class="flex-1 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-semibold transition-colors shadow-sm">
-                    Yes, log out
-                </button>
-            </div>
+    </nav>
+
+<!-- Logout Confirmation Modal (outside nav to avoid sticky/z-index conflicts) -->
+<div x-show="logoutOpen"
+     x-cloak
+     class="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+     @keydown.escape.window="logoutOpen = false">
+    <div class="absolute inset-0 bg-black/50 backdrop-blur-sm"
+         @click="logoutOpen = false"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"></div>
+    <div class="relative bg-white dark:bg-navy-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-navy-700/50 w-full max-w-sm p-6"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0 scale-95 translate-y-2"
+         x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-95 translate-y-2">
+        <div class="w-12 h-12 rounded-2xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center mx-auto mb-4">
+            <svg class="w-6 h-6 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+            </svg>
+        </div>
+        <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100 text-center mb-1">Log out of StudHub?</h3>
+        <p class="text-sm text-gray-500 dark:text-gray-400 text-center mb-6">You'll need to sign in again to access your resources, chats, and lends.</p>
+        <div class="flex gap-3">
+            <button type="button"
+                    @click="logoutOpen = false"
+                    class="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-navy-700 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-700 transition-colors">
+                Stay logged in
+            </button>
+            <button type="button"
+                    @click="document.getElementById('logout-form').submit()"
+                    class="flex-1 px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-semibold transition-colors shadow-sm">
+                Yes, log out
+            </button>
         </div>
     </div>
-</nav>
+</div>
+</div>

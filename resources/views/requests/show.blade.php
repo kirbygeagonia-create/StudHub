@@ -3,7 +3,39 @@
 
     <div class="py-8">
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-            <div class="card p-6 space-y-3">
+            <div class="card overflow-hidden">
+                {{-- Header banner --}}
+                <div class="px-6 py-5 border-b border-gray-100 dark:border-navy-700/50">
+                    <div class="flex items-start gap-4">
+                        @php
+                            $urgBg = match ($request->urgency?->value) {
+                                'urgent' => 'from-red-400 to-red-600',
+                                'low'    => 'from-gray-400 to-gray-500',
+                                default  => 'from-amber-400 to-amber-600',
+                            };
+                            $urgBadge = match ($request->urgency?->value) {
+                                'urgent' => 'bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-300',
+                                'low'    => 'bg-gray-100 text-gray-600 dark:bg-navy-700 dark:text-gray-400',
+                                default  => 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-300',
+                            };
+                        @endphp
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br {{ $urgBg }} flex items-center justify-center flex-shrink-0 shadow-sm">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        </div>
+                        <div class="flex-1">
+                            <h1 class="text-xl font-bold text-gray-900 dark:text-gray-100">
+                                {{ $request->subject->code }} — {{ $request->type_wanted }}
+                            </h1>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ $urgBadge }}">
+                                    {{ $request->urgency?->label() ?? 'Normal' }} urgency
+                                </span>
+                                <span class="text-xs text-gray-400 dark:text-gray-500">{{ $request->created_at->diffForHumans() }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6 space-y-3">
                 <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                     <div>
                         <dt class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Requested by</dt>
@@ -41,6 +73,7 @@
                         <p class="text-sm text-gray-800 dark:text-gray-200 whitespace-pre-line">{{ $request->description }}</p>
                     </div>
                 @endif
+            </div>
             </div>
 
             @if ($request->routes->isNotEmpty())

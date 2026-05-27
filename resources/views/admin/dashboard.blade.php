@@ -2,8 +2,10 @@
     <x-page-header title="Admin Dashboard" />
 
     <div class="py-8">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+
+            {{-- Stats Grid: all 9 stats in one responsive grid --}}
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div class="stat-card">
                     <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Open Reports</p>
                     <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $openReports }}</p>
@@ -20,9 +22,6 @@
                     <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">New Signups (7d)</p>
                     <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $recentSignups }}</p>
                 </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                 <div class="stat-card">
                     <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Daily Active Users</p>
                     <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $dau }}</p>
@@ -39,15 +38,74 @@
                     <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Messages Today</p>
                     <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $messagesToday }}</p>
                 </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="stat-card">
                     <p class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Active Lends</p>
                     <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $activeLends }}</p>
                 </div>
             </div>
 
+            {{-- Moderator Management: side-by-side --}}
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {{-- Assign Moderator --}}
+                <div class="card p-6">
+                    <h3 class="section-title mb-4">Assign Moderator</h3>
+                    <form method="POST" action="{{ route('admin.moderators.assign') }}" class="space-y-3">
+                        @csrf
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label for="assign_user_id" class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">User ID</label>
+                                <input type="number" id="assign_user_id" name="user_id" required
+                                       class="text-sm input-field w-full">
+                            </div>
+                            <div>
+                                <label for="assign_program_id" class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Program</label>
+                                <select id="assign_program_id" name="program_id" required
+                                        class="text-sm input-field w-full">
+                                    <option value="">Select program</option>
+                                    @foreach ($programs as $program)
+                                        <option value="{{ $program->id }}">{{ $program->code }} — {{ $program->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-primary text-xs !px-3 !py-1.5">
+                            Assign Moderator
+                        </button>
+                    </form>
+                </div>
+
+                {{-- Current Moderators --}}
+                <div class="card p-6">
+                    <h3 class="section-title mb-4">Current Moderators</h3>
+                    @if ($moderators->isEmpty())
+                        <p class="text-sm text-gray-500 dark:text-gray-400">No moderators assigned.</p>
+                    @else
+                        <div class="divide-y divide-gray-100 dark:divide-navy-700">
+                            @foreach ($moderators as $mod)
+                                <div class="py-2 flex items-center justify-between">
+                                    <div>
+                                        <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                            {{ $mod->user?->preferredDisplayName() ?? 'Unknown' }}
+                                        </p>
+                                        <p class="text-xs text-gray-500 dark:text-gray-400">
+                                            {{ $mod->program?->code ?? 'Unknown program' }}
+                                        </p>
+                                    </div>
+                                    <form method="POST" action="{{ route('admin.moderators.remove') }}">
+                                        @csrf
+                                        <input type="hidden" name="moderator_id" value="{{ $mod->id }}">
+                                        <button type="submit" class="btn-ghost text-xs !px-2 !py-1 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300">
+                                            Remove
+                                        </button>
+                                    </form>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            {{-- Colleges Overview --}}
             <div class="card p-6">
                 <h3 class="section-title mb-4">Colleges Overview</h3>
                 <div class="overflow-x-auto">
@@ -74,6 +132,7 @@
                 </div>
             </div>
 
+            {{-- Cross-Program Flow --}}
             <div class="card p-6">
                 <h3 class="section-title mb-4">Cross-Program Flow (Top 10)</h3>
                 @if ($crossProgramFlows->isEmpty())
@@ -102,65 +161,7 @@
                 @endif
             </div>
 
-            <div class="card p-6">
-                <h3 class="section-title mb-4">Assign Program Moderator</h3>
-                <form method="POST" action="{{ route('admin.moderators.assign') }}" class="space-y-3">
-                    @csrf
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        <div>
-                            <label for="assign_user_id" class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">User ID</label>
-                            <input type="number" id="assign_user_id" name="user_id" required
-                                   class="text-sm input-field w-full">
-                        </div>
-                        <div>
-                            <label for="assign_program_id" class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">Program</label>
-                            <select id="assign_program_id" name="program_id" required
-                                    class="text-sm input-field w-full">
-                                <option value="">Select program</option>
-                                @foreach ($programs as $program)
-                                    <option value="{{ $program->id }}">{{ $program->code }} — {{ $program->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <button type="submit"
-                            class="btn-primary text-xs !px-3 !py-1.5">
-                        Assign Moderator
-                    </button>
-                </form>
-            </div>
-
-            <div class="card p-6">
-                <h3 class="section-title mb-4">Current Moderators</h3>
-
-                @if ($moderators->isEmpty())
-                    <p class="text-sm text-gray-500 dark:text-gray-400">No moderators assigned.</p>
-                @else
-                    <div class="divide-y divide-gray-100 dark:divide-navy-700">
-                        @foreach ($moderators as $mod)
-                            <div class="py-2 flex items-center justify-between">
-                                <div>
-                                    <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                        {{ $mod->user?->preferredDisplayName() ?? 'Unknown' }}
-                                    </p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">
-                                        {{ $mod->program?->code ?? 'Unknown program' }}
-                                    </p>
-                                </div>
-                                <form method="POST" action="{{ route('admin.moderators.remove') }}">
-                                    @csrf
-                                    <input type="hidden" name="moderator_id" value="{{ $mod->id }}">
-                                    <button type="submit"
-                                            class="text-xs text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300">
-                                        Remove
-                                    </button>
-                                </form>
-                            </div>
-                        @endforeach
-                    </div>
-                @endif
-            </div>
-
+            {{-- Suspend / Unsuspend User --}}
             <div class="card p-6">
                 <h3 class="section-title mb-4">Suspend / Unsuspend User (School-wide)</h3>
                 <form method="POST" action="{{ route('admin.suspend') }}" class="space-y-3 mb-6">
@@ -182,8 +183,7 @@
                         <input type="text" id="admin_suspend_reason" name="reason" maxlength="500"
                                class="text-sm input-field w-full">
                     </div>
-                    <button type="submit"
-                            class="btn-primary text-xs !px-3 !py-1.5 !bg-red-500 hover:!bg-red-600">
+                    <button type="submit" class="btn-primary text-xs !px-3 !py-1.5 !bg-red-500 hover:!bg-red-600">
                         Suspend
                     </button>
                 </form>
@@ -195,12 +195,12 @@
                         <input type="number" id="admin_unsuspend_user_id" name="user_id" required
                                class="text-sm input-field w-full">
                     </div>
-                    <button type="submit"
-                            class="btn-primary text-xs !px-3 !py-1.5 !bg-emerald-500 hover:!bg-emerald-600">
+                    <button type="submit" class="btn-primary text-xs !px-3 !py-1.5 !bg-emerald-500 hover:!bg-emerald-600">
                         Unsuspend
                     </button>
                 </form>
             </div>
+
         </div>
     </div>
 </x-app-layout>

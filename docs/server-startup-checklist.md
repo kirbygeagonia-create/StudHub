@@ -1,11 +1,18 @@
 # Server Startup Checklist
 
-## ⚠️ IMPORTANT: AI agents must NOT run these commands
-> The `planning/studhub-improvements-v2.md` guide explicitly states:
-> **"Do not run npm, vite, or artisan commands — only file writes."**
-> Running `npm run build`, `php artisan serve`, or any `php artisan` command
-> during a UI-only file-edit session can cause unintended side effects.
-> **Only a human should start the server.** AI agents should stop here after file edits.
+## ⚠️ AI agents: Allowed to run these commands
+> AI agents **may** run the commands in this file when explicitly asked to start the server.
+> However, the agent **must** first confirm with the user that:
+> 1. All file edits are complete and saved
+> 2. The user is ready for the server to start
+> 3. No other server instances are running
+>
+> **Caveats for AI agents:**
+> - Do NOT run `npm run dev` (hot-reload mode) — only `npm run build` (production build)
+> - Do NOT run `php artisan serve` in the background and continue editing — the server ties up the terminal
+> - Always kill leftover processes first to avoid port conflicts
+> - Always delete `public/hot` if it exists to prevent stale Vite references
+> - After the server starts, inform the user it's running and how to terminate it
 
 ## Before starting any server, ALWAYS:
 
@@ -40,7 +47,19 @@ npm run build
 php artisan serve
 ```
 
-## For dev mode (with hot reload):
+## One-liner (all steps)
+Copy-paste this into PowerShell to do everything at once:
+```powershell
+Get-Process -Name "node" -ErrorAction SilentlyContinue | Stop-Process -Force; Get-Process -Name "php" -ErrorAction SilentlyContinue | Stop-Process -Force; if (Test-Path "public/hot") { Remove-Item "public/hot" -Force }; $env:Path = "C:\xampp\php;$env:Path"; php artisan view:clear; php artisan config:clear; npm run build; php artisan serve
+```
+
+## Terminating the server
+Press **`Ctrl + C`** in the terminal where the server is running, then run:
+```powershell
+Get-Process -Name "node" -ErrorAction SilentlyContinue | Stop-Process -Force; Get-Process -Name "php" -ErrorAction SilentlyContinue | Stop-Process -Force; if (Test-Path "public/hot") { Remove-Item "public/hot" -Force }
+```
+
+## For dev mode (with hot reload) — HUMAN ONLY
 ```powershell
 # Terminal 1
 php artisan serve

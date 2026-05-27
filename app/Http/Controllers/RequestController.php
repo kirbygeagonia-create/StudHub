@@ -24,7 +24,7 @@ class RequestController extends Controller
         $user = $httpRequest->user();
         abort_unless($user !== null, 403);
 
-        $query = ResourceRequest::with(['requester:id,display_name,name,program_id', 'subject:id,code,name'])
+        $query = ResourceRequest::with(['requester:id,display_name,name,program_id', 'subject:id,code,name', 'offers'])
             ->whereHas('requester', fn ($q) => $q->where('school_id', $user->school_id))
             ->whereIn('status', RequestStatus::openValues())
             ->orderByDesc('created_at');

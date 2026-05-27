@@ -112,7 +112,7 @@ it('renders the leaderboard for the user\'s program', function () {
     $this->actingAs($user)
         ->get(route('leaderboard'))
         ->assertOk()
-        ->assertSee('Top Sharers');
+        ->assertSee('Leaderboard');
 });
 
 it('sorts leaderboard by karma descending', function () {

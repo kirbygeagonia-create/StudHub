@@ -121,7 +121,7 @@
                     <x-icon name="chat" class="w-10 h-10 text-seait-400 dark:text-seait-500" />
                 </div>
                 <p class="text-base font-semibold text-gray-700 dark:text-gray-300" data-testid="chat-empty-state">No messages yet</p>
-                <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">Be the first to say something! 👋</p>
+                <p class="text-sm text-gray-400 dark:text-gray-500 mt-1">Be the first to say something!</p>
             </div>
         @endforelse
 
