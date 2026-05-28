@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\ChatMessage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ChatAttachmentController extends Controller
 {
-    public function download(Request $request, ChatMessage $message)
+    public function download(Request $request, ChatMessage $message): StreamedResponse
     {
         $user = $request->user();
         abort_unless($user !== null, 403);
@@ -33,5 +34,4 @@ class ChatAttachmentController extends Controller
 
         return Storage::disk('public')->download($path, $fileName);
     }
-}
 }

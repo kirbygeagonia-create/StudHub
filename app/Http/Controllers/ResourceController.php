@@ -11,6 +11,7 @@ use App\Models\Program;
 use App\Models\Subject;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
@@ -87,11 +88,11 @@ class ResourceController extends Controller
 
         $shelf = $user->shelves()->first();
 
-        if (!$shelf) {
+        if (! $shelf) {
             return view('resources.shelf', [
                 'shelf' => null,
-                'resources' => new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20),
-                'types' => \App\Domain\Catalog\Enums\ResourceType::cases(),
+                'resources' => new LengthAwarePaginator([], 0, 20),
+                'types' => ResourceType::cases(),
                 'filters' => [],
             ]);
         }
@@ -103,17 +104,17 @@ class ResourceController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%")
-                  ->orWhereHas('owner', function ($oq) use ($search) {
-                      $oq->where('display_name', 'like', "%{$search}%")
-                         ->orWhere('name', 'like', "%{$search}%");
-                  });
+                    ->orWhere('description', 'like', "%{$search}%")
+                    ->orWhereHas('owner', function ($oq) use ($search) {
+                        $oq->where('display_name', 'like', "%{$search}%")
+                            ->orWhere('name', 'like', "%{$search}%");
+                    });
             });
         }
 
         // Filter by type
         $typeFilter = $request->input('type');
-        if ($typeFilter && in_array($typeFilter, array_column(\App\Domain\Catalog\Enums\ResourceType::cases(), 'value'))) {
+        if ($typeFilter && in_array($typeFilter, array_column(ResourceType::cases(), 'value'))) {
             $query->where('type', $typeFilter);
         }
 
@@ -122,7 +123,7 @@ class ResourceController extends Controller
         return view('resources.shelf', [
             'shelf' => $shelf,
             'resources' => $resources,
-            'types' => \App\Domain\Catalog\Enums\ResourceType::cases(),
+            'types' => ResourceType::cases(),
             'filters' => [
                 'q' => $search,
                 'type' => $typeFilter,
