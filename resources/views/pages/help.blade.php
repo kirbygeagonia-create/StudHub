@@ -1,5 +1,12 @@
 <x-app-layout>
-    <x-page-header title="Help &amp; Guide" />
+    <x-page-header title="Help & Guide" />
+
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mt-2">
+        <a href="{{ url('/') }}" class="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-seait-500 dark:hover:text-seait-400 transition-colors">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            Back to Home
+        </a>
+    </div>
 
     <div class="py-8">
         <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
@@ -47,7 +54,7 @@
                     <p><strong>+10 karma</strong> — Fulfill a request</p>
                     <p><strong>+2 karma</strong> — Your chat message marked helpful</p>
                     <p><strong>-5 karma</strong> — Confirmed report against you</p>
-                    <p class="mt-3">Badge tiers: <span class="text-yellow-700 dark:text-amber-300 font-medium">Bronze</span> at 25 karma, <span class="text-gray-400 dark:text-gray-500 font-medium">Silver</span> at 75, <span class="text-amber-500 dark:text-amber-400 font-medium">Gold</span> at 150.</p>
+                    <p class="mt-3">Badge tiers: <span class="text-gray-600 dark:text-gray-300 font-medium">Seedling</span> (0), <span class="text-gray-600 dark:text-gray-300 font-medium">Bookworm</span> (25), <span class="text-gray-600 dark:text-gray-300 font-medium">Scribe</span> (75), <span class="text-gray-600 dark:text-gray-300 font-medium">Scholar</span> (150), <span class="text-gray-600 dark:text-gray-300 font-medium">Illuminator</span> (300), <span class="text-gray-600 dark:text-gray-300 font-medium">Pathfinder</span> (500), and beyond. Each tier is a permanent milestone — your progress never resets.</p>
                 </div>
             </div>
 

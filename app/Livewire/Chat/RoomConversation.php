@@ -89,6 +89,7 @@ class RoomConversation extends Component
                 'url' => '/storage/' . $path,
                 'mime' => $this->attachment->getMimeType(),
                 'size' => $this->attachment->getSize(),
+                'name' => $this->attachment->getClientOriginalName(),
             ];
         }
 

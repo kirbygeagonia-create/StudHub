@@ -43,10 +43,25 @@
                                 <p class="whitespace-pre-wrap leading-relaxed break-words">{{ $message->body }}</p>
                             </div>
                             @if ($message->hasAttachment())
-                                <a href="{{ $message->attachment_url }}" target="_blank" rel="noopener"
-                                   class="mt-1.5 inline-flex items-center gap-1 text-xs text-seait-300 hover:text-seait-200 transition-colors float-right">
-                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
-                                    Attachment
+                                @php
+                                    $ext = strtolower(pathinfo($message->attachment_name ?? $message->attachment_url, PATHINFO_EXTENSION));
+                                    $iconColor = match($ext) {
+                                        'pdf' => 'text-red-400',
+                                        'doc', 'docx' => 'text-blue-400',
+                                        'xls', 'xlsx' => 'text-green-400',
+                                        'ppt', 'pptx' => 'text-orange-400',
+                                        'jpg', 'jpeg', 'png', 'gif', 'webp' => 'text-purple-400',
+                                        'zip', 'rar', '7z' => 'text-yellow-400',
+                                        default => 'text-gray-400',
+                                    };
+                                @endphp
+                                <a href="{{ route('chat.attachments.download', $message) }}" target="_blank" rel="noopener"
+                                   class="mt-1.5 inline-flex items-center gap-1.5 text-xs text-seait-300 hover:text-seait-200 transition-colors float-right bg-seait-500/20 hover:bg-seait-500/30 px-2 py-1 rounded-lg">
+                                    <svg class="w-3.5 h-3.5 {{ $iconColor }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
+                                    <span>{{ $message->attachment_name ?? 'Attachment' }}</span>
+                                    @if ($message->attachment_size)
+                                        <span class="opacity-60">· {{ round($message->attachment_size / 1024) }} KB</span>
+                                    @endif
                                 </a>
                             @endif
                         </div>
@@ -80,10 +95,25 @@
                                     {{ $message->body }}
                                 </div>
                                 @if ($message->hasAttachment())
-                                    <a href="{{ $message->attachment_url }}" target="_blank" rel="noopener"
+                                    @php
+                                        $ext = strtolower(pathinfo($message->attachment_name ?? $message->attachment_url, PATHINFO_EXTENSION));
+                                        $iconColor = match($ext) {
+                                            'pdf' => 'text-red-500',
+                                            'doc', 'docx' => 'text-blue-500',
+                                            'xls', 'xlsx' => 'text-green-500',
+                                            'ppt', 'pptx' => 'text-orange-500',
+                                            'jpg', 'jpeg', 'png', 'gif', 'webp' => 'text-purple-500',
+                                            'zip', 'rar', '7z' => 'text-yellow-500',
+                                            default => 'text-gray-500',
+                                        };
+                                    @endphp
+                                    <a href="{{ route('chat.attachments.download', $message) }}" target="_blank" rel="noopener"
                                        class="mt-1.5 inline-flex items-center gap-1.5 text-xs text-seait-600 bg-seait-50 hover:bg-seait-100 px-2.5 py-1 rounded-lg dark:text-seait-400 dark:bg-seait-900/20 transition-colors">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
-                                        Attachment
+                                        <svg class="w-3.5 h-3.5 {{ $iconColor }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
+                                        <span>{{ $message->attachment_name ?? 'Attachment' }}</span>
+                                        @if ($message->attachment_size)
+                                            <span class="opacity-60">· {{ round($message->attachment_size / 1024) }} KB</span>
+                                        @endif
                                     </a>
                                 @endif
                             </div>
@@ -159,25 +189,65 @@
 
     {{-- Input bar --}}
     <div class="flex-shrink-0 border-t border-gray-200/60 dark:border-navy-700/40 bg-white/80 dark:bg-navy-800/80 backdrop-blur-sm px-4 py-3">
-        <form wire:submit="send" class="flex items-end gap-2">
-            <label class="flex-shrink-0 cursor-pointer p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-navy-700 transition-colors text-gray-400 hover:text-gray-600 border border-gray-200 dark:border-navy-700" title="Attach file">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
-                <input type="file" wire:model="attachment" accept="image/*,application/pdf" class="hidden">
-            </label>
-            <div class="flex-1 relative">
-                <label for="chat-body" class="sr-only">Message</label>
-                <textarea id="chat-body" wire:model="body" rows="1"
-                          class="input-field resize-none w-full max-h-32 overflow-y-auto !py-2.5"
-                          placeholder="Send a message… @name to mention"
-                          @keydown.enter.prevent="if(!$event.shiftKey){$wire.send()}else{$event.target.value+='\n'}"
-                          oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,128)+'px'"></textarea>
+        {{-- File upload progress + preview --}}
+        <div x-data="{ uploading: false, progress: 0 }"
+             x-on:livewire-upload-start="uploading = true; progress = 0"
+             x-on:livewire-upload-finish="uploading = false"
+             x-on:livewire-upload-error="uploading = false"
+             x-on:livewire-upload-progress="progress = $event.detail.progress">
+            {{-- Upload progress bar --}}
+            <div x-show="uploading" class="mb-2 p-3 rounded-xl bg-gray-50 dark:bg-navy-700/50 border border-gray-200 dark:border-navy-700">
+                <div class="flex items-center gap-3">
+                    <svg class="w-5 h-5 text-seait-500 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-xs font-medium text-gray-700 dark:text-gray-300">Uploading attachment…</span>
+                            <span class="text-xs text-gray-500 dark:text-gray-400" x-text="progress + '%'"></span>
+                        </div>
+                        <div class="h-1.5 w-full bg-gray-200 dark:bg-navy-600 rounded-full overflow-hidden">
+                            <div class="h-full bg-seait-500 rounded-full transition-all duration-300" :style="'width: ' + progress + '%'"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <button type="submit" wire:loading.attr="disabled"
-                    class="flex-shrink-0 p-2.5 rounded-xl bg-seait-500 hover:bg-seait-600 text-white transition-colors disabled:opacity-50 shadow-sm">
-                <x-icon wire:loading.remove.delay name="send" class="w-5 h-5" />
-                <x-icon wire:loading name="spinner" class="w-5 h-5 animate-spin" />
-            </button>
-        </form>
+
+            {{-- File preview card --}}
+            <template x-if="$wire.attachment">
+                <div class="mb-2 p-2.5 rounded-xl bg-gray-50 dark:bg-navy-700/50 border border-gray-200 dark:border-navy-700 flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-seait-100 dark:bg-seait-900/30 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-4 h-4 text-seait-600 dark:text-seait-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-xs font-medium text-gray-700 dark:text-gray-300 truncate" x-text="$wire.attachment ? $wire.attachment.name : ''"></p>
+                        <p class="text-[10px] text-gray-400 dark:text-gray-500" x-text="$wire.attachment ? Math.round($wire.attachment.size / 1024) + ' KB' : ''"></p>
+                    </div>
+                    <button type="button" x-on:click="$wire.set('attachment', null)"
+                            class="p-1 rounded text-gray-300 hover:text-red-500 hover:bg-red-50 dark:text-gray-600 dark:hover:text-red-400 dark:hover:bg-red-900/10 transition-colors flex-shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+            </template>
+
+            <form wire:submit="send" class="flex items-end gap-2">
+                <label class="flex-shrink-0 cursor-pointer p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-navy-700 transition-colors text-gray-400 hover:text-gray-600 border border-gray-200 dark:border-navy-700" title="Attach file">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
+                    <input type="file" wire:model="attachment" accept="image/*,application/pdf" class="hidden">
+                </label>
+                <div class="flex-1 relative">
+                    <label for="chat-body" class="sr-only">Message</label>
+                    <textarea id="chat-body" wire:model="body" rows="1"
+                              class="input-field resize-none w-full max-h-32 overflow-y-auto !py-2.5"
+                              placeholder="Send a message… @name to mention"
+                              @keydown.enter.prevent="if(!$event.shiftKey){$wire.send()}else{$event.target.value+='\n'}"
+                              oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,128)+'px'"></textarea>
+                </div>
+                <button type="submit" wire:loading.attr="disabled"
+                        class="flex-shrink-0 p-2.5 rounded-xl bg-seait-500 hover:bg-seait-600 text-white transition-colors disabled:opacity-50 shadow-sm">
+                    <x-icon wire:loading.remove.delay name="send" class="w-5 h-5" />
+                    <x-icon wire:loading name="spinner" class="w-5 h-5 animate-spin" />
+                </button>
+            </form>
+        </div>
         @error('body') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
         @error('attachment') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
         <p class="mt-1 text-[10px] text-gray-400 dark:text-gray-600">

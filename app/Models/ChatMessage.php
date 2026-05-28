@@ -21,6 +21,7 @@ class ChatMessage extends Model
         'attachment_url',
         'attachment_mime',
         'attachment_size',
+        'attachment_name',
         'pinned_at',
         'reply_to_message_id',
         'is_helpful',

@@ -29,9 +29,20 @@ class LendController extends Controller
             ->orderByDesc('lent_at')
             ->paginate(10, ['*'], 'borrowed_page');
 
+        // Incoming borrow requests: requests where the user has made an offer
+        $incomingRequests = ResourceRequest::whereHas('offers', function ($q) use ($user) {
+            $q->where('offerer_user_id', $user->id);
+        })->whereIn('status', ['open', 'matched'])
+            ->with(['requester:id,display_name,name', 'subject:id,code,name', 'offers' => function ($q) use ($user) {
+                $q->where('offerer_user_id', $user->id);
+            }])
+            ->orderByDesc('created_at')
+            ->get();
+
         return view('lends.index', [
             'lentOut' => $lentOut,
             'borrowed' => $borrowed,
+            'incomingRequests' => $incomingRequests,
         ]);
     }
 

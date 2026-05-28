@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ChatAttachmentController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\LendController;
@@ -33,6 +34,9 @@ Route::middleware(['auth', 'verified', 'onboarded', 'not_suspended'])->group(fun
 
     Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
     Route::get('/chat/{room}', [ChatController::class, 'show'])->name('chat.show');
+    Route::get('/chat/attachments/{message}/download', [ChatAttachmentController::class, 'download'])
+        ->middleware(['auth', 'verified'])
+        ->name('chat.attachments.download');
 
     Route::get('/resources', [ResourceController::class, 'index'])->name('resources.index');
     Route::get('/resources/create', [ResourceController::class, 'create'])->name('resources.create');

@@ -46,6 +46,10 @@
                         <x-icon name="leaderboard" class="w-4 h-4 mr-1.5" />
                         Leaderboard
                     </x-nav-link>
+                    <x-nav-link :href="route('requests.index')" :active="request()->routeIs('requests.*')">
+                        <x-icon name="search" class="w-4 h-4 mr-1.5" />
+                        Requests
+                    </x-nav-link>
                     <x-nav-link :href="route('lends.index')" :active="request()->routeIs('lends.*')">
                         <x-icon name="lends" class="w-4 h-4 mr-1.5" />
                         Lends
@@ -182,6 +186,10 @@
                                 <x-icon name="shelf" class="w-4 h-4 mr-2 flex-shrink-0" />
                                 My Shelf
                             </x-dropdown-link>
+                            <x-dropdown-link :href="route('requests.index')">
+                                <x-icon name="search" class="w-4 h-4 mr-2 flex-shrink-0" />
+                                My Requests
+                            </x-dropdown-link>
                             <x-dropdown-link :href="route('notifications.index')">
                                 <x-icon name="notifications" class="w-4 h-4 mr-2 flex-shrink-0" />
                                 Notifications
@@ -246,6 +254,7 @@
                 <x-responsive-nav-link :href="route('chat.index')" :active="request()->routeIs('chat.*')">Chat</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('resources.index')" :active="request()->routeIs('resources.*')">Resources</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('leaderboard')" :active="request()->routeIs('leaderboard')">Leaderboard</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('requests.index')" :active="request()->routeIs('requests.*')">Requests</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('lends.index')" :active="request()->routeIs('lends.*')">Lends</x-responsive-nav-link>
                 @if (Auth::user()?->isModerator() || Auth::user()?->isAdmin())
                     <x-responsive-nav-link :href="route('moderation.dashboard')" :active="request()->routeIs('moderation.*')">Moderation</x-responsive-nav-link>
@@ -261,6 +270,7 @@
                 </div>
                 <x-responsive-nav-link :href="route('profile.show')">Profile</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('resources.shelf')">My Shelf</x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('requests.index')">My Requests</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('notifications.index')">Notifications</x-responsive-nav-link>
                 @if (Auth::user()?->isAdmin())
                     <x-responsive-nav-link :href="route('admin.feedback')">View Feedback</x-responsive-nav-link>

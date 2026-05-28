@@ -87,18 +87,46 @@ class ResourceController extends Controller
 
         $shelf = $user->shelves()->first();
 
-        $resources = collect();
-
-        if ($shelf !== null) {
-            $resources = $shelf->resources()
-                ->with(['owner:id,display_name,name,program_id', 'subject:id,code,name', 'program:id,code'])
-                ->orderByDesc('shelf_items.created_at')
-                ->paginate(20);
+        if (!$shelf) {
+            return view('resources.shelf', [
+                'shelf' => null,
+                'resources' => new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20),
+                'types' => \App\Domain\Catalog\Enums\ResourceType::cases(),
+                'filters' => [],
+            ]);
         }
+
+        $query = $shelf->resources()->with(['owner:id,display_name,name,program_id', 'subject:id,code,name', 'program:id,code']);
+
+        // Search
+        $search = $request->input('q');
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhereHas('owner', function ($oq) use ($search) {
+                      $oq->where('display_name', 'like', "%{$search}%")
+                         ->orWhere('name', 'like', "%{$search}%");
+                  });
+            });
+        }
+
+        // Filter by type
+        $typeFilter = $request->input('type');
+        if ($typeFilter && in_array($typeFilter, array_column(\App\Domain\Catalog\Enums\ResourceType::cases(), 'value'))) {
+            $query->where('type', $typeFilter);
+        }
+
+        $resources = $query->orderByDesc('shelf_items.created_at')->paginate(20);
 
         return view('resources.shelf', [
             'shelf' => $shelf,
             'resources' => $resources,
+            'types' => \App\Domain\Catalog\Enums\ResourceType::cases(),
+            'filters' => [
+                'q' => $search,
+                'type' => $typeFilter,
+            ],
         ]);
     }
 

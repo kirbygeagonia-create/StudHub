@@ -1,4 +1,11 @@
 <x-app-layout>
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-2">
+        <a href="{{ route('chat.index') }}" class="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-seait-500 dark:hover:text-seait-400 transition-colors">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            Back to Chat Rooms
+        </a>
+    </div>
+
     <div class="flex flex-col" style="height: calc(100vh - 4rem); overflow: hidden;">
 
         {{-- Chat header --}}

@@ -236,43 +236,50 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
             <div class="p-5">
-                <div class="text-center mb-4">
-                    <div class="w-10 h-10 flex items-center justify-center mx-auto mb-2">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" class="w-10 h-10">
-                            <defs>
-                                <linearGradient id="wLG" x1="0" y1="0" x2="1" y2="1">
-                                    <stop offset="0%" stop-color="#FF6B35"/>
-                                    <stop offset="100%" stop-color="#C94B15"/>
-                                </linearGradient>
-                                <linearGradient id="wLA" x1="0" y1="1" x2="1" y2="0">
-                                    <stop offset="0%" stop-color="#FFB347"/>
-                                    <stop offset="100%" stop-color="#FF8C5A"/>
-                                </linearGradient>
-                            </defs>
-                            <path d="M100 18 C68 18 38 30 24 52 C10 74 10 100 10 100 C10 132 12 152 30 166 C48 180 72 182 100 182 C128 182 152 180 170 166 C188 152 190 132 190 100 C190 100 190 74 176 52 C162 30 132 18 100 18Z" fill="url(#wLG)"/>
-                            <path d="M100 52 C88 54 66 62 54 74 L54 148 C66 138 88 132 100 132 Z" fill="white" opacity="0.16"/>
-                            <path d="M100 52 C112 54 134 62 146 74 L146 148 C134 138 112 132 100 132 Z" fill="white" opacity="0.10"/>
-                            <line x1="100" y1="52" x2="100" y2="148" stroke="white" stroke-width="2" opacity="0.28" stroke-linecap="round"/>
-                            <rect x="72" y="94" width="56" height="8" rx="4" fill="white" opacity="0.95"/>
-                            <path d="M100 70 L118 91 L100 99 L82 91 Z" fill="white" opacity="0.95"/>
-                            <line x1="116" y1="97" x2="116" y2="122" stroke="url(#wLA)" stroke-width="3" stroke-linecap="round"/>
-                            <circle cx="116" cy="126" r="4.5" fill="url(#wLA)"/>
-                        </svg>
-                    </div>
-                    <h2 class="text-lg font-bold text-gray-900 dark:text-white">Welcome back</h2>
-                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Log in to your StudHub account</p>
+<div class="text-center mb-4">
+                <div class="w-10 h-10 flex items-center justify-center mx-auto mb-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" class="w-10 h-10">
+                        <defs>
+                            <linearGradient id="wLG" x1="0" y1="0" x2="1" y2="1">
+                                <stop offset="0%" stop-color="#FF6B35"/>
+                                <stop offset="100%" stop-color="#C94B15"/>
+                            </linearGradient>
+                            <linearGradient id="wLA" x1="0" y1="1" x2="1" y2="0">
+                                <stop offset="0%" stop-color="#FFB347"/>
+                                <stop offset="100%" stop-color="#FF8C5A"/>
+                            </linearGradient>
+                        </defs>
+                        <path d="M100 18 C68 18 38 30 24 52 C10 74 10 100 10 100 C10 132 12 152 30 166 C48 180 72 182 100 182 C128 182 152 180 170 166 C188 152 190 132 190 100 C190 100 190 74 176 52 C162 30 132 18 100 18Z" fill="url(#wLG)"/>
+                        <path d="M100 52 C88 54 66 62 54 74 L54 148 C66 138 88 132 100 132 Z" fill="white" opacity="0.16"/>
+                        <path d="M100 52 C112 54 134 62 146 74 L146 148 C134 138 112 132 100 132 Z" fill="white" opacity="0.10"/>
+                        <line x1="100" y1="52" x2="100" y2="148" stroke="white" stroke-width="2" opacity="0.28" stroke-linecap="round"/>
+                        <rect x="72" y="94" width="56" height="8" rx="4" fill="white" opacity="0.95"/>
+                        <path d="M100 70 L118 91 L100 99 L82 91 Z" fill="white" opacity="0.95"/>
+                        <line x1="116" y1="97" x2="116" y2="122" stroke="url(#wLA)" stroke-width="3" stroke-linecap="round"/>
+                        <circle cx="116" cy="126" r="4.5" fill="url(#wLA)"/>
+                    </svg>
                 </div>
-                <form method="POST" action="{{ route('login') }}">
+                <h2 class="text-lg font-bold text-gray-900 dark:text-white">Welcome back</h2>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Log in to your StudHub account</p>
+            </div>
+            {{-- Error banner --}}
+            @if ($errors->any())
+                <div class="w-full bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30 text-red-700 dark:text-red-300 rounded-xl px-3 py-2.5 mb-3 flex items-center gap-2">
+                    <svg class="w-4 h-4 flex-shrink-0 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span class="text-xs font-medium">{{ $errors->first('email') ?: $errors->first('password') }}</span>
+                </div>
+            @endif
+            <form method="POST" action="{{ route('login') }}">
                     @csrf
                     <div>
                         <label for="login-email" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
                         <input id="login-email" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username" class="input-field text-sm" placeholder="you@seait.edu.ph">
-                        @error('email')<p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
                     </div>
                     <div class="mt-2.5">
                         <label for="login-password" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
                         <input id="login-password" type="password" name="password" required autocomplete="current-password" class="input-field text-sm" placeholder="••••••••">
-                        @error('password')<p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
                     </div>
                     <div class="flex items-center justify-between mt-2.5">
                         <label for="remember_me" class="inline-flex items-center cursor-pointer">

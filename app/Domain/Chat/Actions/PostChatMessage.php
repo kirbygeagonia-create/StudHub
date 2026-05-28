@@ -17,7 +17,7 @@ use InvalidArgumentException;
  * dispatches the broadcast event, and fans out database notifications to
  * mentioned users.
  *
- * @phpstan-type AttachmentPayload array{url: string, mime?: string|null, size?: int|null}
+ * @phpstan-type AttachmentPayload array{url: string, mime?: string|null, size?: int|null, name?: string|null}
  */
 class PostChatMessage
 {
@@ -56,6 +56,7 @@ class PostChatMessage
                 'attachment_url' => $attachment['url'] ?? null,
                 'attachment_mime' => $attachment['mime'] ?? null,
                 'attachment_size' => $attachment['size'] ?? null,
+                'attachment_name' => $attachment['name'] ?? null,
                 'reply_to_message_id' => $replyToMessageId,
             ]);
 

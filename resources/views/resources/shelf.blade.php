@@ -5,10 +5,44 @@
         </x-slot>
     </x-page-header>
 
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-2">
+        <a href="{{ route('resources.index') }}" class="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-seait-500 dark:hover:text-seait-400 transition-colors">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            Back to Resources
+        </a>
+    </div>
+
     <div class="py-8">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
 
             @if ($shelf && $resources->isNotEmpty())
+                {{-- Search & Filter --}}
+                <div class="card p-4 mb-4">
+                    <form method="GET" action="{{ route('resources.shelf') }}" class="flex flex-wrap items-end gap-3">
+                        <div class="flex-1 min-w-[200px]">
+                            <label for="shelf-q" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Search</label>
+                            <input id="shelf-q" type="text" name="q" value="{{ $filters['q'] ?? '' }}"
+                                   placeholder="Search by title, description, or uploader…"
+                                   class="input-field w-full text-sm">
+                        </div>
+                        <div class="w-40">
+                            <label for="shelf-type" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Type</label>
+                            <select id="shelf-type" name="type" class="input-field w-full text-sm">
+                                <option value="">All types</option>
+                                @foreach ($types as $type)
+                                    <option value="{{ $type->value }}" @selected(($filters['type'] ?? '') === $type->value)>
+                                        {{ $type->label() }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-secondary text-xs">Filter</button>
+                        @if (($filters['q'] ?? '') !== '' || ($filters['type'] ?? '') !== '')
+                            <a href="{{ route('resources.shelf') }}" class="btn-ghost text-xs">Clear</a>
+                        @endif
+                    </form>
+                </div>
+
                 <div class="space-y-3">
                     <p class="text-xs text-gray-500 dark:text-gray-400 px-1">{{ $resources->total() }} saved {{ Str::plural('resource', $resources->total()) }}</p>
 
