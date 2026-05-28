@@ -1,5 +1,10 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth" x-data="{ dark: localStorage.getItem('dark') === 'true', showLoginModal: false, showRegisterModal: false, showForgotPasswordModal: false }" x-init="$watch('dark', v => { localStorage.setItem('dark', v); document.documentElement.classList.toggle('dark', v) }); document.documentElement.classList.toggle('dark', dark)" :class="{ 'dark': dark }">
+<html lang="en" class="scroll-smooth" x-data="{
+    dark: localStorage.getItem('dark') === 'true',
+    showLoginModal: {{ ($errors->hasBag('default') || $errors->has('email') || $errors->has('password')) && !$errors->has('name') ? 'true' : 'false' }},
+    showRegisterModal: {{ $errors->has('name') || $errors->has('student_number') || $errors->has('password_confirmation') ? 'true' : 'false' }},
+    showForgotPasswordModal: false
+}" x-init="$watch('dark', v => { localStorage.setItem('dark', v); document.documentElement.classList.toggle('dark', v) }); document.documentElement.classList.toggle('dark', dark)" :class="{ 'dark': dark }">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">

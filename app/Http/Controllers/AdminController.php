@@ -8,6 +8,7 @@ use App\Domain\Moderation\Actions\SuspendUser;
 use App\Domain\Moderation\Enums\ReportStatus;
 use App\Models\ChatMessage;
 use App\Models\College;
+use App\Models\Feedback;
 use App\Models\LearningResource;
 use App\Models\Lend;
 use App\Models\Program;
@@ -193,5 +194,17 @@ class AdminController extends Controller
         session()->flash('status', 'User unsuspended.');
 
         return redirect()->route('admin.dashboard');
+    }
+
+    public function feedback(HttpRequest $httpRequest): View
+    {
+        $user = $httpRequest->user();
+        abort_unless($user?->isAdmin(), 403);
+
+        $feedbacks = Feedback::with('user:id,display_name,name,email')
+            ->latest()
+            ->paginate(25);
+
+        return view('admin.feedback', ['feedbacks' => $feedbacks]);
     }
 }

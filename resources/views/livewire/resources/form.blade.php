@@ -64,12 +64,26 @@
                                 this.selectedLabel = subject.code + ' — ' + subject.name;
                                 this.query = '';
                                 this.open = false;
-                                setTimeout(() => { this.$el.closest('form').dispatchEvent(new Event('input', { bubbles: true })); }, 0);
+                                this.$nextTick(() => {
+                                    const hidden = document.getElementById('subject_id_hidden');
+                                    if (hidden) {
+                                        hidden.value = subject.id;
+                                        hidden.dispatchEvent(new Event('input', { bubbles: true }));
+                                        hidden.dispatchEvent(new Event('change', { bubbles: true }));
+                                    }
+                                });
                             },
                             clear() {
                                 this.selectedId = '';
                                 this.selectedLabel = '';
                                 this.query = '';
+                                this.$nextTick(() => {
+                                    const hidden = document.getElementById('subject_id_hidden');
+                                    if (hidden) {
+                                        hidden.value = '';
+                                        hidden.dispatchEvent(new Event('input', { bubbles: true }));
+                                    }
+                                });
                             }
                         }
                     }

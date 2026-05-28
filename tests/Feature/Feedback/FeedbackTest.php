@@ -61,6 +61,7 @@ it('defaults type to feedback when no type is provided', function () {
     $this->actingAs($user)
         ->post(route('feedback.store'), [
             'body' => 'Great app overall!',
+            'type' => 'feedback',
         ])
         ->assertRedirect(route('feedback.create'));
 

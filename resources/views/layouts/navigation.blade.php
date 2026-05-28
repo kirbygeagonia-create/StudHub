@@ -186,14 +186,17 @@
                                 <x-icon name="notifications" class="w-4 h-4 mr-2 flex-shrink-0" />
                                 Notifications
                             </x-dropdown-link>
-                            <x-dropdown-link :href="route('profile.notification-preferences')">
-                                <x-icon name="settings" class="w-4 h-4 mr-2 flex-shrink-0" />
-                                Notif. Settings
-                            </x-dropdown-link>
-                            <x-dropdown-link :href="route('feedback.create')">
-                                <x-icon name="feedback" class="w-4 h-4 mr-2 flex-shrink-0" />
-                                Feedback
-                            </x-dropdown-link>
+                            @if (Auth::user()?->isAdmin())
+                                <x-dropdown-link :href="route('admin.feedback')">
+                                    <x-icon name="feedback" class="w-4 h-4 mr-2 flex-shrink-0" />
+                                    View Feedback
+                                </x-dropdown-link>
+                            @else
+                                <x-dropdown-link :href="route('feedback.create')">
+                                    <x-icon name="feedback" class="w-4 h-4 mr-2 flex-shrink-0" />
+                                    Feedback
+                                </x-dropdown-link>
+                            @endif
                         </div>
 
                         <div class="border-t border-gray-100 dark:border-navy-700/50 py-1">
@@ -259,8 +262,11 @@
                 <x-responsive-nav-link :href="route('profile.show')">Profile</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('resources.shelf')">My Shelf</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('notifications.index')">Notifications</x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('profile.notification-preferences')">Notif. Settings</x-responsive-nav-link>
-                <x-responsive-nav-link :href="route('feedback.create')">Feedback</x-responsive-nav-link>
+                @if (Auth::user()?->isAdmin())
+                    <x-responsive-nav-link :href="route('admin.feedback')">View Feedback</x-responsive-nav-link>
+                @else
+                    <x-responsive-nav-link :href="route('feedback.create')">Feedback</x-responsive-nav-link>
+                @endif
                 <div class="px-3 py-2">
                     <button @click="dark = !dark" type="button" class="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 flex items-center gap-2 transition-colors">
                         <template x-if="!dark">

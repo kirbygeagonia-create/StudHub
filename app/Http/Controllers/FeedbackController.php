@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Domain\Feedback\Actions\SubmitFeedback;
+use App\Domain\Feedback\Enums\FeedbackType;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -21,7 +22,7 @@ class FeedbackController extends Controller
 
         $validated = $request->validate([
             'body' => ['required', 'string', 'min:5', 'max:2000'],
-            'type' => ['nullable', 'string', 'in:bug,feature,praise,other'],
+            'type' => ['required', 'string', 'in:' . implode(',', FeedbackType::values())],
         ]);
 
         $submitFeedback->handle($user, $validated);

@@ -94,7 +94,7 @@
 
             <div class="shrink-0 flex items-center flex-col relative z-10">
                 <a href="/">
-                    <x-application-logo class="w-20 h-20" />
+                    <x-application-logo class="w-16 h-16" />
                 </a>
                 <p class="mt-2 text-xs font-semibold text-seait-500 dark:text-seait-400 tracking-widest uppercase">StudHub</p>
                 <p class="text-[10px] text-gray-400 dark:text-gray-500">SEAIT Academic Resource Exchange</p>

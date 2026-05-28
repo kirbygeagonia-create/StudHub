@@ -133,6 +133,7 @@ Route::middleware(['auth', 'verified', 'onboarded', 'role:admin'])->group(functi
     Route::post('/admin/unsuspend', [AdminController::class, 'unsuspend'])
         ->middleware('throttle:10,1')
         ->name('admin.unsuspend');
+    Route::get('/admin/feedback', [AdminController::class, 'feedback'])->name('admin.feedback');
 });
 
 require __DIR__ . '/auth.php';

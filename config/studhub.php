@@ -25,7 +25,7 @@ return [
     |
     */
 
-    'allowed_email_domains' => env('STUDHUB_ALLOWED_EMAIL_DOMAINS', 'seait.edu.ph,students.seait.edu.ph'),
+    'allowed_email_domains' => env('STUDHUB_ALLOWED_EMAIL_DOMAINS', ''),
 
     /*
     |--------------------------------------------------------------------------
