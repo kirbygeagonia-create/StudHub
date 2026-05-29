@@ -1,6 +1,6 @@
 <x-guest-layout>
     <div class="text-center mb-6">
-        <h1 class="text-xl font-bold text-gray-900 dark:text-gray-100">Help &amp; Guide</h1>
+        <h1 class="text-xl font-bold text-gray-900 dark:text-gray-100">Help & Guide</h1>
         <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Everything you need to know about StudHub</p>
     </div>
 

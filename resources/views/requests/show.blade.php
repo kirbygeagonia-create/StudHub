@@ -199,8 +199,9 @@
 
             <div class="text-right">
                 <a href="{{ route('requests.index') }}"
-                   class="text-sm text-seait-500 hover:text-seait-800">
-                    &larr; Back to request board
+                   class="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-seait-500 dark:hover:text-seait-400 transition-colors">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    Back to request board
                 </a>
             </div>
         </div>

@@ -188,12 +188,12 @@
     </div>
 
     {{-- Input bar --}}
-    <div class="flex-shrink-0 border-t border-gray-200/60 dark:border-navy-700/40 bg-white/80 dark:bg-navy-800/80 backdrop-blur-sm px-4 py-3">
+    <div class="flex-shrink-0 border-t border-gray-200/60 dark:border-navy-700/40 bg-white/80 dark:bg-navy-800/80 backdrop-blur-sm px-4 py-2.5">
         {{-- File upload progress + preview --}}
-        <div x-data="{ uploading: false, progress: 0 }"
+        <div x-data="{ uploading: false, progress: 0, fileName: '', fileSize: 0, hasFile: false }"
              x-on:livewire-upload-start="uploading = true; progress = 0"
              x-on:livewire-upload-finish="uploading = false"
-             x-on:livewire-upload-error="uploading = false"
+             x-on:livewire-upload-error="uploading = false; hasFile = false; fileName = ''; fileSize = 0"
              x-on:livewire-upload-progress="progress = $event.detail.progress">
             {{-- Upload progress bar --}}
             <div x-show="uploading" class="mb-2 p-3 rounded-xl bg-gray-50 dark:bg-navy-700/50 border border-gray-200 dark:border-navy-700">
@@ -212,37 +212,38 @@
             </div>
 
             {{-- File preview card --}}
-            <template x-if="$wire.attachment">
+            <template x-if="hasFile">
                 <div class="mb-2 p-2.5 rounded-xl bg-gray-50 dark:bg-navy-700/50 border border-gray-200 dark:border-navy-700 flex items-center gap-3">
                     <div class="w-8 h-8 rounded-lg bg-seait-100 dark:bg-seait-900/30 flex items-center justify-center flex-shrink-0">
                         <svg class="w-4 h-4 text-seait-600 dark:text-seait-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
                     </div>
                     <div class="flex-1 min-w-0">
-                        <p class="text-xs font-medium text-gray-700 dark:text-gray-300 truncate" x-text="$wire.attachment ? $wire.attachment.name : ''"></p>
-                        <p class="text-[10px] text-gray-400 dark:text-gray-500" x-text="$wire.attachment ? Math.round($wire.attachment.size / 1024) + ' KB' : ''"></p>
+                        <p class="text-xs font-medium text-gray-700 dark:text-gray-300 truncate" x-text="fileName"></p>
+                        <p class="text-[10px] text-gray-400 dark:text-gray-500" x-text="fileSize ? Math.round(fileSize / 1024) + ' KB' : ''"></p>
                     </div>
-                    <button type="button" x-on:click="$wire.set('attachment', null)"
+                    <button type="button" x-on:click="$wire.set('attachment', null); hasFile = false; fileName = ''; fileSize = 0"
                             class="p-1 rounded text-gray-300 hover:text-red-500 hover:bg-red-50 dark:text-gray-600 dark:hover:text-red-400 dark:hover:bg-red-900/10 transition-colors flex-shrink-0">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
                 </div>
             </template>
 
-            <form wire:submit="send" class="flex items-end gap-2">
-                <label class="flex-shrink-0 cursor-pointer p-2.5 rounded-xl hover:bg-gray-100 dark:hover:bg-navy-700 transition-colors text-gray-400 hover:text-gray-600 border border-gray-200 dark:border-navy-700" title="Attach file">
+            <form wire:submit="send" class="flex items-center gap-2">
+                <label class="flex-shrink-0 cursor-pointer p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-navy-700 transition-colors text-gray-400 hover:text-gray-600 border border-gray-200 dark:border-navy-700 hover:border-gray-300 dark:hover:border-navy-600" title="Attach file">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
-                    <input type="file" wire:model="attachment" accept="image/*,application/pdf" class="hidden">
+                    <input type="file" wire:model="attachment" accept="image/*,application/pdf" class="hidden"
+                           @change="const f = $event.target.files[0]; if (f) { fileName = f.name; fileSize = f.size; hasFile = true; }">
                 </label>
                 <div class="flex-1 relative">
                     <label for="chat-body" class="sr-only">Message</label>
                     <textarea id="chat-body" wire:model="body" rows="1"
-                              class="input-field resize-none w-full max-h-32 overflow-y-auto !py-2.5"
+                              class="input-field resize-none w-full max-h-32 overflow-y-auto !py-2.5 rounded-2xl"
                               placeholder="Send a message… @name to mention"
                               @keydown.enter.prevent="if(!$event.shiftKey){$wire.send()}else{$event.target.value+='\n'}"
                               oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,128)+'px'"></textarea>
                 </div>
                 <button type="submit" wire:loading.attr="disabled"
-                        class="flex-shrink-0 p-2.5 rounded-xl bg-seait-500 hover:bg-seait-600 text-white transition-colors disabled:opacity-50 shadow-sm">
+                        class="flex-shrink-0 p-2 rounded-xl bg-seait-500 hover:bg-seait-600 text-white transition-colors disabled:opacity-50 shadow-sm hover:shadow-md">
                     <x-icon wire:loading.remove.delay name="send" class="w-5 h-5" />
                     <x-icon wire:loading name="spinner" class="w-5 h-5 animate-spin" />
                 </button>
@@ -250,9 +251,10 @@
         </div>
         @error('body') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
         @error('attachment') <p class="mt-1 text-xs text-red-500">{{ $message }}</p> @enderror
-        <p class="mt-1 text-[10px] text-gray-400 dark:text-gray-600">
-            <kbd class="px-1 rounded bg-gray-100 dark:bg-navy-700 font-mono text-[9px]">Enter</kbd> send &nbsp;·&nbsp;
-            <kbd class="px-1 rounded bg-gray-100 dark:bg-navy-700 font-mono text-[9px]">Shift+Enter</kbd> new line
+        <p class="mt-0.5 text-[10px] text-gray-400 dark:text-gray-500">
+            <kbd class="px-1 py-[1px] rounded bg-gray-100 dark:bg-navy-700 font-mono text-[9px] border border-gray-200 dark:border-navy-600">Enter</kbd> send
+            <span class="mx-1 text-gray-300 dark:text-gray-600">·</span>
+            <kbd class="px-1 py-[1px] rounded bg-gray-100 dark:bg-navy-700 font-mono text-[9px] border border-gray-200 dark:border-navy-600">Shift+Enter</kbd> new line
         </p>
     </div>
 </div>

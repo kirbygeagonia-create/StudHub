@@ -10,8 +10,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>StudHub — SEAIT Academic Resource Exchange</title>
     <meta name="color-scheme" content="light dark">
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" sizes="any">
     <meta name="theme-color" content="#FF6B35">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
@@ -26,7 +25,7 @@
         </div>
 
         {{-- Flash Messages --}}
-        @if (session('status') || session('success') || session('error'))
+        @if (session('status') || session('success') || session('error') || session('warning') || session('info'))
             <div class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-md px-4">
                 @if (session('status') || session('success'))
                     <div x-data="{ flashShow: true }" x-show="flashShow" x-init="setTimeout(() => flashShow = false, 4000)"
@@ -44,6 +43,24 @@
                         <svg class="w-5 h-5 flex-shrink-0 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         <span>{{ session('error') }}</span>
                         <button @click="flashShow = false" class="ml-auto text-red-500 hover:text-red-700 dark:hover:text-red-300"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+                    </div>
+                @endif
+                @if (session('warning'))
+                    <div x-data="{ flashShow: true }" x-show="flashShow" x-init="setTimeout(() => flashShow = false, 6000)"
+                         x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-2"
+                         class="flash-warning">
+                        <svg class="w-5 h-5 flex-shrink-0 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.054 0 1.502-1.275.722-1.845l-6.928-5.013c-.752-.545-1.792-.545-2.544 0L5.094 17.155c-.78.57-.332 1.845.722 1.845z"/></svg>
+                        <span>{{ session('warning') }}</span>
+                        <button @click="flashShow = false" class="ml-auto text-amber-500 hover:text-amber-700 dark:hover:text-amber-300"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+                    </div>
+                @endif
+                @if (session('info'))
+                    <div x-data="{ flashShow: true }" x-show="flashShow" x-init="setTimeout(() => flashShow = false, 5000)"
+                         x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 -translate-y-2"
+                         class="flash-info">
+                        <svg class="w-5 h-5 flex-shrink-0 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span>{{ session('info') }}</span>
+                        <button @click="flashShow = false" class="ml-auto text-blue-500 hover:text-blue-700 dark:hover:text-blue-300"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
                     </div>
                 @endif
             </div>
@@ -78,6 +95,8 @@
                     <span class="font-bold text-lg text-gray-900 dark:text-gray-100 group-hover:text-seait-500 dark:group-hover:text-seait-400 transition-colors duration-200">StudHub</span>
                 </a>
                 <div class="flex items-center gap-3">
+                    <a href="{{ route('help') }}" class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition">Help</a>
+                    <a href="{{ route('aup') }}" class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition">Policy</a>
                     @if (Route::has('login'))
                         @auth
                             <a href="{{ route('dashboard') }}" class="btn-primary text-xs !px-4 !py-2">Dashboard</a>
@@ -239,7 +258,16 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
             <div class="p-5">
-<div class="text-center mb-4">
+            {{-- Error banner — above heading --}}
+            @if ($errors->any())
+                <div class="w-full bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30 text-red-700 dark:text-red-300 rounded-xl px-3 py-2.5 mb-3 flex items-center gap-2">
+                    <svg class="w-4 h-4 flex-shrink-0 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span class="text-xs font-medium">{{ $errors->first('login') }}</span>
+                </div>
+            @endif
+            <div class="text-center mb-4">
                 <div class="w-10 h-10 flex items-center justify-center mx-auto mb-2">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" class="w-10 h-10">
                         <defs>
@@ -265,15 +293,6 @@
                 <h2 class="text-lg font-bold text-gray-900 dark:text-white">Welcome back</h2>
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Log in to your StudHub account</p>
             </div>
-            {{-- Error banner --}}
-            @if ($errors->any())
-                <div class="w-full bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30 text-red-700 dark:text-red-300 rounded-xl px-3 py-2.5 mb-3 flex items-center gap-2">
-                    <svg class="w-4 h-4 flex-shrink-0 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    <span class="text-xs font-medium">{{ $errors->first('login') }}</span>
-                </div>
-            @endif
             <form method="POST" action="{{ route('login') }}">
                     @csrf
                     <div>

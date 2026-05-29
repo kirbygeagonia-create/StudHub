@@ -4,13 +4,10 @@ $isModal = request()->header('X-Requested-With') === 'XMLHttpRequest' || request
 @endphp
 
 @if (!$isModal)
-<x-guest-layout :heading="__('Log in to StudHub')">
+<x-guest-layout>
 @endif
 
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
-
-    {{-- Error banner --}}
+    {{-- Error banner — above heading --}}
     @if ($errors->any())
         <div class="w-full bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30 text-red-700 dark:text-red-300 rounded-xl px-4 py-3 mb-4 flex items-center gap-2.5">
             <svg class="w-5 h-5 flex-shrink-0 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -19,6 +16,11 @@ $isModal = request()->header('X-Requested-With') === 'XMLHttpRequest' || request
             <span class="text-sm font-medium">{{ $errors->first('login') }}</span>
         </div>
     @endif
+
+    <!-- Session Status -->
+    <x-auth-session-status class="mb-4" :status="session('status')" />
+
+    <h1 class="text-2xl font-bold text-center text-gray-900 dark:text-white mb-6">{{ __('Log in to StudHub') }}</h1>
 
     <form method="POST" action="{{ route('login') }}" @if($isModal) @submit.prevent="submitModalForm($event)" @endif>
         @csrf

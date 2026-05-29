@@ -17,10 +17,29 @@
                         <div class="text-xs text-gray-500 dark:text-gray-400">Karma</div>
                         @if ($badge)
                             <span class="inline-flex items-center gap-1 mt-1 px-2.5 py-0.5 rounded-full text-xs font-medium
-                                {{ $badge->value === 'gold' ? 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-300' : ($badge->value === 'silver' ? 'bg-gray-200 text-gray-700 dark:bg-navy-700 dark:text-gray-300' : 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-300') }}"
+                                {{ in_array($badge->rarity()->value, ['legendary', 'rare']) ? 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-300' : 'bg-seait-50 text-seait-700 dark:bg-seait-900/20 dark:text-seait-300' }}"
                                 data-testid="badge-tier">
                                 {{ $badge->label() }}
                             </span>
+                            @php $nextTier = $badge->next(); $karmaToNext = $nextTier ? $badge->karmaToNext($karma) : 0; @endphp
+                            @if ($nextTier)
+                                <div class="mt-2 text-left" style="min-width:120px">
+                                    <div class="flex items-center justify-between mb-0.5">
+                                        <span class="text-[10px] text-gray-400 dark:text-gray-500">Next: {{ $nextTier->label() }}</span>
+                                        <span class="text-[10px] text-gray-400 dark:text-gray-500">{{ $karmaToNext }} left</span>
+                                    </div>
+                                    <div class="h-1.5 w-full bg-gray-200 dark:bg-navy-700 rounded-full overflow-hidden">
+                                        @php
+                                            $progress = $nextTier
+                                                ? min(100, round(($karma - $badge->threshold()) / ($nextTier->threshold() - $badge->threshold()) * 100))
+                                                : 100;
+                                        @endphp
+                                        <div class="h-full bg-gradient-to-r from-seait-400 to-seait-500 rounded-full transition-all" style="width: {{ $progress }}%"></div>
+                                    </div>
+                                </div>
+                            @else
+                                <p class="text-[10px] text-amber-600 dark:text-amber-400 mt-1 font-semibold flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16.5 18.75h-9m9 0a3 3 0 0 1 3 3h-15a3 3 0 0 1 3-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 0 1-.982-3.172M9.497 14.25a7.454 7.454 0 0 0 .981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 0 0 7.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M18.75 4.236c.982.143 1.954.317 2.916.52A6.003 6.003 0 0 1 16.27 9.728M18.75 4.236V4.5c0 2.108-.966 3.99-2.48 5.228m0 0a6.023 6.023 0 0 1-2.77.896m0 0a6.022 6.022 0 0 1-2.77-.896m0 0a6.023 6.023 0 0 1-2.77-.896"/></svg>Max tier reached</p>
+                            @endif
                         @endif
                     </div>
                 </div>
@@ -96,8 +115,9 @@
             </div>
 
             <div class="text-right">
-                <a href="{{ route('profile.show') }}" class="text-sm text-seait-500 hover:text-seait-800">
-                    &larr; Back to your profile
+                <a href="{{ route('profile.show') }}" class="inline-flex items-center gap-1 text-xs text-gray-400 hover:text-seait-500 dark:hover:text-seait-400 transition-colors">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    Back to your profile
                 </a>
             </div>
         </div>

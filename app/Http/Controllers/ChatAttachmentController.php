@@ -14,12 +14,17 @@ class ChatAttachmentController extends Controller
         $user = $request->user();
         abort_unless($user !== null, 403);
 
-        // Verify user is a member of the chat room
-        $isMember = $message->room->members()
-            ->where('user_id', $user->id)
-            ->exists();
-
-        abort_unless($isMember, 403, 'You are not a participant of this chat room.');
+        // Verify user can view the room (same program/school check as ChatController)
+        $room = $message->room;
+        if ($room->school_id !== $user->school_id) {
+            abort(403, 'You cannot access attachments from this chat room.');
+        }
+        if ($room->program_id !== null && $room->program_id !== $user->program_id) {
+            abort(403, 'This attachment is restricted to a different program.');
+        }
+        if ($room->year_level !== null && $room->year_level !== $user->year_level) {
+            abort(403, 'This attachment is restricted to a different year level.');
+        }
 
         // Verify the message has an attachment
         abort_unless($message->hasAttachment(), 404, 'No attachment found.');

@@ -49,6 +49,7 @@ class RegisteredUserController extends Controller
             'school_id' => $school?->id,
             'name' => $validated['name'],
             'email' => $validated['email'],
+            'email_verified_at' => now(),
             'password' => Hash::make($validated['password']),
             'role' => UserRole::Student->value,
             'student_number' => $validated['student_number'] ?? null,
