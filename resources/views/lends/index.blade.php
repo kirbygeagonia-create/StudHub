@@ -8,6 +8,42 @@
         </a>
     </div>
 
+    {{-- How lending works guidance --}}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+        <div x-data="{ showGuide: false }"
+             class="card p-4 border-l-4 border-seait-400 bg-seait-50/40 dark:bg-seait-900/10 dark:border-seait-500">
+            <button @click="showGuide = !showGuide" type="button"
+                    class="flex items-center gap-2 w-full text-left">
+                <div class="w-8 h-8 rounded-lg bg-seait-100 dark:bg-seait-900/30 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 text-seait-600 dark:text-seait-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/></svg>
+                </div>
+                <div class="flex-1">
+                    <p class="text-sm font-semibold text-gray-900 dark:text-gray-100">How lending works</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">A quick guide to lending and borrowing on StudHub</p>
+                </div>
+                <svg class="w-4 h-4 text-gray-400 transition-transform duration-200" :class="showGuide && 'rotate-180'" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <div x-show="showGuide" x-collapse class="mt-3 pt-3 border-t border-seait-200 dark:border-seait-800/30">
+                <div class="grid sm:grid-cols-2 gap-4 text-sm text-gray-600 dark:text-gray-400">
+                    <div class="p-3 rounded-xl bg-white dark:bg-navy-800/50">
+                        <p class="font-semibold text-gray-800 dark:text-gray-200 mb-1 flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-seait-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+                            Lending
+                        </p>
+                        <p class="text-xs">When someone requests a resource and you have it, make an offer on their request. If they accept, go to the request page and click <strong>"Record Lend"</strong> to log it here.</p>
+                    </div>
+                    <div class="p-3 rounded-xl bg-white dark:bg-navy-800/50">
+                        <p class="font-semibold text-gray-800 dark:text-gray-200 mb-1 flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                            Borrowing
+                        </p>
+                        <p class="text-xs">When someone accepts your offer on a request you posted, the requester records the lend. Both parties can mark items as returned when done.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {{-- Incoming Borrow Requests --}}

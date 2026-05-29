@@ -42,7 +42,7 @@
         </div>
 
         <div class="card p-6">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Karma &amp; Badges</h3>
+            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Karma & Badges</h3>
             <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                 <p><strong>+5 karma</strong> — Upload a resource</p>
                 <p><strong>+5 karma</strong> — Your resource gets saved by someone</p>

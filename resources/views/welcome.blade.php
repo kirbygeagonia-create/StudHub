@@ -3,7 +3,9 @@
     dark: localStorage.getItem('dark') === 'true',
     showLoginModal: {{ ($errors->hasBag('default') || $errors->has('email') || $errors->has('password')) && !$errors->has('name') ? 'true' : 'false' }},
     showRegisterModal: {{ $errors->has('name') || $errors->has('student_number') || $errors->has('password_confirmation') ? 'true' : 'false' }},
-    showForgotPasswordModal: false
+    showForgotPasswordModal: false,
+    showHelpModal: false,
+    showPolicyModal: false
 }" x-init="$watch('dark', v => { localStorage.setItem('dark', v); document.documentElement.classList.toggle('dark', v) }); document.documentElement.classList.toggle('dark', dark)" :class="{ 'dark': dark }">
 <head>
     <meta charset="utf-8">
@@ -11,6 +13,7 @@
     <title>StudHub — SEAIT Academic Resource Exchange</title>
     <meta name="color-scheme" content="light dark">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" sizes="any">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <meta name="theme-color" content="#FF6B35">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
@@ -95,8 +98,8 @@
                     <span class="font-bold text-lg text-gray-900 dark:text-gray-100 group-hover:text-seait-500 dark:group-hover:text-seait-400 transition-colors duration-200">StudHub</span>
                 </a>
                 <div class="flex items-center gap-3">
-                    <a href="{{ route('help') }}" class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition">Help</a>
-                    <a href="{{ route('aup') }}" class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition">Policy</a>
+                    <button @click="showHelpModal = true" class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition">Help</a>
+                    <button @click="showPolicyModal = true" class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition">Policy</a>
                     @if (Route::has('login'))
                         @auth
                             <a href="{{ route('dashboard') }}" class="btn-primary text-xs !px-4 !py-2">Dashboard</a>
@@ -246,7 +249,7 @@
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
          class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-navy-950/50 backdrop-blur-sm" @click="showLoginModal = false"></div>
+        <div x-show="showLoginModal" class="absolute inset-0 bg-navy-950/50 backdrop-blur-sm" @click="showLoginModal = false"></div>
         <div x-transition:enter="ease-out duration-300"
              x-transition:enter-start="opacity-0 translate-y-4 scale-95"
              x-transition:enter-end="opacity-100 translate-y-0 scale-100"
@@ -258,15 +261,6 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
             <div class="p-5">
-            {{-- Error banner — above heading --}}
-            @if ($errors->any())
-                <div class="w-full bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30 text-red-700 dark:text-red-300 rounded-xl px-3 py-2.5 mb-3 flex items-center gap-2">
-                    <svg class="w-4 h-4 flex-shrink-0 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    <span class="text-xs font-medium">{{ $errors->first('login') }}</span>
-                </div>
-            @endif
             <div class="text-center mb-4">
                 <div class="w-10 h-10 flex items-center justify-center mx-auto mb-2">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" class="w-10 h-10">
@@ -293,6 +287,15 @@
                 <h2 class="text-lg font-bold text-gray-900 dark:text-white">Welcome back</h2>
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Log in to your StudHub account</p>
             </div>
+            {{-- Error banner below heading --}}
+            @if ($errors->any())
+                <div class="w-full bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/30 text-red-700 dark:text-red-300 rounded-xl px-3 py-2.5 mb-3 flex items-center gap-2">
+                    <svg class="w-4 h-4 flex-shrink-0 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span class="text-xs font-medium">{{ $errors->first('login') }}</span>
+                </div>
+            @endif
             <form method="POST" action="{{ route('login') }}">
                     @csrf
                     <div>
@@ -332,7 +335,7 @@
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
          class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-navy-950/50 backdrop-blur-sm" @click="showRegisterModal = false"></div>
+        <div x-show="showRegisterModal" class="absolute inset-0 bg-navy-950/50 backdrop-blur-sm" @click="showRegisterModal = false"></div>
         <div x-transition:enter="ease-out duration-300"
              x-transition:enter-start="opacity-0 translate-y-4 scale-95"
              x-transition:enter-end="opacity-100 translate-y-0 scale-100"
@@ -418,7 +421,7 @@
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
          class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="absolute inset-0 bg-navy-950/50 backdrop-blur-sm" @click="showForgotPasswordModal = false"></div>
+        <div x-show="showForgotPasswordModal" class="absolute inset-0 bg-navy-950/50 backdrop-blur-sm" @click="showForgotPasswordModal = false"></div>
         <div x-transition:enter="ease-out duration-300"
              x-transition:enter-start="opacity-0 translate-y-4 scale-95"
              x-transition:enter-end="opacity-100 translate-y-0 scale-100"
@@ -470,6 +473,190 @@
                         Remember your password?
                         <button @click="showForgotPasswordModal = false; showLoginModal = true" class="font-semibold text-seait-500 hover:text-seait-600 dark:hover:text-seait-400 transition">Log in</button>
                     </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Help Modal --}}
+    <div x-show="showHelpModal"
+         x-cloak
+         x-transition:enter="ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div x-show="showHelpModal" class="absolute inset-0 bg-navy-950/50 backdrop-blur-sm" @click="showHelpModal = false"></div>
+        <div x-transition:enter="ease-out duration-300"
+             x-transition:enter-start="opacity-0 translate-y-4 scale-95"
+             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+             x-transition:leave="ease-in duration-200"
+             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+             x-transition:leave-end="opacity-0 translate-y-4 scale-95"
+             class="relative w-full max-w-xl bg-white dark:bg-navy-800 rounded-2xl shadow-card-lg border border-gray-100 dark:border-navy-700/50 overflow-hidden">
+            <button @click="showHelpModal = false" class="absolute top-3 right-3 p-1.5 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition rounded-lg hover:bg-gray-100 dark:hover:bg-navy-700 z-10">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+            <div class="p-6">
+                <div class="text-center mb-4">
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white">Help & Guide</h2>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Everything you need to know about StudHub</p>
+                </div>
+                <div class="space-y-4">
+                    <!-- Getting Started -->
+                    <div class="border-b pb-3">
+                        <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">Getting Started</h3>
+                        <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                            <div>
+                                <h4 class="font-medium text-gray-800 dark:text-gray-200">1. Complete your onboarding</h4>
+                                <p>After registering with your SEAIT email, you'll be asked to pick your program and year level. This helps StudHub route resources correctly.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-800 dark:text-gray-200">2. Post a resource</h4>
+                                <p>Go to Resources &rarr; Post Resource. Upload PDFs, images, or documents. Your file is watermarked with your identity before it's shared.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-800 dark:text-gray-200">3. Make a request</h4>
+                                <p>Go to Resources &rarr; Request Board. Describe what you need (reviewer, textbook, past exam) and which subject. StudHub notifies students in programs that teach that subject.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-800 dark:text-gray-200">4. Use chat</h4>
+                                <p>Chat is per-program. Use @display_name to mention someone. Attach files up to 25 MB.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- How to Ask for Resources -->
+                    <div class="border-b pb-3">
+                        <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">How to Ask for Resources</h3>
+                        <p class="mt-3 font-semibold text-gray-800 dark:text-gray-200">When posting a request, include these details to get faster responses:</p>
+                        <ul class="list-disc list-inside space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                            <li>The exact <strong>subject code</strong> (e.g., <em>IT 211</em>, not "Programming")</li>
+                            <li>What <strong>type</strong> of resource you need (reviewer, textbook, e-module, past exam)</li>
+                            <li>Your <strong>urgency</strong> — low, normal, or urgent</li>
+                            <li>Any specific details in the description (e.g., "preferably with answer keys")</li>
+                        </ul>
+                        <p class="mt-3">Once posted, StudHub's routing engine matches your request to programs that teach that subject. You'll receive offers from other students who have what you need.</p>
+                    </div>
+
+                    <!-- Karma & Badges -->
+                    <div class="border-b pb-3">
+                        <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">Karma & Badges</h3>
+                        <div class="space-y-2">
+                            <p><strong>+5 karma</strong> — Upload a resource</p>
+                            <p><strong>+5 karma</strong> — Your resource gets saved by someone</p>
+                            <p><strong>+10 karma</strong> — Fulfill a request</p>
+                            <p><strong>+2 karma</strong> — Your chat message marked helpful</p>
+                            <p><strong>-5 karma</strong> — Confirmed report against you</p>
+                            <p class="mt-2 font-semibold text-gray-800 dark:text-gray-200">Badge Tiers (permanent milestones — your progress never resets):</p>
+                            <ul class="list-disc list-inside space-y-1 text-sm text-gray-600 dark:text-gray-400">
+                                <li><span class="font-medium text-gray-800 dark:text-gray-200">Seedling</span> (0 karma) — Common</li>
+                                <li><span class="font-medium text-gray-800 dark:text-gray-200">Bookworm</span> (25) — Common</li>
+                                <li><span class="font-medium text-gray-800 dark:text-gray-200">Scribe</span> (75) — Common</li>
+                                <li><span class="font-medium text-gray-800 dark:text-gray-200">Scholar</span> (150) — Common</li>
+                                <li><span class="font-medium text-gray-800 dark:text-gray-200">Illuminator</span> (300) — Uncommon</li>
+                                <li><span class="font-medium text-gray-800 dark:text-gray-200">Pathfinder</span> (500) — Uncommon</li>
+                                <li><span class="font-medium text-gray-800 dark:text-gray-200">Sage</span> (750) — Uncommon</li>
+                                <li><span class="font-medium text-gray-800 dark:text-gray-200">Luminary</span> (1,000) — Rare</li>
+                                <li><span class="font-medium text-gray-800 dark:text-gray-200">Archivist</span> (1,500) — Rare</li>
+                                <li><span class="font-medium text-gray-800 dark:text-gray-200">Oracle</span> (2,500) — Legendary</li>
+                                <li><span class="font-medium text-gray-800 dark:text-gray-200">Custodian</span> (4,000) — Legendary</li>
+                                <li><span class="font-medium text-gray-800 dark:text-gray-200">StudHub Legend</span> (6,000) — Legendary</li>
+                            </ul>
+                            <p class="mt-2 text-xs text-gray-400 italic">There may be hidden tiers beyond these — only the most dedicated will discover them.</p>
+                        </div>
+                    </div>
+
+                    <!-- Contact -->
+                    <div class="border-t pt-3">
+                        <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">Contact</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                            For issues or questions, message a moderator in your program's chat room or email
+                            <a href="mailto:support@studhub.seait.local" class="text-seait-500 hover:underline">support@studhub.seait.local</a>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Policy Modal --}}
+    <div x-show="showPolicyModal"
+         x-cloak
+         x-transition:enter="ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div x-show="showPolicyModal" class="absolute inset-0 bg-navy-950/50 backdrop-blur-sm" @click="showPolicyModal = false"></div>
+        <div x-transition:enter="ease-out duration-300"
+             x-transition:enter-start="opacity-0 translate-y-4 scale-95"
+             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+             x-transition:leave="ease-in duration-200"
+             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+             x-transition:leave-end="opacity-0 translate-y-4 scale-95"
+             class="relative w-full max-w-xl bg-white dark:bg-navy-800 rounded-2xl shadow-card-lg border border-gray-100 dark:border-navy-700/50 overflow-hidden">
+            <button @click="showPolicyModal = false" class="absolute top-3 right-3 p-1.5 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition rounded-lg hover:bg-gray-100 dark:hover:bg-navy-700 z-10">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+            <div class="p-6">
+                <div class="space-y-4">
+                    <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Acceptable Use Policy</h2>
+                    <p class="text-base text-gray-600 dark:text-gray-400">
+                        Welcome to StudHub! By accessing or using our platform, you agree to comply with and be bound by the following policies. If you do not agree with any part of these terms, please refrain from using our service.
+                    </p>
+
+                    <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-3">1. Eligibility</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        StudHub is exclusively for students, faculty, and staff of the South East Asian Institute of Technology (SEAIT). You must have a valid SEAIT email address to register and use the platform.
+                    </p>
+
+                    <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-3">2. Account Responsibility</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. Notify us immediately of any unauthorized use.
+                    </p>
+
+                    <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-3">3. Resource Sharing Guidelines</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        You may share educational resources including textbooks, reviewers, lecture notes, past exams, and modules. All shared content must be either original work or material you have the right to distribute.
+                    </p>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                        Resources containing copyrighted material without proper authorization will be removed. Repeated violations may result in account termination.
+                    </p>
+
+                    <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-3">4. Respectful Communication</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        Engage in respectful and constructive communication. Harassment, hate speech, or any form of discrimination will not be tolerated.
+                    </p>
+
+                    <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-3">5. Privacy & Data Protection</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        Your personal information is protected in accordance with data privacy laws. We do not sell or share your data with third parties for marketing purposes.
+                    </p>
+
+                    <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-3">6. Prohibited Activities</h3>
+                    <ul class="list-disc list-inside space-y-2 text-sm text-gray-600 dark:text-gray-400 mt-1">
+                        <li>Uploading malicious software, viruses, or harmful code</li>
+                        <li>Attempting to gain unauthorized access to other accounts or system features</li>
+                        <li>Using the platform for commercial purposes without explicit permission</li>
+                        <li>Sharing inappropriate or non-educational content</li>
+                        <li>Spamming or flooding the chat system with meaningless messages</li>
+                    </ul>
+
+                    <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-3">7. Consequences of Violation</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400">
+                        Violations may result in warnings, temporary suspension, or permanent account termination depending on severity and frequency.
+                    </p>
+
+                    <div class="mt-4 pt-3 border-t border-gray-200">
+                        <p class="text-xs text-gray-500 dark:text-gray-400 text-center">
+                            By using StudHub, you acknowledge that you have read, understood, and agree to comply with this Acceptable Use Policy.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
