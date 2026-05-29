@@ -110,7 +110,7 @@ Route::middleware(['auth', 'verified', 'onboarded', 'not_suspended'])->group(fun
     Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 });
 
-Route::middleware(['auth', 'verified', 'onboarded', 'role:moderator,admin'])->group(function () {
+Route::middleware(['auth', 'verified', 'onboarded', 'role:moderator,admin,super_admin'])->group(function () {
     Route::get('/moderation', [ModerationController::class, 'dashboard'])->name('moderation.dashboard');
     Route::post('/moderation/reports/{report}/resolve', [ModerationController::class, 'resolve'])
         ->middleware('throttle:20,1')
@@ -123,7 +123,7 @@ Route::middleware(['auth', 'verified', 'onboarded', 'role:moderator,admin'])->gr
         ->name('moderation.unsuspend');
 });
 
-Route::middleware(['auth', 'verified', 'onboarded', 'role:admin'])->group(function () {
+Route::middleware(['auth', 'verified', 'onboarded', 'role:admin,super_admin'])->group(function () {
     Route::get('/admin', [AdminController::class, 'dashboard'])->name('admin.dashboard');
     Route::post('/admin/moderators/assign', [AdminController::class, 'assignModerator'])
         ->middleware('throttle:20,1')
@@ -138,6 +138,12 @@ Route::middleware(['auth', 'verified', 'onboarded', 'role:admin'])->group(functi
         ->middleware('throttle:10,1')
         ->name('admin.unsuspend');
     Route::get('/admin/feedback', [AdminController::class, 'feedback'])->name('admin.feedback');
+});
+
+// SuperAdmin-only routes (system-level management)
+Route::middleware(['auth', 'verified', 'onboarded', 'role:super_admin'])->group(function () {
+    // SuperAdmin can manage all feedback and system settings
+    Route::get('/admin/super', [AdminController::class, 'superDashboard'])->name('admin.super');
 });
 
 require __DIR__ . '/auth.php';

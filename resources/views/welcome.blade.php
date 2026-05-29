@@ -10,6 +10,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>StudHub — SEAIT Academic Resource Exchange</title>
     <meta name="color-scheme" content="light dark">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <meta name="theme-color" content="#FF6B35">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -268,7 +271,7 @@
                     <svg class="w-4 h-4 flex-shrink-0 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
-                    <span class="text-xs font-medium">{{ $errors->first('email') ?: $errors->first('password') }}</span>
+                    <span class="text-xs font-medium">{{ $errors->first('login') }}</span>
                 </div>
             @endif
             <form method="POST" action="{{ route('login') }}">

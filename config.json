@@ -1,0 +1,47 @@
+{
+  "agent": {
+    "orchestrator": {
+      "model": "gemini-custom/gemini-2.5-flash",
+      "variant": "high",
+      "options": {},
+      "permission": {}
+    },
+    "oracle": {
+      "model": "gemini-custom/gemini-2.5-flash",
+      "variant": "high",
+      "options": {},
+      "permission": {}
+    },
+    "librarian": {
+      "model": "cerebras/gpt-oss-120b",
+      "variant": "low",
+      "options": {},
+      "permission": {}
+    },
+    "explorer": {
+      "model": "opencode/deepseek-v4-flash-free",
+      "variant": "low",
+      "options": {},
+      "permission": {}
+    },
+    "designer": {
+      "model": "gemini-custom/gemini-2.5-flash",
+      "variant": "medium",
+      "options": {},
+      "permission": {}
+    },
+    "fixer": {
+      "model": "mistral/codestral-latest",
+      "variant": "low",
+      "options": {},
+      "permission": {}
+    },
+    "observer": {
+      "model": "cohere/command-a-03-2025",
+      "variant": "low",
+      "options": {},
+      "permission": {}
+    }
+  },
+  "$schema": "https://opencode.ai/config.json"
+}

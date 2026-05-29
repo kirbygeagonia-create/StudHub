@@ -66,6 +66,12 @@
                             Admin
                         </x-nav-link>
                     @endif
+                    @if (Auth::user()?->isSuperAdmin())
+                        <x-nav-link :href="route('admin.super')" :active="request()->routeIs('admin.super')">
+                            <x-icon name="admin" class="w-4 h-4 mr-1.5" />
+                            Super Admin
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -261,6 +267,9 @@
                 @endif
                 @if (Auth::user()?->isAdmin())
                     <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.*')">Admin</x-responsive-nav-link>
+                @endif
+                @if (Auth::user()?->isSuperAdmin())
+                    <x-responsive-nav-link :href="route('admin.super')" :active="request()->routeIs('admin.super')">Super Admin</x-responsive-nav-link>
                 @endif
             </div>
             <div class="border-t border-gray-100 dark:border-navy-700/50 px-3 py-3 space-y-1">

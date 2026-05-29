@@ -201,10 +201,45 @@ class AdminController extends Controller
         $user = $httpRequest->user();
         abort_unless($user?->isAdmin(), 403);
 
-        $feedbacks = Feedback::with('user:id,display_name,name,email')
-            ->latest()
-            ->paginate(25);
+        // SuperAdmin sees all feedback; Admin (Program Head) sees feedback from their program
+        $query = Feedback::with('user:id,display_name,name,email,program_id');
+
+        if (! $user->isSuperAdmin() && $user->program_id) {
+            $query->whereHas('user', fn ($q) => $q->where('program_id', $user->program_id));
+        }
+
+        $feedbacks = $query->latest()->paginate(25);
 
         return view('admin.feedback', ['feedbacks' => $feedbacks]);
+    }
+
+    public function superDashboard(HttpRequest $httpRequest): View
+    {
+        $user = $httpRequest->user();
+        abort_unless($user?->isSuperAdmin(), 403);
+
+        // SuperAdmin overview: all feedback, all reports, system stats
+        $allFeedback = Feedback::with('user:id,display_name,name,email,program_id')
+            ->latest()
+            ->paginate(25, ['*'], 'feedback_page');
+
+        $openReports = Report::with(['reported', 'reporter:id,display_name,name'])
+            ->where('status', ReportStatus::Open->value)
+            ->latest()
+            ->paginate(15, ['*'], 'reports_page');
+
+        $totalUsers = User::where('school_id', $user->school_id)->count();
+        $totalAdmins = User::whereIn('role', [UserRole::Admin->value, UserRole::SuperAdmin->value])
+            ->where('school_id', $user->school_id)->count();
+        $totalModerators = User::where('role', UserRole::Moderator->value)
+            ->where('school_id', $user->school_id)->count();
+
+        return view('admin.super', [
+            'allFeedback' => $allFeedback,
+            'openReports' => $openReports,
+            'totalUsers' => $totalUsers,
+            'totalAdmins' => $totalAdmins,
+            'totalModerators' => $totalModerators,
+        ]);
     }
 }

@@ -146,9 +146,39 @@
                                 It changes as others earn or spend karma.
                             </p>
                             <p>
-                                <strong class="text-gray-800 dark:text-gray-200">Badge Tiers</strong> (Seedling → StudHub Legend) are permanent milestones you unlock by reaching karma thresholds — they never go down.
+                                <strong class="text-gray-800 dark:text-gray-200">Badge Tiers</strong> are permanent milestones you unlock by reaching karma thresholds — they never go down.
                             </p>
-                            <p>Earn karma by:</p>
+                            <div class="bg-gray-50 dark:bg-navy-700/40 rounded-xl p-3 space-y-1.5 text-xs">
+                                <p class="font-semibold text-gray-700 dark:text-gray-300 mb-1">Known tiers:</p>
+                                <div class="grid grid-cols-2 gap-x-4 gap-y-1">
+                                    <span class="font-medium text-gray-700 dark:text-gray-300">Seedling</span>
+                                    <span class="text-emerald-600 dark:text-emerald-400">0 karma — Common</span>
+                                    <span class="font-medium text-gray-700 dark:text-gray-300">Bookworm</span>
+                                    <span class="text-emerald-600 dark:text-emerald-400">25 — Common</span>
+                                    <span class="font-medium text-gray-700 dark:text-gray-300">Scribe</span>
+                                    <span class="text-emerald-600 dark:text-emerald-400">75 — Common</span>
+                                    <span class="font-medium text-gray-700 dark:text-gray-300">Scholar</span>
+                                    <span class="text-emerald-600 dark:text-emerald-400">150 — Common</span>
+                                    <span class="font-medium text-gray-700 dark:text-gray-300">Illuminator</span>
+                                    <span class="text-blue-600 dark:text-blue-400">300 — Uncommon</span>
+                                    <span class="font-medium text-gray-700 dark:text-gray-300">Pathfinder</span>
+                                    <span class="text-blue-600 dark:text-blue-400">500 — Uncommon</span>
+                                    <span class="font-medium text-gray-700 dark:text-gray-300">Sage</span>
+                                    <span class="text-blue-600 dark:text-blue-400">750 — Uncommon</span>
+                                    <span class="font-medium text-gray-700 dark:text-gray-300">Luminary</span>
+                                    <span class="text-purple-600 dark:text-purple-400">1,000 — Rare</span>
+                                    <span class="font-medium text-gray-700 dark:text-gray-300">Archivist</span>
+                                    <span class="text-purple-600 dark:text-purple-400">1,500 — Rare</span>
+                                    <span class="font-medium text-gray-700 dark:text-gray-300">Oracle</span>
+                                    <span class="text-amber-600 dark:text-amber-400">2,500 — Legendary</span>
+                                    <span class="font-medium text-gray-700 dark:text-gray-300">Custodian</span>
+                                    <span class="text-amber-600 dark:text-amber-400">4,000 — Legendary</span>
+                                    <span class="font-medium text-gray-700 dark:text-gray-300">StudHub Legend</span>
+                                    <span class="text-amber-600 dark:text-amber-400">6,000 — Legendary</span>
+                                </div>
+                                <p class="mt-2 text-gray-400 italic">There may be hidden tiers beyond these — only the most dedicated will discover them.</p>
+                            </div>
+                            <p class="font-semibold text-gray-800 dark:text-gray-200 mt-2">Earn karma by:</p>
                             <ul class="list-disc list-inside space-y-1">
                                 <li>Uploading resources (+5)</li>
                                 <li>Your resource gets saved by someone (+5)</li>

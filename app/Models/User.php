@@ -192,7 +192,24 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function isAdmin(): bool
     {
-        return $this->role === UserRole::Admin;
+        return $this->role === UserRole::Admin || $this->role === UserRole::SuperAdmin;
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === UserRole::SuperAdmin;
+    }
+
+    /**
+     * Returns all role values this user has permissions for (inheritance).
+     *
+     * @return array<int, string>
+     */
+    public function inheritedRoles(): array
+    {
+        return $this->role instanceof UserRole
+            ? $this->role->inheritedRoles()
+            : ['student'];
     }
 
     public function isSuspended(): bool

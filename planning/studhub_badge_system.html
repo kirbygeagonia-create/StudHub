@@ -1,0 +1,179 @@
+
+<h2 class="sr-only">StudHub badge system — 46 unique badges across 7 categories</h2>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans)}
+.wrap{padding:1rem 0}
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.5rem}
+.filter-btn{padding:5px 12px;font-size:12px;font-weight:500;border-radius:20px;border:0.5px solid var(--color-border-tertiary);background:var(--color-background-primary);color:var(--color-text-secondary);cursor:pointer;transition:all .15s;font-family:var(--font-sans)}
+.filter-btn:hover{background:var(--color-background-secondary);color:var(--color-text-primary)}
+.filter-btn.active{border-color:currentColor}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+.badge-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:14px;display:flex;flex-direction:column;gap:8px;transition:border-color .15s}
+.badge-card:hover{border-color:var(--color-border-secondary)}
+.badge-top{display:flex;align-items:center;justify-content:space-between}
+.badge-icon{width:36px;height:36px;border-radius:var(--border-radius-md);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.badge-name{font-size:13px;font-weight:500;color:var(--color-text-primary);line-height:1.3}
+.badge-desc{font-size:11px;color:var(--color-text-secondary);line-height:1.5}
+.badge-foot{display:flex;align-items:center;justify-content:space-between;margin-top:2px}
+.rarity{font-size:10px;font-weight:500;padding:2px 7px;border-radius:20px;border:0.5px solid}
+.cat-pill{font-size:10px;color:var(--color-text-tertiary)}
+.section-label{font-size:11px;font-weight:500;color:var(--color-text-tertiary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;margin-top:16px}
+.section-label:first-of-type{margin-top:0}
+.count{font-size:12px;color:var(--color-text-tertiary);margin-bottom:1rem}
+
+.r-common{background:#EAF3DE;color:#3B6D11;border-color:#C0DD97}
+.r-uncommon{background:#E6F1FB;color:#185FA5;border-color:#B5D4F4}
+.r-rare{background:#EEEDFE;color:#534AB7;border-color:#CECBF6}
+.r-legendary{background:#FAEEDA;color:#854F0B;border-color:#FAC775}
+.r-hidden{background:#FBEAF0;color:#993556;border-color:#F4C0D1}
+
+.ci-tier{background:#FAEEDA;color:#854F0B}
+.ci-upload{background:#E6F1FB;color:#185FA5}
+.ci-fulfill{background:#E1F5EE;color:#0F6E56}
+.ci-lend{background:#EEEDFE;color:#534AB7}
+.ci-activity{background:#EAF3DE;color:#3B6D11}
+.ci-chat{background:#FAECE7;color:#993C1D}
+.ci-special{background:#FBEAF0;color:#993556}
+
+.cat-dot{width:6px;height:6px;border-radius:50%;display:inline-block;margin-right:4px;vertical-align:middle}
+.d-tier{background:#BA7517}
+.d-upload{background:#185FA5}
+.d-fulfill{background:#0F6E56}
+.d-lend{background:#534AB7}
+.d-activity{background:#3B6D11}
+.d-chat{background:#993C1D}
+.d-special{background:#993556}
+</style>
+
+<div class="wrap">
+  <div class="filters" id="filters">
+    <button class="filter-btn active" data-cat="all" style="border-color:#888780;color:var(--color-text-primary)">All badges <span id="total-count"></span></button>
+    <button class="filter-btn" data-cat="tier"     style="color:#854F0B">Tier progression</button>
+    <button class="filter-btn" data-cat="upload"   style="color:#185FA5">Uploads</button>
+    <button class="filter-btn" data-cat="fulfill"  style="color:#0F6E56">Requests</button>
+    <button class="filter-btn" data-cat="lend"     style="color:#534AB7">Lending</button>
+    <button class="filter-btn" data-cat="activity" style="color:#3B6D11">Activity</button>
+    <button class="filter-btn" data-cat="chat"     style="color:#993C1D">Community</button>
+    <button class="filter-btn" data-cat="special"  style="color:#993556">Special / Hidden</button>
+  </div>
+
+  <p class="count" id="showing"></p>
+  <div class="grid" id="grid"></div>
+</div>
+
+<script>
+const badges = [
+  {cat:'tier',    icon:'ti-seedling',      name:'Seedling',           desc:'Just joined StudHub. Everyone starts here.',                                     earn:'Auto on registration',                    rarity:'common'},
+  {cat:'tier',    icon:'ti-book',          name:'Bookworm',           desc:'Saved your first resources and began building a shelf.',                          earn:'Reach 25 karma',                          rarity:'common'},
+  {cat:'tier',    icon:'ti-pencil',        name:'Scribe',             desc:'Started contributing — the campus is already a little richer.',                   earn:'Reach 75 karma',                          rarity:'common'},
+  {cat:'tier',    icon:'ti-school',        name:'Scholar',            desc:'A consistent presence. Others know they can count on you.',                        earn:'Reach 150 karma',                         rarity:'uncommon'},
+  {cat:'tier',    icon:'ti-bulb',          name:'Illuminator',        desc:'You bring light to others\' study sessions without being asked.',                  earn:'Reach 300 karma',                         rarity:'uncommon'},
+  {cat:'tier',    icon:'ti-compass',       name:'Pathfinder',         desc:'You don\'t just share files — you show people the way.',                           earn:'Reach 500 karma',                         rarity:'uncommon'},
+  {cat:'tier',    icon:'ti-moon-stars',    name:'Sage',               desc:'Deep knowledge, quietly shared. Your uploads speak for themselves.',               earn:'Reach 750 karma',                         rarity:'rare'},
+  {cat:'tier',    icon:'ti-bolt',          name:'Luminary',           desc:'Standout contributor. Your name appears in the leaderboard without trying.',       earn:'Reach 1,000 karma',                       rarity:'rare'},
+  {cat:'tier',    icon:'ti-archive',       name:'Archivist',          desc:'You have built something close to a personal library for the whole campus.',       earn:'Reach 1,500 karma',                       rarity:'rare'},
+  {cat:'tier',    icon:'ti-eye',           name:'Oracle',             desc:'People post requests hoping you\'ll see them. You usually do.',                    earn:'Reach 2,500 karma',                       rarity:'legendary'},
+  {cat:'tier',    icon:'ti-building-arch', name:'Custodian',          desc:'You have become a pillar of SEAIT\'s knowledge commons.',                          earn:'Reach 4,000 karma',                       rarity:'legendary'},
+  {cat:'tier',    icon:'ti-crown',         name:'StudHub Legend',     desc:'The highest honour. Your contributions have shaped how SEAIT learns.',             earn:'Reach 6,000 karma',                       rarity:'legendary'},
+
+  {cat:'upload',  icon:'ti-upload',        name:'Page Turner',        desc:'Uploaded your very first resource. The journey starts with one file.',             earn:'First upload',                            rarity:'common'},
+  {cat:'upload',  icon:'ti-files',         name:'Study Supplier',     desc:'Maintaining a steady supply of study material for your classmates.',               earn:'Upload 5 resources',                      rarity:'common'},
+  {cat:'upload',  icon:'ti-library',       name:'The Librarian',      desc:'Built a collection that rivals the school library (well, almost).',                earn:'Upload 25 resources',                     rarity:'uncommon'},
+  {cat:'upload',  icon:'ti-safe',          name:'Vault Keeper',       desc:'Your uploads are practically a full semester\'s worth of material.',               earn:'Upload 50 resources',                     rarity:'rare'},
+  {cat:'upload',  icon:'ti-device-laptop', name:'Module Master',      desc:'Specialist in digital learning — your e-modules are always in demand.',            earn:'Upload 10 e-modules',                     rarity:'uncommon'},
+  {cat:'upload',  icon:'ti-checklist',     name:'Reviewer Royale',    desc:'Your reviewers have helped more people pass than a cram school ever could.',       earn:'Upload 10 reviewers',                     rarity:'uncommon'},
+  {cat:'upload',  icon:'ti-rocket',        name:'Content Mill',       desc:'A week of unstoppable output. The campus thanks you for your dedication.',         earn:'Upload 10 resources in a single week',    rarity:'rare'},
+  {cat:'upload',  icon:'ti-arrows-shuffle','name':'Cross-Pollinator', desc:'Shared resources for a program other than your own. True campus citizen.',         earn:'Upload for a different program',          rarity:'uncommon'},
+  {cat:'upload',  icon:'ti-history',       name:'Legacy Holder',      desc:'Resources you uploaded months ago are still being saved and downloaded.',          earn:'Have an upload saved 30+ days after posting',rarity:'rare'},
+
+  {cat:'fulfill', icon:'ti-flag',          name:'First Responder',    desc:'Answered someone\'s call for help before anyone else did.',                        earn:'Fulfill your first request',              rarity:'common'},
+  {cat:'fulfill', icon:'ti-sword',         name:'Request Slayer',     desc:'Ten requests down. The board is a little cleaner because of you.',                 earn:'Fulfill 10 requests',                     rarity:'uncommon'},
+  {cat:'fulfill', icon:'ti-transfer',      name:'Demand & Supply',    desc:'A reliable force keeping the StudHub ecosystem alive and flowing.',                 earn:'Fulfill 25 requests',                     rarity:'rare'},
+  {cat:'fulfill', icon:'ti-circuit-cell',  name:'The Fixer',          desc:'You\'ve become the go-to solver. Half the board gets cleared by you.',             earn:'Fulfill 50 requests',                     rarity:'legendary'},
+  {cat:'fulfill', icon:'ti-antenna',       name:'Signal Boost',       desc:'Responded to an urgent request and saved someone\'s exam prep.',                   earn:'Fulfill an urgent request within 2 hours', rarity:'uncommon'},
+  {cat:'fulfill', icon:'ti-topology-star', name:'Bridge Builder',     desc:'You\'ve connected needs across different programs — a true campus bridge.',         earn:'Fulfill requests from 3+ different programs',rarity:'rare'},
+
+  {cat:'lend',    icon:'ti-heart-handshake','name':'Generous Soul',   desc:'Trusted someone enough to hand over your actual physical book. Rare quality.',     earn:'Complete your first physical lend',        rarity:'common'},
+  {cat:'lend',    icon:'ti-map-pin',        name:'Book Nomad',        desc:'Your books travel the campus. They probably know more roads than you do.',         earn:'Lend 5 books',                            rarity:'uncommon'},
+  {cat:'lend',    icon:'ti-bus',            name:'Traveling Library', desc:'A mobile lending service of one. Your collection is always somewhere useful.',      earn:'Lend 15 books',                           rarity:'rare'},
+  {cat:'lend',    icon:'ti-trophy',         name:'Supreme Lender',    desc:'The highest lending honour. Your generosity has set the benchmark for SEAIT.',      earn:'Lend 30 books',                           rarity:'legendary'},
+
+  {cat:'activity',icon:'ti-coffee',         name:'Early Bird',        desc:'Who studies before 7am? You do. Apparently without being forced.',                  earn:'Log in before 7:00 AM',                   rarity:'uncommon'},
+  {cat:'activity',icon:'ti-moon',           name:'Night Owl',         desc:'Your best ideas come after midnight. Science might agree.',                         earn:'Active past midnight',                    rarity:'uncommon'},
+  {cat:'activity',icon:'ti-calendar-check', name:'Daily Devotee',     desc:'Seven days straight. Consistency is a skill and you have it.',                      earn:'7-day activity streak',                   rarity:'uncommon'},
+  {cat:'activity',icon:'ti-flame',          name:'Habit Former',      desc:'Thirty days of showing up. StudHub is officially part of your routine.',            earn:'30-day activity streak',                  rarity:'rare'},
+  {cat:'activity',icon:'ti-star',           name:'Semester Strong',   desc:'Active every week of an entire semester. That is iron discipline.',                 earn:'Active every week of a semester',         rarity:'rare'},
+  {cat:'activity',icon:'ti-infinity',       name:'Iron Commitment',   desc:'Sixty consecutive days. At this point you and StudHub are basically partners.',     earn:'60-day activity streak',                  rarity:'legendary'},
+
+  {cat:'chat',    icon:'ti-messages',       name:'Chatterbox',        desc:'You keep the program channels alive with 50 messages and counting.',                earn:'Send 50 chat messages',                   rarity:'common'},
+  {cat:'chat',    icon:'ti-speakerphone',   name:'Thread Starter',    desc:'Ten conversations you kicked off. You ask the questions others were afraid to.',    earn:'Start 10 chat threads',                   rarity:'uncommon'},
+  {cat:'chat',    icon:'ti-social',         name:'The Connector',     desc:'You have @mentioned 20 different people. StudHub is more social because of you.',   earn:'@mention 20 different users',             rarity:'uncommon'},
+  {cat:'chat',    icon:'ti-bolt',           name:'Quick Draw',        desc:'Lightning-fast replies, ten times over. You were there when it mattered.',          earn:'Reply within 1 minute, 10 times',         rarity:'rare'},
+  {cat:'chat',    icon:'ti-door-enter',     name:'Room Regular',      desc:'A familiar face across multiple chat rooms. Your program can\'t claim you fully.',  earn:'Active in 3+ chat rooms',                 rarity:'uncommon'},
+
+  {cat:'special', icon:'ti-plant-2',        name:'Pioneer',           desc:'You were here before most people even knew StudHub existed. A founding voice.',     earn:'One of the first 50 registered users',    rarity:'hidden'},
+  {cat:'special', icon:'ti-box',            name:'The Complete Package',desc:'Upload. Request. Lend. Chat. You have done it all — a true all-rounder.',         earn:'Use all 4 core modules at least once',    rarity:'hidden'},
+  {cat:'special', icon:'ti-moon-2',         name:'Night Shift',       desc:'Uploaded a resource between midnight and 4am. We hope you slept eventually.',       earn:'Upload between 12:00 – 4:00 AM',          rarity:'hidden'},
+  {cat:'special', icon:'ti-hourglass',      name:'Crammer',           desc:'Three uploads in one day. Finals panic or pure dedication — both count.',           earn:'Upload 3+ resources in 24 hours',         rarity:'hidden'},
+  {cat:'special', icon:'ti-arrow-back-up',  name:'Comeback Kid',      desc:'Gone for a month, back like nothing happened. Welcome back — you were missed.',     earn:'Return after 30+ days inactive',          rarity:'hidden'},
+  {cat:'special', icon:'ti-list-check',     name:'Completionist',     desc:'Every profile field filled. You believe details matter, and you are right.',        earn:'Complete 100% of your profile',           rarity:'hidden'},
+  {cat:'special', icon:'ti-ghost-2',        name:'Phantom',           desc:'Twenty saves, zero uploads. The campus gives; you receive. Balance is overrated.',  earn:'Save 20 resources without uploading',      rarity:'hidden'},
+];
+
+const rarityColors = {common:'r-common',uncommon:'r-uncommon',rare:'r-rare',legendary:'r-legendary',hidden:'r-hidden'};
+const rarityLabel  = {common:'Common',uncommon:'Uncommon',rare:'Rare',legendary:'Legendary',hidden:'Hidden'};
+const catIcon      = {tier:'ci-tier',upload:'ci-upload',fulfill:'ci-fulfill',lend:'ci-lend',activity:'ci-activity',chat:'ci-chat',special:'ci-special'};
+const catLabel     = {tier:'Tier',upload:'Upload',fulfill:'Fulfill',lend:'Lend',activity:'Activity',chat:'Community',special:'Special'};
+const dotClass     = {tier:'d-tier',upload:'d-upload',fulfill:'d-fulfill',lend:'d-lend',activity:'d-activity',chat:'d-chat',special:'d-special'};
+
+let currentCat = 'all';
+
+document.getElementById('total-count').textContent = `(${badges.length})`;
+
+function render(){
+  const grid = document.getElementById('grid');
+  const showing = document.getElementById('showing');
+  const filtered = currentCat === 'all' ? badges : badges.filter(b => b.cat === currentCat);
+  showing.textContent = `Showing ${filtered.length} of ${badges.length} badges`;
+
+  if(currentCat === 'all'){
+    const cats = ['tier','upload','fulfill','lend','activity','chat','special'];
+    const catNames = {tier:'Tier progression (12)',upload:'Upload badges (9)',fulfill:'Request fulfillment (6)',lend:'Lending badges (4)',activity:'Activity & streaks (6)',chat:'Community & chat (5)',special:'Special / hidden (7)'};
+    let html = '';
+    cats.forEach(cat => {
+      const group = badges.filter(b => b.cat === cat);
+      html += `<div style="grid-column:1/-1"><p class="section-label"><span class="cat-dot ${dotClass[cat]}"></span>${catNames[cat]}</p></div>`;
+      group.forEach(b => { html += card(b); });
+    });
+    grid.innerHTML = html;
+  } else {
+    grid.innerHTML = filtered.map(b => card(b)).join('');
+  }
+}
+
+function card(b){
+  return `<div class="badge-card">
+    <div class="badge-top">
+      <div class="badge-icon ${catIcon[b.cat]}"><i class="ti ${b.icon}" aria-hidden="true"></i></div>
+      <span class="rarity ${rarityColors[b.rarity]}">${rarityLabel[b.rarity]}</span>
+    </div>
+    <p class="badge-name">${b.name}</p>
+    <p class="badge-desc">${b.desc}</p>
+    <div class="badge-foot">
+      <p class="badge-desc" style="font-style:italic;color:var(--color-text-tertiary)">🔓 ${b.earn}</p>
+    </div>
+  </div>`;
+}
+
+document.getElementById('filters').addEventListener('click', e => {
+  const btn = e.target.closest('.filter-btn');
+  if(!btn) return;
+  currentCat = btn.dataset.cat;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+});
+
+render();
+</script>

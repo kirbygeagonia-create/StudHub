@@ -21,6 +21,11 @@ class EnsureHasRole
             abort(403);
         }
 
+        // SuperAdmin inherits all roles — they pass any role check
+        if ($user->isSuperAdmin()) {
+            return $next($request);
+        }
+
         $roleValue = $user->role instanceof UserRole
             ? $user->role->value
             : (string) $user->role;

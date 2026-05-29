@@ -17,11 +17,12 @@ it('defaults new users to the Student role', function () {
 });
 
 it('exposes a flat list of role values for validation rules', function () {
-    expect(UserRole::values())->toEqualCanonicalizing(['student', 'moderator', 'admin']);
+    expect(UserRole::values())->toEqualCanonicalizing(['student', 'moderator', 'admin', 'super_admin']);
 });
 
 it('UserRole enum has correct labels', function () {
     expect(UserRole::Student->label())->toBe('Student');
     expect(UserRole::Moderator->label())->toBe('Program Moderator');
-    expect(UserRole::Admin->label())->toBe('School Admin');
+    expect(UserRole::Admin->label())->toBe('Program Head / Dean');
+    expect(UserRole::SuperAdmin->label())->toBe('Super Admin');
 });
