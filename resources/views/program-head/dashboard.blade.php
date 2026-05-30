@@ -10,7 +10,7 @@
             <!-- Stats Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                 <div class="stat-card">
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Open Reports</p>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Open Reports <span class="text-xs opacity-60">(campus-wide)</span></p>
                     <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $openReports }}</p>
                 </div>
                 <div class="stat-card">

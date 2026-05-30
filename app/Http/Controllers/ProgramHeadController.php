@@ -8,6 +8,7 @@ use App\Domain\Moderation\Actions\SuspendUser;
 use App\Domain\Moderation\Enums\ReportStatus;
 use App\Models\Feedback;
 use App\Models\LearningResource;
+use App\Models\Program;
 use App\Models\ProgramModerator;
 use App\Models\Report;
 use App\Models\User;
@@ -23,33 +24,39 @@ class ProgramHeadController extends Controller
         $user = $httpRequest->user();
         abort_unless($user !== null, 403);
 
-        $programId = $user->program_id;
+        $collegeId = $user->college_id;
+
+        // All programs under this college (for resource counts etc.)
+        $programIds = Program::where('college_id', $collegeId)->pluck('id');
 
         $openReports = Report::where('status', ReportStatus::Open->value)
             ->where('school_id', $user->school_id)
             ->count();
+
         $totalModerators = User::where('role', UserRole::Moderator->value)
-            ->where('school_id', $user->school_id)
-            ->where('program_id', $programId)
-            ->count();
-        $activeUsers = User::whereNotNull('onboarded_at')
-            ->whereNull('suspended_until')
-            ->where('school_id', $user->school_id)
-            ->where('program_id', $programId)
-            ->count();
-        $totalResources = LearningResource::whereNull('deleted_at')
-            ->where('school_id', $user->school_id)
-            ->where('program_id', $programId)
+            ->where('college_id', $collegeId)
             ->count();
 
-        $moderators = ProgramModerator::with(['user:id,display_name,name,program_id', 'program:id,code,name'])
-            ->where('program_id', $programId)
+        $activeUsers = User::whereNotNull('onboarded_at')
+            ->whereNull('suspended_until')
+            ->where('college_id', $collegeId)
+            ->count();
+
+        $totalResources = LearningResource::whereNull('deleted_at')
+            ->whereIn('program_id', $programIds)
+            ->count();
+
+        $moderators = ProgramModerator::with([
+            'user:id,display_name,name,program_id',
+            'program:id,code,name',
+        ])
+            ->whereIn('program_id', $programIds)
             ->latest()
             ->paginate(50);
 
         $unreadFeedback = Feedback::where('recipient_role', 'program_head')
-            ->where('recipient_program_id', $programId)
-            ->where('status', 'open')
+            ->where('recipient_college_id', $collegeId)
+            ->whereNull('read_at')
             ->count();
 
         return view('program-head.dashboard', [
@@ -75,9 +82,12 @@ class ProgramHeadController extends Controller
         $userId = (int) $validated['user_id'];
         $programId = (int) $validated['program_id'];
 
-        // Program Head can only assign moderators within their own program
-        if ($programId !== $user->program_id) {
-            return redirect()->back()->withErrors(['error' => 'You can only assign moderators within your own program.']);
+        // Ensure the program belongs to this Program Head's college
+        $program = Program::findOrFail($programId);
+        if ($program->college_id !== $user->college_id) {
+            return redirect()->back()->withErrors([
+                'error' => 'You can only assign moderators to programs within your college.',
+            ]);
         }
 
         DB::transaction(function () use ($userId, $programId, $user): void {
@@ -107,9 +117,12 @@ class ProgramHeadController extends Controller
 
         $moderator = ProgramModerator::findOrFail((int) $validated['moderator_id']);
 
-        // Program Head can only remove moderators within their own program
-        if ($moderator->program_id !== $user->program_id) {
-            return redirect()->back()->withErrors(['error' => 'You can only remove moderators within your own program.']);
+        $program = Program::findOrFail($moderator->program_id);
+
+        if ($program->college_id !== $user->college_id) {
+            return redirect()->back()->withErrors([
+                'error' => 'You can only remove moderators from programs within your college.',
+            ]);
         }
 
         DB::transaction(function () use ($moderator, &$userId): void {
@@ -143,9 +156,10 @@ class ProgramHeadController extends Controller
 
         $target = User::findOrFail((int) $validated['user_id']);
 
-        // Program Head can only suspend users within their own program
-        if ($target->program_id !== $user->program_id) {
-            return redirect()->back()->withErrors(['error' => 'You can only suspend users within your own program.']);
+        if ($target->college_id !== $user->college_id) {
+            return redirect()->back()->withErrors([
+                'error' => 'You can only suspend users within your college.',
+            ]);
         }
 
         try {
@@ -170,8 +184,10 @@ class ProgramHeadController extends Controller
 
         $target = User::findOrFail((int) $validated['user_id']);
 
-        if ($target->program_id !== $user->program_id) {
-            return redirect()->back()->withErrors(['error' => 'You can only unsuspend users within your own program.']);
+        if ($target->college_id !== $user->college_id) {
+            return redirect()->back()->withErrors([
+                'error' => 'You can only unsuspend users within your college.',
+            ]);
         }
 
         try {
@@ -190,11 +206,17 @@ class ProgramHeadController extends Controller
         $user = $httpRequest->user();
         abort_unless($user !== null, 403);
 
-        $query = Feedback::with('user:id,display_name,name,email,program_id')
-            ->where('recipient_role', 'program_head')
-            ->where('recipient_program_id', $user->program_id);
+        // Mark all unread feedback for this college as read
+        Feedback::where('recipient_role', 'program_head')
+            ->where('recipient_college_id', $user->college_id)
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
 
-        $feedbacks = $query->latest()->paginate(25);
+        $feedbacks = Feedback::with('user:id,display_name,name,email,program_id')
+            ->where('recipient_role', 'program_head')
+            ->where('recipient_college_id', $user->college_id)
+            ->latest()
+            ->paginate(25);
 
         return view('program-head.feedback', ['feedbacks' => $feedbacks]);
     }
@@ -204,8 +226,8 @@ class ProgramHeadController extends Controller
         $user = $httpRequest->user();
         abort_unless($user !== null, 403);
 
-        if ($feedback->recipient_program_id !== $user->program_id) {
-            return redirect()->back()->withErrors(['error' => 'This feedback is not for your program.']);
+        if ($feedback->recipient_college_id !== $user->college_id) {
+            return redirect()->back()->withErrors(['error' => 'This feedback does not belong to your college.']);
         }
 
         $feedback->update([
@@ -224,8 +246,8 @@ class ProgramHeadController extends Controller
         $user = $httpRequest->user();
         abort_unless($user !== null, 403);
 
-        if ($feedback->recipient_program_id !== $user->program_id) {
-            return redirect()->back()->withErrors(['error' => 'This feedback is not for your program.']);
+        if ($feedback->recipient_college_id !== $user->college_id) {
+            return redirect()->back()->withErrors(['error' => 'This feedback does not belong to your college.']);
         }
 
         DB::transaction(function () use ($feedback, $user): void {

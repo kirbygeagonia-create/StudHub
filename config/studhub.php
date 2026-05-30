@@ -41,4 +41,12 @@ return [
     'year_level_min' => 1,
     'year_level_max' => 5,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Feature flags
+    |--------------------------------------------------------------------------
+    */
+
+    'announcements_enabled' => env('STUDHUB_ANNOUNCEMENTS_ENABLED', false),
+
 ];

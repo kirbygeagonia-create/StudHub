@@ -34,11 +34,11 @@ class DeanController extends Controller
             ->whereIn('program_id', $programIds)
             ->count();
         $totalProgramHeads = User::where('role', UserRole::ProgramHead->value)
-            ->whereIn('program_id', $programIds)
+            ->where('college_id', $collegeId)
             ->count();
         $unreadFeedback = Feedback::where('recipient_role', 'dean')
             ->where('recipient_college_id', $collegeId)
-            ->where('status', 'open')
+            ->whereNull('read_at')
             ->count();
         $openReports = Report::where('status', ReportStatus::Open->value)
             ->where('school_id', $user->school_id)
@@ -61,6 +61,12 @@ class DeanController extends Controller
     {
         $user = $httpRequest->user();
         abort_unless($user !== null, 403);
+
+        // Mark all unread feedback for this college as read
+        Feedback::where('recipient_role', 'dean')
+            ->where('recipient_college_id', $user->college_id)
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
 
         $feedbacks = Feedback::with('user:id,display_name,name,email,program_id')
             ->where('recipient_role', 'dean')
@@ -168,7 +174,9 @@ class DeanController extends Controller
         DB::transaction(function () use ($targetUser, $program): void {
             $targetUser->update([
                 'role' => UserRole::ProgramHead,
-                'program_id' => $program->id,
+                'college_id' => $program->college_id,
+                'program_id' => null,
+                'year_level' => null,
             ]);
         });
 

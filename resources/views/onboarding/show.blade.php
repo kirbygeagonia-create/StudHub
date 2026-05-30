@@ -39,15 +39,17 @@
         <div class="w-6 h-6 rounded-full bg-gray-200 dark:bg-navy-700 text-gray-500 dark:text-gray-400 text-xs font-bold flex items-center justify-center">3</div>
     </div>
 
+    @php $currentUser = auth()->user(); @endphp
+
     <form method="POST" action="{{ route('onboarding.store') }}" class="space-y-4">
         @csrf
 
         <div>
             <label for="display_name" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                Display name <span class="text-gray-400 font-normal">(how classmates will see you)</span>
+                Display name <span class="text-gray-400 font-normal">(how others will see you)</span>
             </label>
             <input id="display_name" type="text" name="display_name"
-                   value="{{ old('display_name', auth()->user()?->name) }}"
+                   value="{{ old('display_name', $currentUser?->name) }}"
                    class="block w-full input-field" required autofocus
                    placeholder="e.g. Juan D. or JuanC2024">
             @error('display_name')
@@ -55,33 +57,64 @@
             @enderror
         </div>
 
-        <div>
-            <label for="program_id" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Degree program</label>
-            <select id="program_id" name="program_id" required class="block w-full input-field">
-                <option value="">Select your program…</option>
-                @foreach ($programs as $program)
-                    <option value="{{ $program->id }}" @selected(old('program_id') == $program->id)>
-                        {{ $program->code }} — {{ $program->name }} ({{ $program->college?->code }})
-                    </option>
-                @endforeach
-            </select>
-            @error('program_id')
-                <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
-            @enderror
-        </div>
+        @if ($currentUser?->isSao() || $currentUser?->isSuperAdmin())
+            {{-- SAO and SuperAdmin: only need display name --}}
+            <div class="bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800/30 rounded-xl p-3 text-xs text-blue-700 dark:text-blue-300">
+                <p class="font-medium">You're being set up as a campus-wide administrator.</p>
+                <p class="mt-0.5">No program or year level needed. You'll have access to all colleges and programs.</p>
+            </div>
+        @elseif ($currentUser?->isDean() || $currentUser?->isProgramHead())
+            {{-- Dean and Program Head: need program selection for college assignment --}}
+            <div>
+                <label for="program_id" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                    Select a program <span class="text-gray-400 font-normal">(to determine your college)</span>
+                </label>
+                <select id="program_id" name="program_id" required class="block w-full input-field">
+                    <option value="">Select a program…</option>
+                    @foreach ($programs as $program)
+                        <option value="{{ $program->id }}" @selected(old('program_id') == $program->id)>
+                            {{ $program->code }} — {{ $program->name }} ({{ $program->college?->code }})
+                        </option>
+                    @endforeach
+                </select>
+                @error('program_id')
+                    <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
+                @enderror
+            </div>
+            <div class="bg-indigo-50 dark:bg-indigo-900/10 border border-indigo-200 dark:border-indigo-800/30 rounded-xl p-3 text-xs text-indigo-700 dark:text-indigo-300">
+                <p class="font-medium">You're being set up as an administrator.</p>
+                <p class="mt-0.5">Pick any program under your college to set your college affiliation. No year level needed.</p>
+            </div>
+        @else
+            {{-- Students and Moderators: need full profile --}}
+            <div>
+                <label for="program_id" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Degree program</label>
+                <select id="program_id" name="program_id" required class="block w-full input-field">
+                    <option value="">Select your program…</option>
+                    @foreach ($programs as $program)
+                        <option value="{{ $program->id }}" @selected(old('program_id') == $program->id)>
+                            {{ $program->code }} — {{ $program->name }} ({{ $program->college?->code }})
+                        </option>
+                    @endforeach
+                </select>
+                @error('program_id')
+                    <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
+                @enderror
+            </div>
 
-        <div>
-            <label for="year_level" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Year level</label>
-            <select id="year_level" name="year_level" required class="block w-full input-field">
-                <option value="">Pick a year…</option>
-                @for ($y = $yearMin; $y <= $yearMax; $y++)
-                    <option value="{{ $y }}" @selected(old('year_level') == $y)>Year {{ $y }}</option>
-                @endfor
-            </select>
-            @error('year_level')
-                <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
-            @enderror
-        </div>
+            <div>
+                <label for="year_level" class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Year level</label>
+                <select id="year_level" name="year_level" required class="block w-full input-field">
+                    <option value="">Pick a year…</option>
+                    @for ($y = $yearMin; $y <= $yearMax; $y++)
+                        <option value="{{ $y }}" @selected(old('year_level') == $y)>Year {{ $y }}</option>
+                    @endfor
+                </select>
+                @error('year_level')
+                    <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
+                @enderror
+            </div>
+        @endif
 
         <button type="submit" class="btn-primary w-full !py-2.5 mt-2">
             Finish setup → Go to Dashboard

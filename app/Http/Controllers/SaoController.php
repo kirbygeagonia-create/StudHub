@@ -33,7 +33,7 @@ class SaoController extends Controller
         $openReports = Report::where('status', ReportStatus::Open->value)
             ->where('school_id', $user->school_id)->count();
         $unreadFeedback = Feedback::where('recipient_role', 'sao')
-            ->where('status', 'open')
+            ->whereNull('read_at')
             ->count();
 
         $colleges = College::withCount([
@@ -61,6 +61,11 @@ class SaoController extends Controller
     {
         $user = $httpRequest->user();
         abort_unless($user !== null, 403);
+
+        // Mark all unread SAO feedback as read
+        Feedback::where('recipient_role', 'sao')
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
 
         $feedbacks = Feedback::with('user:id,display_name,name,email,program_id')
             ->where('recipient_role', 'sao')
@@ -138,6 +143,34 @@ class SaoController extends Controller
         ]);
 
         $target = User::findOrFail((int) $validated['user_id']);
+
+        // Prevent duplicate Dean per college
+        if ($validated['role'] === UserRole::Dean->value) {
+            $alreadyHasDean = User::where('role', UserRole::Dean->value)
+                ->where('college_id', $validated['college_id'])
+                ->where('id', '!=', $target->id)
+                ->exists();
+
+            if ($alreadyHasDean) {
+                return redirect()->back()->withErrors([
+                    'error' => 'This college already has a Dean assigned. Remove the existing Dean first.',
+                ]);
+            }
+        }
+
+        // Prevent duplicate Program Head per college
+        if ($validated['role'] === UserRole::ProgramHead->value) {
+            $alreadyHasProgramHead = User::where('role', UserRole::ProgramHead->value)
+                ->where('college_id', $validated['college_id'])
+                ->where('id', '!=', $target->id)
+                ->exists();
+
+            if ($alreadyHasProgramHead) {
+                return redirect()->back()->withErrors([
+                    'error' => 'This college already has a Program Head assigned. Remove the existing Program Head first.',
+                ]);
+            }
+        }
 
         $updateData = ['role' => UserRole::from($validated['role'])];
 

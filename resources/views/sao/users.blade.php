@@ -66,7 +66,7 @@
                                 <tr>
                                     <td colspan="5" class="py-4 text-gray-400 text-center">No users found.</td>
                                 </tr>
-                            </endforelse
+                            </endforelse>
                         </tbody>
                     </table>
                 </div>

@@ -49,7 +49,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                             <div>
-                                <p class="text-sm font-semibold text-red-700 dark:text-red-300">{{ $openReports }} open reports</p>
+                                <p class="text-sm font-semibold text-red-700 dark:text-red-300">{{ $openReports }} open reports <span class="text-xs opacity-60">(campus-wide)</span></p>
                                 <a href="{{ route('moderation.dashboard') }}" class="text-xs text-red-600 underline">View reports</a>
                             </div>
                         </div>

@@ -16,10 +16,12 @@ class ScopeGuard
     public static function programScope(User $user): ?array
     {
         return match ($user->role) {
-            UserRole::SuperAdmin, UserRole::Sao => null,
-            UserRole::Dean => null,  // Dean sees all programs in college; use collegeScope
-            UserRole::ProgramHead, UserRole::Moderator => ['program_id' => $user->program_id],
-            default => ['program_id' => $user->program_id, 'year_level' => $user->year_level],
+            UserRole::SuperAdmin,
+            UserRole::Sao => null,              // unrestricted
+            UserRole::Dean,
+            UserRole::ProgramHead => null,              // college-scoped via collegeScope() instead
+            UserRole::Moderator => ['program_id' => $user->program_id],
+            default => ['program_id' => $user->program_id],
         };
     }
 
@@ -29,8 +31,10 @@ class ScopeGuard
     public static function collegeScope(User $user): ?array
     {
         return match ($user->role) {
-            UserRole::SuperAdmin, UserRole::Sao => null,
-            UserRole::Dean => ['college_id' => $user->college_id],
+            UserRole::SuperAdmin,
+            UserRole::Sao => null,
+            UserRole::Dean,
+            UserRole::ProgramHead => ['college_id' => $user->college_id], // both same scope
             default => ['college_id' => $user->college_id],
         };
     }
@@ -53,7 +57,7 @@ class ScopeGuard
                 && in_array($targetRoleValue, ['student', 'moderator', 'program_head'], true);
         }
         if ($user->isProgramHead()) {
-            return $target->program_id === $user->program_id
+            return $target->college_id === $user->college_id
                 && in_array($targetRoleValue, ['student', 'moderator'], true);
         }
 

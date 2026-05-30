@@ -26,6 +26,12 @@ class Feedback extends Model
         'resolution_note',
     ];
 
+    protected $casts = [
+        'read_at' => 'datetime',
+        'resolved_at' => 'datetime',
+        'escalated_from_id' => 'integer',
+    ];
+
     /**
      * @return BelongsTo<User, $this>
      */

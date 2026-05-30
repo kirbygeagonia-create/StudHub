@@ -62,11 +62,9 @@ class RoomConversation extends Component
     {
         return $this->room->messages()
             ->with('sender.program')
-            ->latest()
+            ->orderBy('created_at', 'asc')
             ->limit(50)
-            ->get()
-            ->reverse()
-            ->values();
+            ->get();
     }
 
     public function send(PostChatMessage $action): void

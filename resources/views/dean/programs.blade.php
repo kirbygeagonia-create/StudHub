@@ -56,7 +56,7 @@
                             @foreach ($programHeads as $ph)
                                 <div class="flex items-center justify-between bg-gray-50 dark:bg-navy-800/60 rounded-lg px-4 py-2">
                                     <span class="text-sm">{{ $ph->preferredDisplayName() }}</span>
-                                    <span class="text-xs text-gray-500">{{ $ph->program?->code ?? 'No program' }}</span>
+                                    <span class="text-xs text-gray-500">{{ $ph->college?->code ?? 'N/A' }}</span>
                                 </div>
                             @endforeach
                         </div>

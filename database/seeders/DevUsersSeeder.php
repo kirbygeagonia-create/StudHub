@@ -57,18 +57,20 @@ class DevUsersSeeder extends Seeder
             ],
         );
 
+        $cbgg = College::where('code', 'CBGG')->where('school_id', $school->id)->firstOrFail();
+
         User::updateOrCreate(
             ['email' => 'admin@seait.edu.ph'],
             [
                 'school_id' => $school->id,
-                'program_id' => $bsbaMm->id,
-                'college_id' => $bsbaMm->college_id,
-                'name' => 'Program Head User',
+                'college_id' => $cbgg->id,
+                'program_id' => null,
+                'year_level' => null,
+                'name' => 'Program Head CBGG',
                 'display_name' => 'Program Head',
                 'email_verified_at' => now(),
                 'password' => $password,
                 'role' => UserRole::ProgramHead,
-                'year_level' => 4,
                 'onboarded_at' => now(),
                 'karma' => 200,
             ],

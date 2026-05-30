@@ -1,4 +1,4 @@
-<div class="flex flex-col h-full" wire:poll.10s.visible>
+<div class="flex flex-col h-full">
 
     {{-- Messages --}}
     <div id="chat-log"
@@ -63,7 +63,7 @@
                                     };
                                 @endphp
                                 <a href="{{ route('chat.attachments.download', $message) }}" target="_blank" rel="noopener"
-                                   class="mt-1.5 inline-flex items-center gap-1.5 text-xs text-white/90 hover:text-white transition-colors float-right bg-white/20 hover:bg-white/30 px-2 py-1 rounded-lg">
+                                   class="mt-1.5 inline-flex items-center gap-1.5 text-xs text-white hover:text-white transition-colors float-right bg-white/25 hover:bg-white/40 px-2.5 py-1.5 rounded-lg font-medium">
                                     <svg class="w-3.5 h-3.5 {{ $iconColor }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $iconPath }}"/></svg>
                                     <span>{{ $message->attachment_name ?? (basename($message->attachment_url ?? '') ?: 'Attachment') }}</span>
                                     @if ($message->attachment_size)

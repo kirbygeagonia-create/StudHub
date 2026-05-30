@@ -18,70 +18,79 @@
                      x-transition:leave-start="opacity-100"
                      x-transition:leave-end="opacity-0"
                      class="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div class="absolute inset-0 bg-navy-950/50 backdrop-blur-sm" @click="showInfo = false"></div>
+                    <div x-show="showInfo"
+                         x-transition:enter="ease-out duration-200"
+                         x-transition:enter-start="opacity-0"
+                         x-transition:enter-end="opacity-100"
+                         x-transition:leave="ease-in duration-150"
+                         x-transition:leave-start="opacity-100"
+                         x-transition:leave-end="opacity-0"
+                         class="absolute inset-0 bg-navy-950/50 backdrop-blur-sm" @click="showInfo = false"></div>
                     <div x-transition:enter="ease-out duration-300"
                          x-transition:enter-start="opacity-0 translate-y-4 scale-95"
                          x-transition:enter-end="opacity-100 translate-y-0 scale-100"
                          x-transition:leave="ease-in duration-200"
                          x-transition:leave-start="opacity-100 translate-y-0 scale-100"
                          x-transition:leave-end="opacity-0 translate-y-4 scale-95"
-                         class="relative w-full max-w-md bg-white dark:bg-navy-800 rounded-2xl shadow-card-lg border border-gray-100 dark:border-navy-700/50 overflow-hidden p-6">
-                        <button @click="showInfo = false" class="absolute top-3 right-3 p-1.5 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition rounded-lg hover:bg-gray-100 dark:hover:bg-navy-700">
+                         class="relative w-full max-w-lg bg-white dark:bg-navy-800 rounded-2xl shadow-card-lg border border-gray-100 dark:border-navy-700/50 overflow-hidden max-h-[85vh]">
+                        <button @click="showInfo = false" class="absolute top-3 right-3 p-1.5 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition rounded-lg hover:bg-gray-100 dark:hover:bg-navy-700 z-10">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="w-10 h-10 rounded-xl bg-seait-100 dark:bg-seait-900/30 flex items-center justify-center">
-                                <svg class="w-5 h-5 text-seait-600 dark:text-seait-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/></svg>
-                            </div>
-                            <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">How rankings and badges work</h3>
-                        </div>
-                        <div class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
-                            <p>
-                                <strong class="text-gray-800 dark:text-gray-200">Leaderboard rank</strong> (the numbered position) shows who has earned the most karma in your program.
-                                It changes as others earn or spend karma.
-                            </p>
-                            <p>
-                                <strong class="text-gray-800 dark:text-gray-200">Badge Tiers</strong> are permanent milestones you unlock by reaching karma thresholds — they never go down.
-                            </p>
-                            <div class="bg-gray-50 dark:bg-navy-700/40 rounded-xl p-3 space-y-1.5 text-xs">
-                                <p class="font-semibold text-gray-700 dark:text-gray-300 mb-1">Known tiers:</p>
-                                <div class="grid grid-cols-2 gap-x-4 gap-y-1">
-                                    <span class="font-medium text-gray-700 dark:text-gray-300">Seedling</span>
-                                    <span class="text-emerald-600 dark:text-emerald-400">0 karma — Common</span>
-                                    <span class="font-medium text-gray-700 dark:text-gray-300">Bookworm</span>
-                                    <span class="text-emerald-600 dark:text-emerald-400">25 — Common</span>
-                                    <span class="font-medium text-gray-700 dark:text-gray-300">Scribe</span>
-                                    <span class="text-emerald-600 dark:text-emerald-400">75 — Common</span>
-                                    <span class="font-medium text-gray-700 dark:text-gray-300">Scholar</span>
-                                    <span class="text-emerald-600 dark:text-emerald-400">150 — Common</span>
-                                    <span class="font-medium text-gray-700 dark:text-gray-300">Illuminator</span>
-                                    <span class="text-blue-600 dark:text-blue-400">300 — Uncommon</span>
-                                    <span class="font-medium text-gray-700 dark:text-gray-300">Pathfinder</span>
-                                    <span class="text-blue-600 dark:text-blue-400">500 — Uncommon</span>
-                                    <span class="font-medium text-gray-700 dark:text-gray-300">Sage</span>
-                                    <span class="text-blue-600 dark:text-blue-400">750 — Uncommon</span>
-                                    <span class="font-medium text-gray-700 dark:text-gray-300">Luminary</span>
-                                    <span class="text-purple-600 dark:text-purple-400">1,000 — Rare</span>
-                                    <span class="font-medium text-gray-700 dark:text-gray-300">Archivist</span>
-                                    <span class="text-purple-600 dark:text-purple-400">1,500 — Rare</span>
-                                    <span class="font-medium text-gray-700 dark:text-gray-300">Oracle</span>
-                                    <span class="text-amber-600 dark:text-amber-400">2,500 — Legendary</span>
-                                    <span class="font-medium text-gray-700 dark:text-gray-300">Custodian</span>
-                                    <span class="text-amber-600 dark:text-amber-400">4,000 — Legendary</span>
-                                    <span class="font-medium text-gray-700 dark:text-gray-300">StudHub Legend</span>
-                                    <span class="text-amber-600 dark:text-amber-400">6,000 — Legendary</span>
+                        <div class="p-6 overflow-y-auto max-h-[calc(85vh-2rem)]">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-xl bg-seait-100 dark:bg-seait-900/30 flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-5 h-5 text-seait-600 dark:text-seait-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/></svg>
                                 </div>
-                                <p class="mt-2 text-gray-400 italic">There may be hidden tiers beyond these — only the most dedicated will discover them.</p>
+                                <h3 class="text-lg font-bold text-gray-900 dark:text-gray-100">How rankings and badges work</h3>
                             </div>
-                            <p class="font-semibold text-gray-800 dark:text-gray-200 mt-2">Earn karma by:</p>
-                            <ul class="list-disc list-inside space-y-1">
-                                <li>Uploading resources (+5)</li>
-                                <li>Your resource gets saved by someone (+5)</li>
-                                <li>Fulfilling a request (+10)</li>
-                                <li>Your chat message marked helpful (+2)</li>
-                            </ul>
+                            <div class="space-y-3 text-sm text-gray-600 dark:text-gray-400">
+                                <p>
+                                    <strong class="text-gray-800 dark:text-gray-200">Leaderboard rank</strong> (the numbered position) shows who has earned the most karma in your program.
+                                    It changes as others earn or spend karma.
+                                </p>
+                                <p>
+                                    <strong class="text-gray-800 dark:text-gray-200">Badge Tiers</strong> are permanent milestones you unlock by reaching karma thresholds — they never go down.
+                                </p>
+                                <div class="bg-gray-50 dark:bg-navy-700/40 rounded-xl p-3 space-y-1.5 text-xs">
+                                    <p class="font-semibold text-gray-700 dark:text-gray-300 mb-1">Known tiers:</p>
+                                    <div class="grid grid-cols-2 gap-x-4 gap-y-1">
+                                        <span class="font-medium text-gray-700 dark:text-gray-300">Seedling</span>
+                                        <span class="text-emerald-600 dark:text-emerald-400">0 karma — Common</span>
+                                        <span class="font-medium text-gray-700 dark:text-gray-300">Bookworm</span>
+                                        <span class="text-emerald-600 dark:text-emerald-400">25 — Common</span>
+                                        <span class="font-medium text-gray-700 dark:text-gray-300">Scribe</span>
+                                        <span class="text-emerald-600 dark:text-emerald-400">75 — Common</span>
+                                        <span class="font-medium text-gray-700 dark:text-gray-300">Scholar</span>
+                                        <span class="text-emerald-600 dark:text-emerald-400">150 — Common</span>
+                                        <span class="font-medium text-gray-700 dark:text-gray-300">Illuminator</span>
+                                        <span class="text-blue-600 dark:text-blue-400">300 — Uncommon</span>
+                                        <span class="font-medium text-gray-700 dark:text-gray-300">Pathfinder</span>
+                                        <span class="text-blue-600 dark:text-blue-400">500 — Uncommon</span>
+                                        <span class="font-medium text-gray-700 dark:text-gray-300">Sage</span>
+                                        <span class="text-blue-600 dark:text-blue-400">750 — Uncommon</span>
+                                        <span class="font-medium text-gray-700 dark:text-gray-300">Luminary</span>
+                                        <span class="text-purple-600 dark:text-purple-400">1,000 — Rare</span>
+                                        <span class="font-medium text-gray-700 dark:text-gray-300">Archivist</span>
+                                        <span class="text-purple-600 dark:text-purple-400">1,500 — Rare</span>
+                                        <span class="font-medium text-gray-700 dark:text-gray-300">Oracle</span>
+                                        <span class="text-amber-600 dark:text-amber-400">2,500 — Legendary</span>
+                                        <span class="font-medium text-gray-700 dark:text-gray-300">Custodian</span>
+                                        <span class="text-amber-600 dark:text-amber-400">4,000 — Legendary</span>
+                                        <span class="font-medium text-gray-700 dark:text-gray-300">StudHub Legend</span>
+                                        <span class="text-amber-600 dark:text-amber-400">6,000 — Legendary</span>
+                                    </div>
+                                    <p class="mt-2 text-gray-400 italic">There may be hidden tiers beyond these — only the most dedicated will discover them.</p>
+                                </div>
+                                <p class="font-semibold text-gray-800 dark:text-gray-200 mt-2">Earn karma by:</p>
+                                <ul class="list-disc list-inside space-y-1">
+                                    <li>Uploading resources (+5)</li>
+                                    <li>Your resource gets saved by someone (+5)</li>
+                                    <li>Fulfilling a request (+10)</li>
+                                    <li>Your chat message marked helpful (+2)</li>
+                                </ul>
+                            </div>
+                            <button @click="showInfo = false" class="btn-primary w-full mt-5 !py-2">Got it</button>
                         </div>
-                        <button @click="showInfo = false" class="btn-primary w-full mt-5 !py-2">Got it</button>
                     </div>
                 </div>
             </div>

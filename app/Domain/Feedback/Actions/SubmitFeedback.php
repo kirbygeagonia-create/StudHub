@@ -49,16 +49,17 @@ class SubmitFeedback
     private function resolveRecipient(User $user): array
     {
         return match ($user->role) {
-            // Student/Moderator → goes to their Program Head
-            UserRole::Student, UserRole::Moderator => ['program_head', $user->college_id, $user->program_id],
+            // Student/Moderator → Program Head of their college
+            UserRole::Student,
+            UserRole::Moderator => ['program_head', $user->college_id, null],
 
-            // Program Head → goes to their Dean
+            // Program Head → Dean of their college
             UserRole::ProgramHead => ['dean', $user->college_id, null],
 
-            // Dean → goes directly to SAO
+            // Dean → SAO
             UserRole::Dean => ['sao', null, null],
 
-            // SAO / SuperAdmin → goes to SuperAdmin (system-level)
+            // SAO / SuperAdmin → SuperAdmin (system-level issues only)
             default => ['super_admin', null, null],
         };
     }

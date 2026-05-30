@@ -258,7 +258,14 @@
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
          class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div x-show="showLoginModal" class="absolute inset-0 bg-navy-950/50 backdrop-blur-sm" @click="showLoginModal = false"></div>
+        <div x-show="showLoginModal"
+             x-transition:enter="ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="absolute inset-0 bg-navy-950/50 backdrop-blur-sm" @click="showLoginModal = false"></div>
         <div x-transition:enter="ease-out duration-300"
              x-transition:enter-start="opacity-0 translate-y-4 scale-95"
              x-transition:enter-end="opacity-100 translate-y-0 scale-100"
@@ -346,7 +353,14 @@
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
          class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div x-show="showRegisterModal" class="absolute inset-0 bg-navy-950/50 backdrop-blur-sm" @click="showRegisterModal = false"></div>
+        <div x-show="showRegisterModal"
+             x-transition:enter="ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="absolute inset-0 bg-navy-950/50 backdrop-blur-sm" @click="showRegisterModal = false"></div>
         <div x-transition:enter="ease-out duration-300"
              x-transition:enter-start="opacity-0 translate-y-4 scale-95"
              x-transition:enter-end="opacity-100 translate-y-0 scale-100"
@@ -432,7 +446,14 @@
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
          class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div x-show="showForgotPasswordModal" class="absolute inset-0 bg-navy-950/50 backdrop-blur-sm" @click="showForgotPasswordModal = false"></div>
+        <div x-show="showForgotPasswordModal"
+             x-transition:enter="ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="absolute inset-0 bg-navy-950/50 backdrop-blur-sm" @click="showForgotPasswordModal = false"></div>
         <div x-transition:enter="ease-out duration-300"
              x-transition:enter-start="opacity-0 translate-y-4 scale-95"
              x-transition:enter-end="opacity-100 translate-y-0 scale-100"
@@ -499,25 +520,32 @@
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
          class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div x-show="showHelpModal" class="absolute inset-0 bg-navy-950/50 backdrop-blur-sm" @click="showHelpModal = false"></div>
+        <div x-show="showHelpModal"
+             x-transition:enter="ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="absolute inset-0 bg-navy-950/50 backdrop-blur-sm" @click="showHelpModal = false"></div>
         <div x-transition:enter="ease-out duration-300"
              x-transition:enter-start="opacity-0 translate-y-4 scale-95"
              x-transition:enter-end="opacity-100 translate-y-0 scale-100"
              x-transition:leave="ease-in duration-200"
              x-transition:leave-start="opacity-100 translate-y-0 scale-100"
              x-transition:leave-end="opacity-0 translate-y-4 scale-95"
-             class="relative w-full max-w-xl bg-white dark:bg-navy-800 rounded-2xl shadow-card-lg border border-gray-100 dark:border-navy-700/50 overflow-hidden">
+             class="relative w-full max-w-3xl bg-white dark:bg-navy-800 rounded-2xl shadow-card-lg border border-gray-100 dark:border-navy-700/50 overflow-hidden max-h-[85vh]">
             <button @click="showHelpModal = false" class="absolute top-3 right-3 p-1.5 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition rounded-lg hover:bg-gray-100 dark:hover:bg-navy-700 z-10">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
-            <div class="p-6">
+            <div class="p-6 overflow-y-auto max-h-[calc(85vh-2rem)]">
                 <div class="text-center mb-4">
                     <h2 class="text-lg font-bold text-gray-900 dark:text-white">Help & Guide</h2>
                     <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Everything you need to know about StudHub</p>
                 </div>
-                <div class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Getting Started -->
-                    <div class="border-b pb-3">
+                    <div class="border-b md:border-b-0 md:border-r border-gray-200 dark:border-navy-700/50 pb-3 md:pb-0 md:pr-6">
                         <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">Getting Started</h3>
                         <div class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                             <div>
@@ -540,48 +568,52 @@
                     </div>
 
                     <!-- How to Ask for Resources -->
-                    <div class="border-b pb-3">
+                    <div class="border-b md:border-b-0 pb-3 md:pb-0">
                         <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">How to Ask for Resources</h3>
-                        <p class="mt-3 font-semibold text-gray-800 dark:text-gray-200">When posting a request, include these details to get faster responses:</p>
-                        <ul class="list-disc list-inside space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                        <p class="font-semibold text-gray-800 dark:text-gray-200 text-sm">When posting a request, include these details to get faster responses:</p>
+                        <ul class="list-disc list-inside space-y-1.5 text-sm text-gray-600 dark:text-gray-400 mt-2">
                             <li>The exact <strong>subject code</strong> (e.g., <em>IT 211</em>, not "Programming")</li>
                             <li>What <strong>type</strong> of resource you need (reviewer, textbook, e-module, past exam)</li>
                             <li>Your <strong>urgency</strong> — low, normal, or urgent</li>
                             <li>Any specific details in the description (e.g., "preferably with answer keys")</li>
                         </ul>
-                        <p class="mt-3">Once posted, StudHub's routing engine matches your request to programs that teach that subject. You'll receive offers from other students who have what you need.</p>
+                        <p class="mt-2 text-sm">Once posted, StudHub's routing engine matches your request to programs that teach that subject. You'll receive offers from other students who have what you need.</p>
                     </div>
 
                     <!-- Karma & Badges -->
-                    <div class="border-b pb-3">
+                    <div class="md:col-span-2 border-t border-gray-200 dark:border-navy-700/50 pt-4">
                         <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">Karma & Badges</h3>
-                        <div class="space-y-2">
-                            <p><strong>+5 karma</strong> — Upload a resource</p>
-                            <p><strong>+5 karma</strong> — Your resource gets saved by someone</p>
-                            <p><strong>+10 karma</strong> — Fulfill a request</p>
-                            <p><strong>+2 karma</strong> — Your chat message marked helpful</p>
-                            <p><strong>-5 karma</strong> — Confirmed report against you</p>
-                            <p class="mt-2 font-semibold text-gray-800 dark:text-gray-200">Badge Tiers (permanent milestones — your progress never resets):</p>
-                            <ul class="list-disc list-inside space-y-1 text-sm text-gray-600 dark:text-gray-400">
-                                <li><span class="font-medium text-gray-800 dark:text-gray-200">Seedling</span> (0 karma) — Common</li>
-                                <li><span class="font-medium text-gray-800 dark:text-gray-200">Bookworm</span> (25) — Common</li>
-                                <li><span class="font-medium text-gray-800 dark:text-gray-200">Scribe</span> (75) — Common</li>
-                                <li><span class="font-medium text-gray-800 dark:text-gray-200">Scholar</span> (150) — Common</li>
-                                <li><span class="font-medium text-gray-800 dark:text-gray-200">Illuminator</span> (300) — Uncommon</li>
-                                <li><span class="font-medium text-gray-800 dark:text-gray-200">Pathfinder</span> (500) — Uncommon</li>
-                                <li><span class="font-medium text-gray-800 dark:text-gray-200">Sage</span> (750) — Uncommon</li>
-                                <li><span class="font-medium text-gray-800 dark:text-gray-200">Luminary</span> (1,000) — Rare</li>
-                                <li><span class="font-medium text-gray-800 dark:text-gray-200">Archivist</span> (1,500) — Rare</li>
-                                <li><span class="font-medium text-gray-800 dark:text-gray-200">Oracle</span> (2,500) — Legendary</li>
-                                <li><span class="font-medium text-gray-800 dark:text-gray-200">Custodian</span> (4,000) — Legendary</li>
-                                <li><span class="font-medium text-gray-800 dark:text-gray-200">StudHub Legend</span> (6,000) — Legendary</li>
-                            </ul>
-                            <p class="mt-2 text-xs text-gray-400 italic">There may be hidden tiers beyond these — only the most dedicated will discover them.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-1.5 text-sm text-gray-600 dark:text-gray-400">
+                                <p><strong>+5 karma</strong> — Upload a resource</p>
+                                <p><strong>+5 karma</strong> — Your resource gets saved by someone</p>
+                                <p><strong>+10 karma</strong> — Fulfill a request</p>
+                                <p><strong>+2 karma</strong> — Your chat message marked helpful</p>
+                                <p><strong>-5 karma</strong> — Confirmed report against you</p>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1.5">Badge Tiers (permanent milestones):</p>
+                                <div class="grid grid-cols-2 gap-x-3 gap-y-1 text-sm text-gray-600 dark:text-gray-400">
+                                    <span><span class="font-medium text-gray-800 dark:text-gray-200">Seedling</span> (0) — Common</span>
+                                    <span><span class="font-medium text-gray-800 dark:text-gray-200">Bookworm</span> (25) — Common</span>
+                                    <span><span class="font-medium text-gray-800 dark:text-gray-200">Scribe</span> (75) — Common</span>
+                                    <span><span class="font-medium text-gray-800 dark:text-gray-200">Scholar</span> (150) — Common</span>
+                                    <span><span class="font-medium text-gray-800 dark:text-gray-200">Illuminator</span> (300) — Uncommon</span>
+                                    <span><span class="font-medium text-gray-800 dark:text-gray-200">Pathfinder</span> (500) — Uncommon</span>
+                                    <span><span class="font-medium text-gray-800 dark:text-gray-200">Sage</span> (750) — Uncommon</span>
+                                    <span><span class="font-medium text-gray-800 dark:text-gray-200">Luminary</span> (1,000) — Rare</span>
+                                    <span><span class="font-medium text-gray-800 dark:text-gray-200">Archivist</span> (1,500) — Rare</span>
+                                    <span><span class="font-medium text-gray-800 dark:text-gray-200">Oracle</span> (2,500) — Legendary</span>
+                                    <span><span class="font-medium text-gray-800 dark:text-gray-200">Custodian</span> (4,000) — Legendary</span>
+                                    <span><span class="font-medium text-gray-800 dark:text-gray-200">StudHub Legend</span> (6,000) — Legendary</span>
+                                </div>
+                                <p class="mt-1.5 text-xs text-gray-400 italic">There may be hidden tiers beyond these — only the most dedicated will discover them.</p>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Contact -->
-                    <div class="border-t pt-3">
+                    <div class="md:col-span-2 border-t border-gray-200 dark:border-navy-700/50 pt-4">
                         <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-2">Contact</h3>
                         <p class="text-sm text-gray-600 dark:text-gray-400">
                             For issues or questions, message a moderator in your program's chat room or email
@@ -603,71 +635,91 @@
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
          class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div x-show="showPolicyModal" class="absolute inset-0 bg-navy-950/50 backdrop-blur-sm" @click="showPolicyModal = false"></div>
+        <div x-show="showPolicyModal"
+             x-transition:enter="ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="absolute inset-0 bg-navy-950/50 backdrop-blur-sm" @click="showPolicyModal = false"></div>
         <div x-transition:enter="ease-out duration-300"
              x-transition:enter-start="opacity-0 translate-y-4 scale-95"
              x-transition:enter-end="opacity-100 translate-y-0 scale-100"
              x-transition:leave="ease-in duration-200"
              x-transition:leave-start="opacity-100 translate-y-0 scale-100"
              x-transition:leave-end="opacity-0 translate-y-4 scale-95"
-             class="relative w-full max-w-xl bg-white dark:bg-navy-800 rounded-2xl shadow-card-lg border border-gray-100 dark:border-navy-700/50 overflow-hidden">
+             class="relative w-full max-w-3xl bg-white dark:bg-navy-800 rounded-2xl shadow-card-lg border border-gray-100 dark:border-navy-700/50 overflow-hidden max-h-[85vh]">
             <button @click="showPolicyModal = false" class="absolute top-3 right-3 p-1.5 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition rounded-lg hover:bg-gray-100 dark:hover:bg-navy-700 z-10">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
-            <div class="p-6">
-                <div class="space-y-4">
-                    <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4">Acceptable Use Policy</h2>
-                    <p class="text-base text-gray-600 dark:text-gray-400">
-                        Welcome to StudHub! By accessing or using our platform, you agree to comply with and be bound by the following policies. If you do not agree with any part of these terms, please refrain from using our service.
-                    </p>
-
-                    <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-3">1. Eligibility</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                        StudHub is exclusively for students, faculty, and staff of the South East Asian Institute of Technology (SEAIT). You must have a valid SEAIT email address to register and use the platform.
-                    </p>
-
-                    <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-3">2. Account Responsibility</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                        You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. Notify us immediately of any unauthorized use.
-                    </p>
-
-                    <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-3">3. Resource Sharing Guidelines</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                        You may share educational resources including textbooks, reviewers, lecture notes, past exams, and modules. All shared content must be either original work or material you have the right to distribute.
-                    </p>
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                        Resources containing copyrighted material without proper authorization will be removed. Repeated violations may result in account termination.
-                    </p>
-
-                    <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-3">4. Respectful Communication</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                        Engage in respectful and constructive communication. Harassment, hate speech, or any form of discrimination will not be tolerated.
-                    </p>
-
-                    <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-3">5. Privacy & Data Protection</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                        Your personal information is protected in accordance with data privacy laws. We do not sell or share your data with third parties for marketing purposes.
-                    </p>
-
-                    <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-3">6. Prohibited Activities</h3>
-                    <ul class="list-disc list-inside space-y-2 text-sm text-gray-600 dark:text-gray-400 mt-1">
-                        <li>Uploading malicious software, viruses, or harmful code</li>
-                        <li>Attempting to gain unauthorized access to other accounts or system features</li>
-                        <li>Using the platform for commercial purposes without explicit permission</li>
-                        <li>Sharing inappropriate or non-educational content</li>
-                        <li>Spamming or flooding the chat system with meaningless messages</li>
-                    </ul>
-
-                    <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-3">7. Consequences of Violation</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400">
-                        Violations may result in warnings, temporary suspension, or permanent account termination depending on severity and frequency.
-                    </p>
-
-                    <div class="mt-4 pt-3 border-t border-gray-200">
-                        <p class="text-xs text-gray-500 dark:text-gray-400 text-center">
-                            By using StudHub, you acknowledge that you have read, understood, and agree to comply with this Acceptable Use Policy.
+            <div class="p-6 overflow-y-auto max-h-[calc(85vh-2rem)]">
+                <h2 class="text-lg font-bold text-gray-900 dark:text-white mb-4 text-center">Acceptable Use Policy</h2>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 text-center">
+                    Welcome to StudHub! By accessing or using our platform, you agree to comply with and be bound by the following policies. If you do not agree with any part of these terms, please refrain from using our service.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+                    <div>
+                        <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-1.5">1. Eligibility</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                            StudHub is exclusively for students, faculty, and staff of SEAIT. You must have a valid SEAIT email address to register and use the platform.
                         </p>
                     </div>
+
+                    <div>
+                        <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-1.5">2. Account Responsibility</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                            You are responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. Notify us immediately of any unauthorized use.
+                        </p>
+                    </div>
+
+                    <div>
+                        <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-1.5">3. Resource Sharing Guidelines</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                            You may share educational resources including textbooks, reviewers, lecture notes, past exams, and modules. All shared content must be either original work or material you have the right to distribute.
+                        </p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                            Resources containing copyrighted material without proper authorization will be removed. Repeated violations may result in account termination.
+                        </p>
+                    </div>
+
+                    <div>
+                        <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-1.5">4. Respectful Communication</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                            Engage in respectful and constructive communication. Harassment, hate speech, or any form of discrimination will not be tolerated.
+                        </p>
+                    </div>
+
+                    <div>
+                        <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-1.5">5. Privacy & Data Protection</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                            Your personal information is protected in accordance with data privacy laws. We do not sell or share your data with third parties for marketing purposes.
+                        </p>
+                    </div>
+
+                    <div>
+                        <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-1.5">6. Prohibited Activities</h3>
+                        <ul class="list-disc list-inside space-y-1 text-sm text-gray-600 dark:text-gray-400">
+                            <li>Uploading malicious software, viruses, or harmful code</li>
+                            <li>Attempting to gain unauthorized access to other accounts or system features</li>
+                            <li>Using the platform for commercial purposes without explicit permission</li>
+                            <li>Sharing inappropriate or non-educational content</li>
+                            <li>Spamming or flooding the chat system with meaningless messages</li>
+                        </ul>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-1.5">7. Consequences of Violation</h3>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                            Violations may result in warnings, temporary suspension, or permanent account termination depending on severity and frequency.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-3 border-t border-gray-200 dark:border-navy-700/50">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 text-center">
+                        By using StudHub, you acknowledge that you have read, understood, and agree to comply with this Acceptable Use Policy.
+                    </p>
                 </div>
             </div>
         </div>

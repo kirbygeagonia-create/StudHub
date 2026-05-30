@@ -58,7 +58,13 @@ class SearchGlobal
         $messages = ChatMessage::query()
             ->with(['sender:id,display_name,name', 'room:id,title,slug'])
             ->whereHas('room', function ($q) use ($user) {
-                $q->where('program_id', $user->program_id);
+                if ($user->isProgramHead()) {
+                    $q->whereHas('program', function ($pq) use ($user) {
+                        $pq->where('college_id', $user->college_id);
+                    });
+                } else {
+                    $q->where('program_id', $user->program_id);
+                }
             })
             ->where('body', 'like', '%' . $query . '%')
             ->orderByDesc('created_at')

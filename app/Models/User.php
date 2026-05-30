@@ -167,6 +167,22 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function hasCompletedOnboarding(): bool
     {
+        // SAO and SuperAdmin: campus-wide scope — only need school_id + display_name
+        if ($this->isSao() || $this->isSuperAdmin()) {
+            return $this->onboarded_at !== null
+                && $this->display_name !== null
+                && $this->school_id !== null;
+        }
+
+        // Dean and Program Head: college-scoped — need college_id but NOT program_id or year_level
+        if ($this->isDean() || $this->isProgramHead()) {
+            return $this->onboarded_at !== null
+                && $this->display_name !== null
+                && $this->school_id !== null
+                && $this->college_id !== null;
+        }
+
+        // Students and Moderators: need full profile including program + year
         return $this->onboarded_at !== null
             && $this->program_id !== null
             && $this->year_level !== null
@@ -234,10 +250,11 @@ class User extends Authenticatable implements MustVerifyEmail
 
     /**
      * Returns the program_id this user manages (null if they manage all).
+     * Program Head manages an entire college — not one specific program.
      */
     public function managedProgramId(): ?int
     {
-        return $this->role === UserRole::ProgramHead ? $this->program_id : null;
+        return null;
     }
 
     /**
@@ -245,7 +262,9 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function managedCollegeId(): ?int
     {
-        return $this->role === UserRole::Dean ? $this->college_id : null;
+        return ($this->isDean() || $this->isProgramHead())
+            ? $this->college_id
+            : null;
     }
 
     /**
