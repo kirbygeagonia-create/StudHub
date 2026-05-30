@@ -15,7 +15,7 @@ class SuspendUser
         }
 
         if ($target->isAdmin()) {
-            throw new RuntimeException('You cannot suspend an admin.');
+            throw new RuntimeException('You cannot suspend a Program Head, Dean, SAO, or Super Admin.');
         }
 
         $suspendedUntil = now()->addDays($days);

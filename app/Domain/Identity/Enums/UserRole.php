@@ -6,7 +6,9 @@ enum UserRole: string
 {
     case Student = 'student';
     case Moderator = 'moderator';
-    case Admin = 'admin';
+    case ProgramHead = 'program_head';
+    case Dean = 'dean';
+    case Sao = 'sao';
     case SuperAdmin = 'super_admin';
 
     public function label(): string
@@ -14,8 +16,10 @@ enum UserRole: string
         return match ($this) {
             self::Student => 'Student',
             self::Moderator => 'Program Moderator',
-            self::Admin => 'Program Head / Dean',
-            self::SuperAdmin => 'Super Admin',
+            self::ProgramHead => 'Program Head',
+            self::Dean => 'College Dean',
+            self::Sao => 'Administrator',
+            self::SuperAdmin => 'System Administrator',
         };
     }
 
@@ -27,17 +31,40 @@ enum UserRole: string
 
     /**
      * Returns all roles that have at least the given role's permissions.
-     * SuperAdmin inherits Admin, Admin inherits Moderator, etc.
+     * SAO is the highest school-side authority.
+     * SuperAdmin is developer-only, hidden from school UI.
      *
      * @return array<int, string>
      */
     public function inheritedRoles(): array
     {
         return match ($this) {
-            self::SuperAdmin => ['super_admin', 'admin', 'moderator'],
-            self::Admin => ['admin', 'moderator'],
+            self::SuperAdmin => ['super_admin', 'sao', 'dean', 'program_head', 'moderator'],
+            self::Sao => ['sao', 'dean', 'program_head', 'moderator'],
+            self::Dean => ['dean', 'program_head', 'moderator'],
+            self::ProgramHead => ['program_head', 'moderator'],
             self::Moderator => ['moderator'],
             self::Student => ['student'],
         };
+    }
+
+    public function panelClass(): string
+    {
+        return match ($this) {
+            self::Student, self::Moderator => '',
+            self::ProgramHead => 'panel-program-head',
+            self::Dean => 'panel-dean',
+            self::Sao => 'panel-sao',
+            self::SuperAdmin => 'panel-super',
+        };
+    }
+
+    /**
+     * Whether this role should be visible/assignable inside the school's admin panels.
+     * super_admin is excluded — only assignable directly in the database or via artisan.
+     */
+    public function isSchoolRole(): bool
+    {
+        return $this !== self::SuperAdmin;
     }
 }

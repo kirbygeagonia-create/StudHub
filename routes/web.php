@@ -1,17 +1,19 @@
 <?php
 
-use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ChatAttachmentController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\DeanController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\LendController;
 use App\Http\Controllers\ModerationController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ProgramHeadController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\ResourceController;
+use App\Http\Controllers\SaoController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
 
@@ -110,7 +112,7 @@ Route::middleware(['auth', 'verified', 'onboarded', 'not_suspended'])->group(fun
     Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 });
 
-Route::middleware(['auth', 'verified', 'onboarded', 'role:moderator,admin,super_admin'])->group(function () {
+Route::middleware(['auth', 'verified', 'onboarded', 'role:moderator,program_head,dean,sao,super_admin'])->group(function () {
     Route::get('/moderation', [ModerationController::class, 'dashboard'])->name('moderation.dashboard');
     Route::post('/moderation/reports/{report}/resolve', [ModerationController::class, 'resolve'])
         ->middleware('throttle:20,1')
@@ -123,27 +125,65 @@ Route::middleware(['auth', 'verified', 'onboarded', 'role:moderator,admin,super_
         ->name('moderation.unsuspend');
 });
 
-Route::middleware(['auth', 'verified', 'onboarded', 'role:admin,super_admin'])->group(function () {
-    Route::get('/admin', [AdminController::class, 'dashboard'])->name('admin.dashboard');
-    Route::post('/admin/moderators/assign', [AdminController::class, 'assignModerator'])
+// Program Head routes (replaces old admin routes)
+Route::middleware(['auth', 'verified', 'onboarded', 'role:program_head,dean,sao,super_admin'])->group(function () {
+    Route::get('/program-head', [ProgramHeadController::class, 'dashboard'])->name('program_head.dashboard');
+    Route::post('/program-head/moderators/assign', [ProgramHeadController::class, 'assignModerator'])
         ->middleware('throttle:20,1')
-        ->name('admin.moderators.assign');
-    Route::post('/admin/moderators/remove', [AdminController::class, 'removeModerator'])
+        ->name('program_head.moderators.assign');
+    Route::post('/program-head/moderators/remove', [ProgramHeadController::class, 'removeModerator'])
         ->middleware('throttle:20,1')
-        ->name('admin.moderators.remove');
-    Route::post('/admin/suspend', [AdminController::class, 'suspend'])
+        ->name('program_head.moderators.remove');
+    Route::post('/program-head/suspend', [ProgramHeadController::class, 'suspend'])
         ->middleware('throttle:10,1')
-        ->name('admin.suspend');
-    Route::post('/admin/unsuspend', [AdminController::class, 'unsuspend'])
+        ->name('program_head.suspend');
+    Route::post('/program-head/unsuspend', [ProgramHeadController::class, 'unsuspend'])
         ->middleware('throttle:10,1')
-        ->name('admin.unsuspend');
-    Route::get('/admin/feedback', [AdminController::class, 'feedback'])->name('admin.feedback');
+        ->name('program_head.unsuspend');
+    Route::get('/program-head/feedback', [ProgramHeadController::class, 'feedback'])->name('program_head.feedback');
+    Route::post('/program-head/feedback/{feedback}/resolve', [ProgramHeadController::class, 'resolveFeedback'])
+        ->middleware('throttle:20,1')
+        ->name('program_head.feedback.resolve');
+    Route::post('/program-head/feedback/{feedback}/escalate', [ProgramHeadController::class, 'escalateFeedback'])
+        ->middleware('throttle:20,1')
+        ->name('program_head.feedback.escalate');
 });
 
-// SuperAdmin-only routes (system-level management)
-Route::middleware(['auth', 'verified', 'onboarded', 'role:super_admin'])->group(function () {
-    // SuperAdmin can manage all feedback and system settings
-    Route::get('/admin/super', [AdminController::class, 'superDashboard'])->name('admin.super');
+// Dean routes
+Route::middleware(['auth', 'verified', 'onboarded', 'role:dean,sao,super_admin'])->group(function () {
+    Route::get('/dean', [DeanController::class, 'dashboard'])->name('dean.dashboard');
+    Route::get('/dean/feedback', [DeanController::class, 'feedback'])->name('dean.feedback');
+    Route::post('/dean/feedback/{feedback}/resolve', [DeanController::class, 'resolveFeedback'])
+        ->middleware('throttle:20,1')
+        ->name('dean.feedback.resolve');
+    Route::post('/dean/feedback/{feedback}/escalate', [DeanController::class, 'escalateFeedback'])
+        ->middleware('throttle:20,1')
+        ->name('dean.feedback.escalate');
+    Route::get('/dean/programs', [DeanController::class, 'programs'])->name('dean.programs');
+    Route::post('/dean/program-heads/assign', [DeanController::class, 'assignProgramHead'])
+        ->middleware('throttle:20,1')
+        ->name('dean.program_heads.assign');
+});
+
+// SAO routes (highest school-side authority)
+Route::middleware(['auth', 'verified', 'onboarded', 'role:sao,super_admin'])->group(function () {
+    Route::get('/sao', [SaoController::class, 'dashboard'])->name('sao.dashboard');
+    Route::get('/sao/feedback', [SaoController::class, 'feedback'])->name('sao.feedback');
+    Route::post('/sao/feedback/{feedback}/resolve', [SaoController::class, 'resolveFeedback'])
+        ->middleware('throttle:20,1')
+        ->name('sao.feedback.resolve');
+    Route::get('/sao/users', [SaoController::class, 'users'])->name('sao.users');
+    Route::post('/sao/users/assign-role', [SaoController::class, 'assignRole'])
+        ->middleware('throttle:20,1')
+        ->name('sao.users.assign-role');
+    Route::get('/sao/announcements', [SaoController::class, 'announcements'])->name('sao.announcements');
+});
+
+// Legacy /admin routes — redirect to new program_head routes for backwards compat
+Route::middleware(['auth', 'verified', 'onboarded'])->group(function () {
+    Route::redirect('/admin', '/program-head')->name('admin.dashboard');
+    Route::redirect('/admin/feedback', '/program-head/feedback')->name('admin.feedback');
+    Route::redirect('/admin/super', '/sao')->name('admin.super');
 });
 
 require __DIR__ . '/auth.php';

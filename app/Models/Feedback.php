@@ -16,6 +16,14 @@ class Feedback extends Model
         'user_id',
         'type',
         'body',
+        'recipient_role',
+        'recipient_college_id',
+        'recipient_program_id',
+        'escalated_from_id',
+        'status',
+        'read_at',
+        'resolved_at',
+        'resolution_note',
     ];
 
     /**
@@ -24,5 +32,13 @@ class Feedback extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * @return BelongsTo<Feedback, $this>
+     */
+    public function escalatedFrom(): BelongsTo
+    {
+        return $this->belongsTo(Feedback::class, 'escalated_from_id');
     }
 }

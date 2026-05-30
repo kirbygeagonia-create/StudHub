@@ -288,3 +288,61 @@
     box-shadow: 0 0 40px rgba(255, 107, 53, 0.25);
   }
 }
+
+/* ============================================
+   Panel Skin Overrides (role-aware UI)
+   ============================================ */
+
+/* Program Head — navy professional */
+.panel-program-head {
+    --panel-accent: #2D4258;
+    --panel-accent-light: #4A6175;
+    --panel-accent-hover: #1E2D3D;
+    --panel-btn-bg: var(--panel-accent);
+    --panel-badge-bg: #E3E8EF;
+    --panel-badge-text: #2D4258;
+}
+.panel-program-head .btn-primary {
+    background: linear-gradient(135deg, #2D4258, #1E2D3D);
+}
+.panel-program-head .stat-card {
+    border-left: 3px solid #4A6175;
+}
+
+/* Dean — indigo/royal blue */
+.panel-dean {
+    --panel-accent: #4338CA;
+    --panel-accent-light: #6366F1;
+    --panel-badge-bg: #EEF2FF;
+    --panel-badge-text: #4338CA;
+}
+.panel-dean .btn-primary {
+    background: linear-gradient(135deg, #4338CA, #3730A3);
+}
+.panel-dean .stat-card {
+    border-left: 3px solid #6366F1;
+}
+
+/* SAO — slate/institutional */
+.panel-sao {
+    --panel-accent: #475569;
+    --panel-accent-light: #64748B;
+    --panel-badge-bg: #F1F5F9;
+    --panel-badge-text: #334155;
+}
+.panel-sao .btn-primary {
+    background: linear-gradient(135deg, #475569, #334155);
+}
+.panel-sao .stat-card {
+    border-left: 3px solid #64748B;
+}
+
+/* Super Admin — dark, minimal */
+.panel-super {
+    --panel-accent: #1F2937;
+    --panel-badge-bg: #374151;
+    --panel-badge-text: #F9FAFB;
+}
+.panel-super .btn-primary {
+    background: linear-gradient(135deg, #374151, #1F2937);
+}

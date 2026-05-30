@@ -21,8 +21,8 @@ class EnsureHasRole
             abort(403);
         }
 
-        // SuperAdmin inherits all roles — they pass any role check
-        if ($user->isSuperAdmin()) {
+        // SuperAdmin and SAO inherit all roles — they pass any role check
+        if ($user->isSuperAdmin() || $user->isSao()) {
             return $next($request);
         }
 

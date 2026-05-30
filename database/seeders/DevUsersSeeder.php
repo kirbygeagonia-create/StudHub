@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Domain\Identity\Enums\UserRole;
+use App\Models\College;
 use App\Models\Program;
 use App\Models\School;
 use App\Models\User;
@@ -18,6 +19,7 @@ class DevUsersSeeder extends Seeder
         $bsit = Program::where('school_id', $school->id)->where('code', 'BSIT')->firstOrFail();
         $bsce = Program::where('school_id', $school->id)->where('code', 'BSCE')->firstOrFail();
         $bsbaMm = Program::where('school_id', $school->id)->where('code', 'BSBA-MM')->firstOrFail();
+        $cict = College::where('school_id', $school->id)->where('code', 'CICT')->firstOrFail();
 
         $password = Hash::make('password');
 
@@ -61,20 +63,51 @@ class DevUsersSeeder extends Seeder
                 'school_id' => $school->id,
                 'program_id' => $bsbaMm->id,
                 'college_id' => $bsbaMm->college_id,
-                'name' => 'Admin User',
-                'display_name' => 'Admin',
+                'name' => 'Program Head User',
+                'display_name' => 'Program Head',
                 'email_verified_at' => now(),
                 'password' => $password,
-                'role' => UserRole::Admin,
+                'role' => UserRole::ProgramHead,
                 'year_level' => 4,
                 'onboarded_at' => now(),
                 'karma' => 200,
             ],
         );
 
+        // Dean dev account (CICT college)
+        User::updateOrCreate(
+            ['email' => 'dean.cict@seait.edu.ph'],
+            [
+                'school_id' => $school->id,
+                'college_id' => $cict->id,
+                'name' => 'Dean CICT',
+                'display_name' => 'Dean',
+                'email_verified_at' => now(),
+                'password' => $password,
+                'role' => UserRole::Dean,
+                'onboarded_at' => now(),
+            ],
+        );
+
+        // SAO dev account (campus-wide authority)
+        User::updateOrCreate(
+            ['email' => 'sao@seait.edu.ph'],
+            [
+                'school_id' => $school->id,
+                'name' => 'SAO Officer',
+                'display_name' => 'SAO',
+                'email_verified_at' => now(),
+                'password' => $password,
+                'role' => UserRole::Sao,
+                'onboarded_at' => now(),
+            ],
+        );
+
         $this->command->info('Dev accounts created:');
-        $this->command->info('  Student  → test@seait.edu.ph / password');
-        $this->command->info('  Moderator → mod@seait.edu.ph / password');
-        $this->command->info('  Admin    → admin@seait.edu.ph / password');
+        $this->command->info('  Student      → test@seait.edu.ph / password');
+        $this->command->info('  Moderator    → mod@seait.edu.ph / password');
+        $this->command->info('  Program Head → admin@seait.edu.ph / password');
+        $this->command->info('  Dean         → dean.cict@seait.edu.ph / password');
+        $this->command->info('  SAO          → sao@seait.edu.ph / password');
     }
 }

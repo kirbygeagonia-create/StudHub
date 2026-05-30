@@ -189,11 +189,11 @@ it('unsuspends a user and creates an audit log entry', function () {
     expect(AuditLog::where('action', 'user.unsuspend')->where('target_id', $target->id)->exists())->toBeTrue();
 });
 
-it('refuses to suspend an admin', function () {
+it('refuses to suspend a program head', function () {
     $moderator = User::factory()->onboarded()->create(['role' => UserRole::Moderator]);
-    $admin = User::factory()->onboarded()->create(['role' => UserRole::Admin]);
+    $programHead = User::factory()->onboarded()->create(['role' => UserRole::ProgramHead]);
 
-    expect(fn () => (new SuspendUser)->handle($moderator, $admin, 7))
+    expect(fn () => (new SuspendUser)->handle($moderator, $programHead, 7))
         ->toThrow(RuntimeException::class);
 });
 
@@ -249,13 +249,13 @@ it('renders the moderation dashboard for moderators', function () {
         ->assertSee('Moderation Dashboard');
 });
 
-it('renders the admin dashboard for admins', function () {
-    $admin = User::factory()->onboarded()->create(['role' => UserRole::Admin]);
+it('renders the program head dashboard for program heads', function () {
+    $programHead = User::factory()->onboarded()->create(['role' => UserRole::ProgramHead]);
 
-    $this->actingAs($admin)
-        ->get(route('admin.dashboard'))
+    $this->actingAs($programHead)
+        ->get(route('program_head.dashboard'))
         ->assertOk()
-        ->assertSee('Admin Dashboard');
+        ->assertSee('Program Head Dashboard');
 });
 
 it('blocks students from the moderation dashboard', function () {
@@ -266,74 +266,74 @@ it('blocks students from the moderation dashboard', function () {
         ->assertForbidden();
 });
 
-it('blocks students from the admin dashboard', function () {
+it('blocks students from the program head dashboard', function () {
     $student = User::factory()->onboarded()->create(['role' => UserRole::Student]);
 
     $this->actingAs($student)
-        ->get(route('admin.dashboard'))
+        ->get(route('program_head.dashboard'))
         ->assertForbidden();
 });
 
-it('admin can assign a moderator to a program', function () {
-    $admin = User::factory()->onboarded()->create(['role' => UserRole::Admin]);
+it('program head can assign a moderator to a program', function () {
+    $programHead = User::factory()->onboarded()->create(['role' => UserRole::ProgramHead]);
     $user = User::factory()->onboarded()->create(['role' => UserRole::Student]);
     $program = $user->program;
 
-    $this->actingAs($admin)
-        ->post(route('admin.moderators.assign'), [
+    $this->actingAs($programHead)
+        ->post(route('program_head.moderators.assign'), [
             'user_id' => $user->id,
             'program_id' => $program->id,
         ])
-        ->assertRedirect(route('admin.dashboard'));
+        ->assertRedirect(route('program_head.dashboard'));
 
     expect(ProgramModerator::where('user_id', $user->id)->exists())->toBeTrue();
     expect($user->refresh()->role)->toBe(UserRole::Moderator);
 });
 
-it('admin can remove a moderator from a program', function () {
-    $admin = User::factory()->onboarded()->create(['role' => UserRole::Admin]);
+it('program head can remove a moderator from a program', function () {
+    $programHead = User::factory()->onboarded()->create(['role' => UserRole::ProgramHead]);
     $mod = User::factory()->onboarded()->create(['role' => UserRole::Moderator]);
     $program = $mod->program;
 
     $moderatorship = ProgramModerator::create([
         'user_id' => $mod->id,
         'program_id' => $program->id,
-        'assigned_by_user_id' => $admin->id,
+        'assigned_by_user_id' => $programHead->id,
     ]);
 
-    $this->actingAs($admin)
-        ->post(route('admin.moderators.remove'), [
+    $this->actingAs($programHead)
+        ->post(route('program_head.moderators.remove'), [
             'moderator_id' => $moderatorship->id,
         ])
-        ->assertRedirect(route('admin.dashboard'));
+        ->assertRedirect(route('program_head.dashboard'));
 
     expect(ProgramModerator::where('id', $moderatorship->id)->exists())->toBeFalse();
     expect($mod->refresh()->role)->toBe(UserRole::Student);
 });
 
-it('admin can suspend a user', function () {
-    $admin = User::factory()->onboarded()->create(['role' => UserRole::Admin]);
+it('program head can suspend a user', function () {
+    $programHead = User::factory()->onboarded()->create(['role' => UserRole::ProgramHead]);
     $target = User::factory()->onboarded()->create();
 
-    $this->actingAs($admin)
-        ->post(route('admin.suspend'), [
+    $this->actingAs($programHead)
+        ->post(route('program_head.suspend'), [
             'user_id' => $target->id,
             'days' => 30,
         ])
-        ->assertRedirect(route('admin.dashboard'));
+        ->assertRedirect(route('program_head.dashboard'));
 
     expect($target->refresh()->isSuspended())->toBeTrue();
 });
 
-it('admin can unsuspend a user', function () {
-    $admin = User::factory()->onboarded()->create(['role' => UserRole::Admin]);
+it('program head can unsuspend a user', function () {
+    $programHead = User::factory()->onboarded()->create(['role' => UserRole::ProgramHead]);
     $target = User::factory()->onboarded()->create(['suspended_until' => now()->addDays(30)]);
 
-    $this->actingAs($admin)
-        ->post(route('admin.unsuspend'), [
+    $this->actingAs($programHead)
+        ->post(route('program_head.unsuspend'), [
             'user_id' => $target->id,
         ])
-        ->assertRedirect(route('admin.dashboard'));
+        ->assertRedirect(route('program_head.dashboard'));
 
     expect($target->refresh()->isSuspended())->toBeFalse();
 });
@@ -408,7 +408,9 @@ it('user with expired suspension can access routes', function () {
 it('User model has correct role helper methods', function () {
     $student = User::factory()->make(['role' => UserRole::Student]);
     $moderator = User::factory()->make(['role' => UserRole::Moderator]);
-    $admin = User::factory()->make(['role' => UserRole::Admin]);
+    $programHead = User::factory()->make(['role' => UserRole::ProgramHead]);
+    $dean = User::factory()->make(['role' => UserRole::Dean]);
+    $sao = User::factory()->make(['role' => UserRole::Sao]);
 
     expect($student->isStudent())->toBeTrue();
     expect($student->isModerator())->toBeFalse();
@@ -417,8 +419,15 @@ it('User model has correct role helper methods', function () {
     expect($moderator->isModerator())->toBeTrue();
     expect($moderator->isStudent())->toBeFalse();
 
-    expect($admin->isAdmin())->toBeTrue();
-    expect($admin->isStudent())->toBeFalse();
+    expect($programHead->isProgramHead())->toBeTrue();
+    expect($programHead->isAdmin())->toBeTrue();
+    expect($programHead->isStudent())->toBeFalse();
+
+    expect($dean->isDean())->toBeTrue();
+    expect($dean->isAdmin())->toBeTrue();
+
+    expect($sao->isSao())->toBeTrue();
+    expect($sao->isAdmin())->toBeTrue();
 });
 
 it('prevents self-report via CreateReport action', function () {

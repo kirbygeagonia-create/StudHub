@@ -3,6 +3,7 @@
 namespace App\Domain\Feedback\Actions;
 
 use App\Domain\Feedback\Enums\FeedbackType;
+use App\Domain\Identity\Enums\UserRole;
 use App\Models\Feedback;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -27,12 +28,38 @@ class SubmitFeedback
 
         $type = FeedbackType::tryFrom($data['type'] ?? '') ?? FeedbackType::General;
 
-        return DB::transaction(function () use ($user, $body, $type): Feedback {
+        [$recipientRole, $collegeId, $programId] = $this->resolveRecipient($user);
+
+        return DB::transaction(function () use ($user, $body, $type, $recipientRole, $collegeId, $programId): Feedback {
             return Feedback::create([
                 'user_id' => $user->id,
                 'type' => $type->value,
                 'body' => $body,
+                'recipient_role' => $recipientRole,
+                'recipient_college_id' => $collegeId,
+                'recipient_program_id' => $programId,
+                'status' => 'open',
             ]);
         });
+    }
+
+    /**
+     * @return array{0: string, 1: int|null, 2: int|null}
+     */
+    private function resolveRecipient(User $user): array
+    {
+        return match ($user->role) {
+            // Student/Moderator → goes to their Program Head
+            UserRole::Student, UserRole::Moderator => ['program_head', $user->college_id, $user->program_id],
+
+            // Program Head → goes to their Dean
+            UserRole::ProgramHead => ['dean', $user->college_id, null],
+
+            // Dean → goes directly to SAO
+            UserRole::Dean => ['sao', null, null],
+
+            // SAO / SuperAdmin → goes to SuperAdmin (system-level)
+            default => ['super_admin', null, null],
+        };
     }
 }

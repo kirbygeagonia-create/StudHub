@@ -20,9 +20,10 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @livewireStyles
     </head>
-    <body class="font-sans antialiased text-gray-900 dark:text-gray-100">
+    <body class="font-sans antialiased text-gray-900 dark:text-gray-100 {{ auth()->user()?->panelClass() }}">
         <div class="min-h-screen">
             @auth
+                <x-role-context-banner />
                 @include('layouts.navigation')
             @else
                 {{-- Guest nav — minimal, no protected links --}}

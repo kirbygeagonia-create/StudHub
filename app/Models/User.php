@@ -190,9 +190,29 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->role === UserRole::Moderator;
     }
 
+    public function isProgramHead(): bool
+    {
+        return $this->role === UserRole::ProgramHead;
+    }
+
+    public function isDean(): bool
+    {
+        return $this->role === UserRole::Dean;
+    }
+
+    public function isSao(): bool
+    {
+        return $this->role === UserRole::Sao;
+    }
+
     public function isAdmin(): bool
     {
-        return $this->role === UserRole::Admin || $this->role === UserRole::SuperAdmin;
+        return in_array($this->role, [
+            UserRole::ProgramHead,
+            UserRole::Dean,
+            UserRole::Sao,
+            UserRole::SuperAdmin,
+        ]);
     }
 
     public function isSuperAdmin(): bool
@@ -210,6 +230,32 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->role instanceof UserRole
             ? $this->role->inheritedRoles()
             : ['student'];
+    }
+
+    /**
+     * Returns the program_id this user manages (null if they manage all).
+     */
+    public function managedProgramId(): ?int
+    {
+        return $this->role === UserRole::ProgramHead ? $this->program_id : null;
+    }
+
+    /**
+     * Returns the college_id this user manages (null if they manage all).
+     */
+    public function managedCollegeId(): ?int
+    {
+        return $this->role === UserRole::Dean ? $this->college_id : null;
+    }
+
+    /**
+     * CSS panel class for role-aware UI.
+     */
+    public function panelClass(): string
+    {
+        return $this->role instanceof UserRole
+            ? $this->role->panelClass()
+            : '';
     }
 
     public function isSuspended(): bool

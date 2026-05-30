@@ -54,22 +54,34 @@
                         <x-icon name="lends" class="w-4 h-4 mr-1.5" />
                         Lends
                     </x-nav-link>
-                    @if (Auth::user()?->isModerator() || Auth::user()?->isAdmin())
+                    @if (Auth::user()?->isModerator() || Auth::user()?->isProgramHead() || Auth::user()?->isDean() || Auth::user()?->isSao() || Auth::user()?->isSuperAdmin())
                         <x-nav-link :href="route('moderation.dashboard')" :active="request()->routeIs('moderation.*')">
                             <x-icon name="moderation" class="w-4 h-4 mr-1.5" />
                             Moderation
                         </x-nav-link>
                     @endif
-                    @if (Auth::user()?->isAdmin())
-                        <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.*')">
+                    @if (Auth::user()?->isProgramHead())
+                        <x-nav-link :href="route('program_head.dashboard')" :active="request()->routeIs('program_head.*')">
                             <x-icon name="admin" class="w-4 h-4 mr-1.5" />
-                            Admin
+                            Program Head
+                        </x-nav-link>
+                    @endif
+                    @if (Auth::user()?->isDean())
+                        <x-nav-link :href="route('dean.dashboard')" :active="request()->routeIs('dean.*')">
+                            <x-icon name="admin" class="w-4 h-4 mr-1.5" />
+                            Dean Panel
+                        </x-nav-link>
+                    @endif
+                    @if (Auth::user()?->isSao())
+                        <x-nav-link :href="route('sao.dashboard')" :active="request()->routeIs('sao.*')">
+                            <x-icon name="admin" class="w-4 h-4 mr-1.5" />
+                            SAO Panel
                         </x-nav-link>
                     @endif
                     @if (Auth::user()?->isSuperAdmin())
-                        <x-nav-link :href="route('admin.super')" :active="request()->routeIs('admin.super')">
+                        <x-nav-link :href="route('sao.dashboard')" :active="request()->routeIs('sao.*')">
                             <x-icon name="admin" class="w-4 h-4 mr-1.5" />
-                            Super Admin
+                            System
                         </x-nav-link>
                     @endif
                 </div>
@@ -200,8 +212,18 @@
                                 <x-icon name="notifications" class="w-4 h-4 mr-2 flex-shrink-0" />
                                 Notifications
                             </x-dropdown-link>
-                            @if (Auth::user()?->isAdmin())
-                                <x-dropdown-link :href="route('admin.feedback')">
+                            @if (Auth::user()?->isProgramHead())
+                                <x-dropdown-link :href="route('program_head.feedback')">
+                                    <x-icon name="feedback" class="w-4 h-4 mr-2 flex-shrink-0" />
+                                    View Feedback
+                                </x-dropdown-link>
+                            @elseif (Auth::user()?->isDean())
+                                <x-dropdown-link :href="route('dean.feedback')">
+                                    <x-icon name="feedback" class="w-4 h-4 mr-2 flex-shrink-0" />
+                                    View Feedback
+                                </x-dropdown-link>
+                            @elseif (Auth::user()?->isSao() || Auth::user()?->isSuperAdmin())
+                                <x-dropdown-link :href="route('sao.feedback')">
                                     <x-icon name="feedback" class="w-4 h-4 mr-2 flex-shrink-0" />
                                     View Feedback
                                 </x-dropdown-link>
@@ -262,14 +284,20 @@
                 <x-responsive-nav-link :href="route('leaderboard')" :active="request()->routeIs('leaderboard')">Leaderboard</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('requests.index')" :active="request()->routeIs('requests.*')">Requests</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('lends.index')" :active="request()->routeIs('lends.*')">Lends</x-responsive-nav-link>
-                @if (Auth::user()?->isModerator() || Auth::user()?->isAdmin())
+                @if (Auth::user()?->isModerator() || Auth::user()?->isProgramHead() || Auth::user()?->isDean() || Auth::user()?->isSao() || Auth::user()?->isSuperAdmin())
                     <x-responsive-nav-link :href="route('moderation.dashboard')" :active="request()->routeIs('moderation.*')">Moderation</x-responsive-nav-link>
                 @endif
-                @if (Auth::user()?->isAdmin())
-                    <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.*')">Admin</x-responsive-nav-link>
+                @if (Auth::user()?->isProgramHead())
+                    <x-responsive-nav-link :href="route('program_head.dashboard')" :active="request()->routeIs('program_head.*')">Program Head</x-responsive-nav-link>
+                @endif
+                @if (Auth::user()?->isDean())
+                    <x-responsive-nav-link :href="route('dean.dashboard')" :active="request()->routeIs('dean.*')">Dean Panel</x-responsive-nav-link>
+                @endif
+                @if (Auth::user()?->isSao())
+                    <x-responsive-nav-link :href="route('sao.dashboard')" :active="request()->routeIs('sao.*')">SAO Panel</x-responsive-nav-link>
                 @endif
                 @if (Auth::user()?->isSuperAdmin())
-                    <x-responsive-nav-link :href="route('admin.super')" :active="request()->routeIs('admin.super')">Super Admin</x-responsive-nav-link>
+                    <x-responsive-nav-link :href="route('sao.dashboard')" :active="request()->routeIs('sao.*')">System</x-responsive-nav-link>
                 @endif
             </div>
             <div class="border-t border-gray-100 dark:border-navy-700/50 px-3 py-3 space-y-1">
@@ -281,8 +309,12 @@
                 <x-responsive-nav-link :href="route('resources.shelf')">My Shelf</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('requests.index')">My Requests</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('notifications.index')">Notifications</x-responsive-nav-link>
-                @if (Auth::user()?->isAdmin())
-                    <x-responsive-nav-link :href="route('admin.feedback')">View Feedback</x-responsive-nav-link>
+                @if (Auth::user()?->isProgramHead())
+                    <x-responsive-nav-link :href="route('program_head.feedback')">View Feedback</x-responsive-nav-link>
+                @elseif (Auth::user()?->isDean())
+                    <x-responsive-nav-link :href="route('dean.feedback')">View Feedback</x-responsive-nav-link>
+                @elseif (Auth::user()?->isSao() || Auth::user()?->isSuperAdmin())
+                    <x-responsive-nav-link :href="route('sao.feedback')">View Feedback</x-responsive-nav-link>
                 @else
                     <x-responsive-nav-link :href="route('feedback.create')">Feedback</x-responsive-nav-link>
                 @endif
