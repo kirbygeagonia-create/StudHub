@@ -71,7 +71,7 @@
             <!-- Quick actions -->
             <div>
                 <h3 class="section-title mb-4">Quick Actions</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <a href="{{ route('resources.create') }}" class="card-hover group p-6 animate-fade-in" style="animation-delay: 400ms">
                         <div class="flex items-start gap-4">
                             <div class="flex-shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-seait-400 to-seait-500 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
@@ -104,6 +104,18 @@
                             <div>
                                 <h4 class="font-semibold text-gray-900 dark:text-gray-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">Chat</h4>
                                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Join your program's group chat and connect with classmates.</p>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a href="{{ route('requests.index') }}" class="card-hover group p-6 animate-fade-in" style="animation-delay: 700ms">
+                        <div class="flex items-start gap-4">
+                            <div class="flex-shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-900 dark:text-gray-100 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">Need a resource? Post a request</h4>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Describe what you need — it gets routed to programs that teach that subject.</p>
                             </div>
                         </div>
                     </a>

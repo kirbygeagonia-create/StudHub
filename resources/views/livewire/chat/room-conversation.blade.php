@@ -63,7 +63,7 @@
                                     };
                                 @endphp
                                 <a href="{{ route('chat.attachments.download', $message) }}" target="_blank" rel="noopener"
-                                   class="mt-1.5 inline-flex items-center gap-1.5 text-xs text-seait-300 hover:text-seait-200 transition-colors float-right bg-seait-500/20 hover:bg-seait-500/30 px-2 py-1 rounded-lg">
+                                   class="mt-1.5 inline-flex items-center gap-1.5 text-xs text-white/90 hover:text-white transition-colors float-right bg-white/20 hover:bg-white/30 px-2 py-1 rounded-lg">
                                     <svg class="w-3.5 h-3.5 {{ $iconColor }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $iconPath }}"/></svg>
                                     <span>{{ $message->attachment_name ?? (basename($message->attachment_url ?? '') ?: 'Attachment') }}</span>
                                     @if ($message->attachment_size)
@@ -98,9 +98,11 @@
                                         {{ $message->created_at?->diffForHumans() }}
                                     </time>
                                 </div>
+                                @if ($message->body !== '')
                                 <div class="max-w-[75%] bg-white dark:bg-navy-800 border border-gray-100 dark:border-navy-700/50 rounded-2xl rounded-tl-md px-4 py-2.5 shadow-sm text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap leading-relaxed break-words">
                                     {{ $message->body }}
                                 </div>
+                                @endif
                                 @if ($message->hasAttachment())
                                     @php
                                         $ext = strtolower(pathinfo($message->attachment_name ?? $message->attachment_url, PATHINFO_EXTENSION));
@@ -143,9 +145,11 @@
                                 <time class="text-[10px] text-gray-300 dark:text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity">{{ $message->created_at?->format('g:i') }}</time>
                             </div>
                             <div class="flex-1 min-w-0">
+                                @if ($message->body !== '')
                                 <div class="max-w-[75%] bg-white dark:bg-navy-800 border border-gray-100 dark:border-navy-700/50 rounded-2xl px-4 py-2.5 shadow-sm text-sm text-gray-800 dark:text-gray-200 whitespace-pre-wrap leading-relaxed break-words">
                                     {{ $message->body }}
                                 </div>
+                                @endif
                             </div>
                         </div>
                     @endif
@@ -206,7 +210,8 @@
              x-on:livewire-upload-start="uploading = true; progress = 0"
              x-on:livewire-upload-finish="uploading = false"
              x-on:livewire-upload-error="uploading = false; hasFile = false; fileName = ''; fileSize = 0"
-             x-on:livewire-upload-progress="progress = $event.detail.progress">
+             x-on:livewire-upload-progress="progress = $event.detail.progress"
+             wire:ignore>
             {{-- Upload progress bar --}}
             <div x-show="uploading" class="mb-2 p-3 rounded-xl bg-gray-50 dark:bg-navy-700/50 border border-gray-200 dark:border-navy-700">
                 <div class="flex items-center gap-3">
@@ -250,7 +255,7 @@
             <form wire:submit="send" class="flex items-center gap-2">
                 <label class="flex-shrink-0 cursor-pointer p-2 rounded-xl hover:bg-gray-100 dark:hover:bg-navy-700 transition-colors text-gray-400 hover:text-gray-600 border border-gray-200 dark:border-navy-700 hover:border-gray-300 dark:hover:border-navy-600" title="Attach file">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/></svg>
-                    <input type="file" wire:model="attachment" accept="image/*,application/pdf" class="hidden"
+                    <input type="file" wire:model="attachment" accept="image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,text/plain" class="hidden"
                            @change="const f = $event.target.files[0]; if (f) { fileName = f.name; fileSize = f.size; hasFile = true; }">
                 </label>
                 <div class="flex-1 relative">
@@ -295,13 +300,21 @@ function chatLog() {
                 if (btn) btn.classList.toggle('hidden', this.atBottom);
             });
 
-            // Re-scroll after every Livewire update (poll re-render)
-            Livewire.hook('morph.updated', ({ el }) => {
+            // MutationObserver: re-scroll when new messages appear
+            const observer = new MutationObserver(() => {
                 if (this.atBottom) {
                     this.$nextTick(() => {
                         log.scrollTop = log.scrollHeight;
                     });
                 }
+            });
+            observer.observe(log, { childList: true, subtree: false });
+
+            // Listen for explicit message-sent event
+            window.addEventListener('message-sent', () => {
+                this.$nextTick(() => {
+                    log.scrollTop = log.scrollHeight;
+                });
             });
         }
     }

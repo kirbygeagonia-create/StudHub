@@ -5,8 +5,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <link rel="icon" type="image/svg+xml" href="/favicon.svg" sizes="any">
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2" sizes="any">
+        <link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml">
         <meta name="theme-color" content="#FF6B35">
         <meta name="color-scheme" content="light dark">
 

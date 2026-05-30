@@ -10,7 +10,7 @@
 
     {{-- How lending works guidance --}}
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
-        <div x-data="{ showGuide: false }"
+        <div x-data="{ showGuide: {{ $incomingRequests->isNotEmpty() ? 'true' : 'false' }} }"
              class="card p-4 border-l-4 border-seait-400 bg-seait-50/40 dark:bg-seait-900/10 dark:border-seait-500">
             <button @click="showGuide = !showGuide" type="button"
                     class="flex items-center gap-2 w-full text-left">
@@ -65,8 +65,7 @@
                             @php
                                 $myOffer = $req->offers->first();
                             @endphp
-                            <a href="{{ route('requests.show', $req) }}"
-                               class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-navy-700/50 transition-colors border border-gray-100 dark:border-navy-700/50">
+                            <div class="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-navy-700/50 transition-colors border border-gray-100 dark:border-navy-700/50">
                                 <div class="w-9 h-9 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center flex-shrink-0">
                                     <svg class="w-4 h-4 text-amber-600 dark:text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                                 </div>
@@ -81,12 +80,22 @@
                                         @endif
                                     </p>
                                 </div>
-                                <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
-                                    {{ $req->status->value === 'matched' ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300' : 'bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-300' }}">
-                                    {{ $req->status->label() }}
-                                </span>
-                                <svg class="w-4 h-4 text-gray-300 dark:text-gray-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                            </a>
+                                <div class="flex items-center gap-2">
+                                    @if ($req->status->value === 'matched')
+                                        <a href="{{ route('requests.show', $req) }}"
+                                           class="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-semibold rounded-lg transition-colors shadow-sm">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                            Record Lend
+                                        </a>
+                                    @else
+                                        <a href="{{ route('requests.show', $req) }}"
+                                           class="inline-flex items-center gap-1 px-3 py-1.5 bg-seait-500 hover:bg-seait-600 text-white text-xs font-semibold rounded-lg transition-colors shadow-sm">
+                                            View Request
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
                         @endforeach
                     </div>
                 </div>

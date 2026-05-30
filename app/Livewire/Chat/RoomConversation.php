@@ -75,7 +75,7 @@ class RoomConversation extends Component
 
         $this->validate([
             'body' => ['required_without:attachment', 'nullable', 'string', 'max:4000'],
-            'attachment' => ['nullable', 'file', 'max:25600', 'mimetypes:image/jpeg,image/png,image/webp,image/gif,application/pdf'],
+            'attachment' => ['nullable', 'file', 'max:25600', 'mimetypes:image/jpeg,image/png,image/webp,image/gif,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,text/plain'],
         ]);
 
         $user = auth()->user();
@@ -99,6 +99,8 @@ class RoomConversation extends Component
         $this->attachment = null;
 
         unset($this->roomMessages);
+
+        $this->dispatch('message-sent');
     }
 
     #[On('echo-private:chat-room.{room.id},chat.message.posted')]

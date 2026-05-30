@@ -19,8 +19,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::view('/help', 'pages.help')->name('help');
-Route::view('/aup', 'pages.aup')->name('aup');
+Route::get('/help', fn() => redirect('/?open=help'))->name('help');
+Route::get('/aup', fn() => redirect('/?open=aup'))->name('aup');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/onboarding', [OnboardingController::class, 'show'])->name('onboarding.show');

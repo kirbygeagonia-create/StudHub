@@ -22,8 +22,13 @@ class ChatAttachmentController extends Controller
         if ($room->program_id !== null && $room->program_id !== $user->program_id) {
             abort(403, 'This attachment is restricted to a different program.');
         }
+        // Year-level restriction only gates entry to the chat room, not file access
+        // If the user is in the same school and program, allow download regardless of year level
         if ($room->year_level !== null && $room->year_level !== $user->year_level) {
-            abort(403, 'This attachment is restricted to a different year level.');
+            // Only block if the user doesn't share the same school+program context
+            if ($room->program_id === null || $room->program_id !== $user->program_id) {
+                abort(403, 'You no longer have access to this room\'s files.');
+            }
         }
 
         // Verify the message has an attachment

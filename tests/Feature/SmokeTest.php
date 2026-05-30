@@ -21,16 +21,14 @@ it('uses Asia/Manila as the default timezone for the SEAIT pilot', function () {
     expect(config('app.timezone'))->toBe('Asia/Manila');
 });
 
-it('renders the help page', function () {
+it('redirects /help to the welcome page with modal trigger', function () {
     $this->get('/help')
-        ->assertOk()
-        ->assertSee('Help');
+        ->assertRedirect('/?open=help');
 });
 
-it('renders the AUP page', function () {
+it('redirects /aup to the welcome page with modal trigger', function () {
     $this->get('/aup')
-        ->assertOk()
-        ->assertSee('Acceptable Use');
+        ->assertRedirect('/?open=aup');
 });
 
 it('serves the landing page with StudHub branding', function () {

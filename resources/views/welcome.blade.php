@@ -6,14 +6,23 @@
     showForgotPasswordModal: false,
     showHelpModal: false,
     showPolicyModal: false
-}" x-init="$watch('dark', v => { localStorage.setItem('dark', v); document.documentElement.classList.toggle('dark', v) }); document.documentElement.classList.toggle('dark', dark)" :class="{ 'dark': dark }">
+}" x-init="
+    $watch('dark', v => { localStorage.setItem('dark', v); document.documentElement.classList.toggle('dark', v) });
+    document.documentElement.classList.toggle('dark', dark);
+    // Handle ?open= query param for modal auto-open
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('open') === 'help') showHelpModal = true;
+    if (params.get('open') === 'aup') showPolicyModal = true;
+    if (params.get('open') === 'login') showLoginModal = true;
+    if (params.get('open') === 'register') showRegisterModal = true;
+" :class="{ 'dark': dark }">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>StudHub — SEAIT Academic Resource Exchange</title>
     <meta name="color-scheme" content="light dark">
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" sizes="any">
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2" sizes="any">
+    <link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml">
     <meta name="theme-color" content="#FF6B35">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700,800&display=swap" rel="stylesheet" />
@@ -227,13 +236,13 @@
             <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row justify-between items-center gap-4">
                 <p class="text-sm text-gray-500 dark:text-gray-400">StudHub &copy; {{ date('Y') }} &mdash; South East Asian Institute of Technology, Inc.</p>
                 <div class="flex items-center gap-4">
-                    <a href="{{ route('help') }}" class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition">Help</a>
+                    <button type="button" @click="showHelpModal = true" class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition">Help</button>
                     <span class="text-gray-300 dark:text-gray-600">&middot;</span>
                     @auth
                         <a href="{{ route('feedback.create') }}" class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition">Feedback</a>
                         <span class="text-gray-300 dark:text-gray-600">&middot;</span>
                     @endauth
-                    <a href="{{ route('aup') }}" class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition">Acceptable Use Policy</a>
+                    <button type="button" @click="showPolicyModal = true" class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition">Acceptable Use Policy</button>
                 </div>
             </div>
         </footer>
@@ -242,10 +251,10 @@
     {{-- Login Modal --}}
     <div x-show="showLoginModal"
          x-cloak
-         x-transition:enter="ease-out duration-300"
+         x-transition:enter="ease-out duration-150"
          x-transition:enter-start="opacity-0"
          x-transition:enter-end="opacity-100"
-         x-transition:leave="ease-in duration-200"
+         x-transition:leave="ease-in duration-100"
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
          class="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -301,10 +310,12 @@
                     <div>
                         <label for="login-email" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
                         <input id="login-email" type="email" name="email" value="{{ old('email') }}" required autofocus autocomplete="username" class="input-field text-sm" placeholder="you@seait.edu.ph">
+                        @error('email')<p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
                     </div>
                     <div class="mt-2.5">
                         <label for="login-password" class="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
                         <input id="login-password" type="password" name="password" required autocomplete="current-password" class="input-field text-sm" placeholder="••••••••">
+                        @error('password')<p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p>@enderror
                     </div>
                     <div class="flex items-center justify-between mt-2.5">
                         <label for="remember_me" class="inline-flex items-center cursor-pointer">
@@ -328,10 +339,10 @@
     {{-- Register Modal --}}
     <div x-show="showRegisterModal"
          x-cloak
-         x-transition:enter="ease-out duration-300"
+         x-transition:enter="ease-out duration-150"
          x-transition:enter-start="opacity-0"
          x-transition:enter-end="opacity-100"
-         x-transition:leave="ease-in duration-200"
+         x-transition:leave="ease-in duration-100"
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
          class="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -414,10 +425,10 @@
     {{-- Forgot Password Modal --}}
     <div x-show="showForgotPasswordModal"
          x-cloak
-         x-transition:enter="ease-out duration-300"
+         x-transition:enter="ease-out duration-150"
          x-transition:enter-start="opacity-0"
          x-transition:enter-end="opacity-100"
-         x-transition:leave="ease-in duration-200"
+         x-transition:leave="ease-in duration-100"
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
          class="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -481,10 +492,10 @@
     {{-- Help Modal --}}
     <div x-show="showHelpModal"
          x-cloak
-         x-transition:enter="ease-out duration-300"
+         x-transition:enter="ease-out duration-150"
          x-transition:enter-start="opacity-0"
          x-transition:enter-end="opacity-100"
-         x-transition:leave="ease-in duration-200"
+         x-transition:leave="ease-in duration-100"
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
          class="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -585,10 +596,10 @@
     {{-- Policy Modal --}}
     <div x-show="showPolicyModal"
          x-cloak
-         x-transition:enter="ease-out duration-300"
+         x-transition:enter="ease-out duration-150"
          x-transition:enter-start="opacity-0"
          x-transition:enter-end="opacity-100"
-         x-transition:leave="ease-in duration-200"
+         x-transition:leave="ease-in duration-100"
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
          class="fixed inset-0 z-50 flex items-center justify-center p-4">
