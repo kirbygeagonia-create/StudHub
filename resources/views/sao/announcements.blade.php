@@ -1,15 +1,21 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Campus Announcements') }}
-        </h2>
-    </x-slot>
+@extends('layouts.admin')
 
-    <div class="py-6">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="card p-6">
-                <p class="text-center text-gray-400 py-8">Announcement management coming soon.</p>
-            </div>
+@section('sidebar')
+    @include('sao._sidebar')
+@endsection
+
+@section('pageHeader')
+    <div class="flex items-start justify-between">
+        <div>
+            <h1 class="text-xl font-bold text-gray-900 dark:text-gray-100">
+                Campus Announcements
+            </h1>
         </div>
     </div>
-</x-app-layout>
+@endsection
+
+@section('content')
+    <div class="card p-6">
+        <p class="text-center text-gray-400 py-8">Announcement management coming soon.</p>
+    </div>
+@endsection

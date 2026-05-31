@@ -383,7 +383,7 @@
 
 .admin-layout {
     display: flex;
-    min-height: calc(100vh - 112px);
+    min-height: calc(100vh - 92px);
 }
 
 .admin-sidebar {
@@ -391,7 +391,7 @@
     flex-shrink: 0;
     position: sticky;
     top: 0;
-    height: calc(100vh - 112px);
+    height: calc(100vh - 92px);
     overflow-y: auto;
     display: flex;
     flex-direction: column;

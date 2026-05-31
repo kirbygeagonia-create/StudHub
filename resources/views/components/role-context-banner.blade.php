@@ -45,6 +45,6 @@
         <svg class="w-3.5 h-3.5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.054 0 1.502-1.275.722-1.845l-6.928-5.013c-.752-.545-1.792-.545-2.544 0L5.094 17.155c-.78.57-.332 1.845.722 1.845z"/>
         </svg>
-        <span class="font-semibold text-red-400">⚠ SYSTEM ADMINISTRATION MODE</span>
+        <span class="font-semibold text-red-400">SYSTEM ADMINISTRATION MODE</span>
     </div>
 @endif
