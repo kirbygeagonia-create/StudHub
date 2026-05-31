@@ -1,81 +1,295 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-            {{ __('Program Head Dashboard') }}
-        </h2>
-    </x-slot>
+@extends('layouts.admin')
 
-    <div class="py-6">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Stats Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <div class="stat-card">
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Open Reports <span class="text-xs opacity-60">(campus-wide)</span></p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $openReports }}</p>
-                </div>
-                <div class="stat-card">
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Moderators</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $totalModerators }}</p>
-                </div>
-                <div class="stat-card">
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Active Users</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $activeUsers }}</p>
-                </div>
-                <div class="stat-card">
-                    <p class="text-sm text-gray-500 dark:text-gray-400">Resources</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $totalResources }}</p>
-                </div>
-            </div>
+@section('sidebar')
+    <div class="sidebar-section-label">Program Head</div>
 
-            <!-- Unread Feedback Alert -->
-            @if ($unreadFeedback > 0)
-                <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-xl p-4 mb-6">
-                    <div class="flex items-center gap-3">
-                        <svg class="w-5 h-5 text-amber-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.054 0 1.502-1.275.722-1.845l-6.928-5.013c-.752-.545-1.792-.545-2.544 0L5.094 17.155c-.78.57-.332 1.845.722 1.845z"/>
-                        </svg>
-                        <div>
-                            <p class="text-sm font-semibold text-amber-700 dark:text-amber-300">{{ $unreadFeedback }} unread feedback items</p>
-                            <a href="{{ route('program_head.feedback') }}" class="text-xs text-amber-600 hover:text-amber-700 dark:text-amber-400 underline">View feedback</a>
-                        </div>
-                    </div>
-                </div>
-            @endif
+    <a href="{{ route('program_head.dashboard') }}"
+       class="sidebar-link {{ request()->routeIs('program_head.dashboard') ? 'active' : '' }}">
+        <x-icon name="home" class="w-4 h-4 flex-shrink-0" />
+        Dashboard
+    </a>
 
-            <!-- Moderators List -->
-            <div class="card p-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h3 class="section-title">Program Moderators</h3>
-                    <a href="{{ route('moderation.dashboard') }}" class="text-sm text-seait-600 hover:text-seait-700 dark:text-seait-400 font-medium">Manage Reports →</a>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm">
-                        <thead>
-                            <tr class="text-left text-gray-500 dark:text-gray-400 border-b border-gray-100 dark:border-navy-700/50">
-                                <th class="pb-2 font-medium">User</th>
-                                <th class="pb-2 font-medium">Program</th>
-                                <th class="pb-2 font-medium">Assigned</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($moderators as $mod)
-                                <tr class="border-b border-gray-50 dark:border-navy-700/30">
-                                    <td class="py-2.5">{{ $mod->user?->preferredDisplayName() ?? 'Unknown' }}</td>
-                                    <td class="py-2.5">{{ $mod->program?->code ?? 'N/A' }}</td>
-                                    <td class="py-2.5 text-gray-500">{{ $mod->created_at->diffForHumans() }}</td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="3" class="py-4 text-center text-gray-400">No moderators assigned yet.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-                <div class="mt-4">
-                    {{ $moderators->links() }}
-                </div>
-            </div>
+    <a href="{{ route('program_head.feedback') }}"
+       class="sidebar-link {{ request()->routeIs('program_head.feedback*') ? 'active' : '' }}">
+        <x-icon name="feedback" class="w-4 h-4 flex-shrink-0" />
+        Feedback
+        @if ($unreadFeedback > 0)
+            <span class="sidebar-badge {{ $unreadFeedback > 5 ? 'urgent' : '' }}">
+                {{ $unreadFeedback }}
+            </span>
+        @endif
+    </a>
+
+    <a href="{{ route('moderation.dashboard') }}"
+       class="sidebar-link {{ request()->routeIs('moderation.*') ? 'active' : '' }}">
+        <x-icon name="flag" class="w-4 h-4 flex-shrink-0" />
+        Reports
+        @if ($openReports > 0)
+            <span class="sidebar-badge urgent">{{ $openReports }}</span>
+        @endif
+    </a>
+
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-section-label">Quick Access</div>
+
+    <a href="{{ route('resources.index') }}"
+       class="sidebar-link {{ request()->routeIs('resources.*') ? 'active' : '' }}">
+        <x-icon name="resources" class="w-4 h-4 flex-shrink-0" />
+        Resources
+    </a>
+
+    <a href="{{ route('leaderboard') }}"
+       class="sidebar-link {{ request()->routeIs('leaderboard') ? 'active' : '' }}">
+        <x-icon name="leaderboard" class="w-4 h-4 flex-shrink-0" />
+        Leaderboard
+    </a>
+
+    <a href="{{ route('chat.index') }}"
+       class="sidebar-link {{ request()->routeIs('chat.*') ? 'active' : '' }}">
+        <x-icon name="chat" class="w-4 h-4 flex-shrink-0" />
+        Chat
+    </a>
+
+    <div class="sidebar-divider"></div>
+
+    <a href="{{ route('profile.show') }}"
+       class="sidebar-link {{ request()->routeIs('profile.*') ? 'active' : '' }}">
+        <x-icon name="profile" class="w-4 h-4 flex-shrink-0" />
+        Profile
+    </a>
+@endsection
+
+@section('pageHeader')
+    <div class="flex items-start justify-between">
+        <div>
+            <h1 class="text-xl font-bold text-gray-900 dark:text-gray-100">
+                Program Head Dashboard
+            </h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+                {{ auth()->user()->college?->code }}
+                — {{ auth()->user()->college?->name }}
+            </p>
         </div>
+        <span class="text-xs text-gray-400 dark:text-gray-500 mt-1">
+            {{ now()->format('l, F j') }}
+        </span>
     </div>
-</x-app-layout>
+@endsection
+
+@section('content')
+    {{-- ═══ Stat Cards ═══ --}}
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+        <x-admin-stat-card
+            label="Open Reports"
+            :value="$openReports"
+            icon="flag"
+            :tone="$openReports > 0 ? 'alert' : 'good'"
+            sub="campus-wide"
+        />
+        <x-admin-stat-card
+            label="Moderators"
+            :value="$totalModerators"
+            icon="moderation"
+            :tone="$totalModerators === 0 ? 'warning' : 'default'"
+        />
+        <x-admin-stat-card
+            label="Active Users"
+            :value="number_format($activeUsers)"
+            icon="users"
+            sub="in your college"
+        />
+        <x-admin-stat-card
+            label="Resources"
+            :value="number_format($totalResources)"
+            icon="resources"
+            sub="across all programs"
+        />
+    </div>
+
+    {{-- ═══ Unread Feedback Alert ═══ --}}
+    @if ($unreadFeedback > 0)
+        <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200
+                    dark:border-amber-800/50 rounded-xl p-4 mb-5
+                    flex items-center gap-3">
+            <svg class="w-5 h-5 text-amber-500 flex-shrink-0" fill="none"
+                 stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.054 0
+                         1.502-1.275.722-1.845l-6.928-5.013c-.752-.545
+                         -1.792-.545-2.544 0L5.094 17.155c-.78.57-.332
+                         1.845.722 1.845z"/>
+            </svg>
+            <p class="text-sm font-semibold text-amber-700 dark:text-amber-300 flex-1">
+                {{ $unreadFeedback }} unread
+                {{ Str::plural('feedback', $unreadFeedback) }}
+            </p>
+            <a href="{{ route('program_head.feedback') }}"
+               class="btn-primary !text-xs !px-3 !py-1.5 flex-shrink-0">
+                View feedback
+            </a>
+        </div>
+    @endif
+
+    {{-- ═══ Quick Actions ═══ --}}
+    <div class="grid grid-cols-4 gap-3 mb-5">
+        <a href="{{ route('program_head.feedback') }}" class="quick-action">
+            @if ($unreadFeedback > 0)
+                <span class="quick-action-badge">{{ $unreadFeedback }}</span>
+            @endif
+            <div class="quick-action-icon"><x-icon name="feedback" /></div>
+            <span>Feedback</span>
+        </a>
+        <a href="{{ route('moderation.dashboard') }}" class="quick-action">
+            @if ($openReports > 0)
+                <span class="quick-action-badge">{{ $openReports }}</span>
+            @endif
+            <div class="quick-action-icon"><x-icon name="flag" /></div>
+            <span>Reports</span>
+        </a>
+        <a href="{{ route('resources.index') }}" class="quick-action">
+            <div class="quick-action-icon"><x-icon name="resources" /></div>
+            <span>Resources</span>
+        </a>
+        <a href="{{ route('leaderboard') }}" class="quick-action">
+            <div class="quick-action-icon"><x-icon name="leaderboard" /></div>
+            <span>Leaderboard</span>
+        </a>
+    </div>
+
+    {{-- ═══ Bottom Grid: Moderators + Chart ═══ --}}
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-4">
+
+        {{-- Moderators list (3/5) --}}
+        <div class="lg:col-span-3 card">
+            <div class="p-5 border-b border-gray-100 dark:border-navy-700/50
+                        flex items-center justify-between">
+                <h3 class="section-title">Program Moderators</h3>
+                <a href="{{ route('moderation.dashboard') }}"
+                   class="text-xs font-medium text-navy-700 dark:text-navy-300
+                          hover:underline">
+                    View reports →
+                </a>
+            </div>
+
+            {{-- Inline search filter (no server request needed) --}}
+            <div class="p-3 border-b border-gray-50 dark:border-navy-700/30">
+                <input type="text"
+                       @input="
+                           const q = $event.target.value.toLowerCase();
+                           document.querySelectorAll('[data-mod-row]').forEach(
+                               r => r.style.display =
+                                   r.dataset.modRow.includes(q) ? '' : 'none'
+                           )
+                       "
+                       x-data
+                       class="input-field !text-xs !py-2"
+                       placeholder="Search moderators…">
+            </div>
+
+            @if ($moderators->isEmpty())
+                <x-empty-state
+                    icon="moderation"
+                    title="No moderators yet"
+                    description="Assign moderators to programs in your college."
+                />
+            @else
+                <div class="divide-y divide-gray-50 dark:divide-navy-700/30">
+                    @foreach ($moderators as $mod)
+                        <div class="flex items-center gap-3 px-5 py-3
+                                    hover:bg-gray-50/50 dark:hover:bg-navy-800/30
+                                    transition-colors"
+                             data-mod-row="{{ strtolower(
+                                 ($mod->user?->preferredDisplayName() ?? '') . ' ' .
+                                 ($mod->program?->code ?? '')
+                             ) }}">
+
+                            {{-- Avatar initials --}}
+                            <div class="w-7 h-7 rounded-full bg-emerald-100
+                                        dark:bg-emerald-900/30 flex items-center
+                                        justify-center flex-shrink-0">
+                                <span class="text-xs font-bold text-emerald-600
+                                             dark:text-emerald-400">
+                                    {{ strtoupper(substr(
+                                        $mod->user?->preferredDisplayName() ?? '?', 0, 1
+                                    )) }}
+                                </span>
+                            </div>
+
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-medium text-gray-900
+                                           dark:text-gray-100 truncate">
+                                    {{ $mod->user?->preferredDisplayName() ?? 'Unknown' }}
+                                </p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">
+                                    {{ $mod->program?->code }}
+                                    — {{ $mod->program?->name }}
+                                </p>
+                            </div>
+
+                            <span class="text-xs text-gray-400 flex-shrink-0">
+                                {{ $mod->created_at->diffForHumans() }}
+                            </span>
+
+                            <form method="POST"
+                                  action="{{ route('program_head.moderators.remove') }}"
+                                  onsubmit="return confirm(
+                                      'Remove {{ $mod->user?->preferredDisplayName() }}
+                                       as moderator?')">
+                                @csrf
+                                <input type="hidden"
+                                       name="moderator_id"
+                                       value="{{ $mod->id }}">
+                                <button type="submit"
+                                        class="text-xs text-red-400
+                                               hover:text-red-600 transition-colors
+                                               font-medium">
+                                    Remove
+                                </button>
+                            </form>
+                        </div>
+                    @endforeach
+                </div>
+
+                @if ($moderators->hasPages())
+                    <div class="px-5 py-3 border-t border-gray-100
+                                dark:border-navy-700/50">
+                        {{ $moderators->links() }}
+                    </div>
+                @endif
+            @endif
+        </div>
+
+        {{-- 7-day chart (2/5) --}}
+        <div class="lg:col-span-2 card p-5 flex flex-col">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="section-title">7-Day Activity</h3>
+                <span class="text-xs text-gray-400 dark:text-gray-500">
+                    Active users / day
+                </span>
+            </div>
+
+            <div class="bar-chart flex-1">
+                @php
+                    $maxBars = max(collect($chartData)->pluck('count')->max(), 1);
+                @endphp
+                @foreach ($chartData as $day)
+                    <div class="bar-chart-col">
+                        <div class="bar-chart-bar {{ $loop->last ? 'today' : '' }}"
+                             style="height: {{ max(4, ($day['count'] / $maxBars) * 100) }}%">
+                        </div>
+                        <span class="bar-chart-label">{{ $day['label'] }}</span>
+                    </div>
+                @endforeach
+            </div>
+
+            <p class="text-xs text-gray-400 mt-3 text-center">
+                Active today:
+                <strong class="text-gray-700 dark:text-gray-200">
+                    {{ $chartData[6]['count'] ?? 0 }}
+                </strong>
+            </p>
+        </div>
+
+    </div>
+@endsection

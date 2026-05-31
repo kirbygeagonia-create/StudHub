@@ -376,3 +376,314 @@
 .panel-moderator .stat-card {
     border-left: 3px solid #10B981;
 }
+
+/* ============================================
+   Admin Sidebar Layout
+   ============================================ */
+
+.admin-layout {
+    display: flex;
+    min-height: calc(100vh - 112px);
+}
+
+.admin-sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    height: calc(100vh - 112px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    padding: 1.25rem 0.75rem;
+    gap: 2px;
+    scrollbar-width: none;
+}
+
+.admin-sidebar::-webkit-scrollbar { display: none; }
+
+.admin-content {
+    flex: 1;
+    min-width: 0;
+    padding: 1.5rem 1.5rem 1.5rem 1.25rem;
+}
+
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.60);
+    transition: background 150ms, color 150ms;
+    text-decoration: none;
+    position: relative;
+}
+
+.sidebar-link:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.90);
+}
+
+.sidebar-link.active {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    font-weight: 600;
+}
+
+.sidebar-link.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 6px;
+    bottom: 6px;
+    width: 3px;
+    border-radius: 0 2px 2px 0;
+    background: #fff;
+}
+
+.sidebar-badge {
+    margin-left: auto;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.18);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+
+.sidebar-badge.urgent { background: #EF4444; }
+
+.sidebar-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255, 255, 255, 0.30);
+    padding: 0.75rem 0.75rem 0.25rem;
+}
+
+.sidebar-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.07);
+    margin: 0.5rem 0.75rem;
+}
+
+/* Sidebar background per role */
+.panel-program-head .admin-sidebar { background: #1E2D3D; }
+.panel-dean         .admin-sidebar { background: #312E81; }
+.panel-sao          .admin-sidebar { background: #1E293B; }
+
+/* ============================================
+   Enriched Admin Stat Cards
+   ============================================ */
+
+.admin-stat-card {
+    position: relative;
+    background: white;
+    border: 0.5px solid #E5E7EB;
+    border-radius: 0.75rem;
+    padding: 1rem 1.125rem;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.875rem;
+}
+
+.dark .admin-stat-card {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.07);
+}
+
+.admin-stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(
+        90deg,
+        var(--panel-accent, #FF6B35),
+        var(--panel-accent-light, #FF8C5A)
+    );
+}
+
+.admin-stat-icon {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 0.625rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 0.125rem;
+    background: color-mix(in srgb,
+        var(--panel-accent, #FF6B35) 12%, transparent);
+}
+
+.dark .admin-stat-icon {
+    background: color-mix(in srgb,
+        var(--panel-accent, #FF6B35) 18%, transparent);
+}
+
+.admin-stat-icon svg {
+    width: 1.125rem;
+    height: 1.125rem;
+    color: var(--panel-accent, #FF6B35);
+}
+
+.admin-stat-label {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #6B7280;
+    margin: 0 0 0.25rem;
+}
+
+.dark .admin-stat-label { color: #9CA3AF; }
+
+.admin-stat-value {
+    font-size: 1.625rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #111827;
+}
+
+.dark .admin-stat-value { color: #F9FAFB; }
+
+.admin-stat-value.alert   { color: #DC2626; }
+.admin-stat-value.warning { color: #D97706; }
+.admin-stat-value.good    { color: #059669; }
+
+.dark .admin-stat-value.alert   { color: #F87171; }
+.dark .admin-stat-value.warning { color: #FBBF24; }
+.dark .admin-stat-value.good    { color: #34D399; }
+
+.admin-stat-sub {
+    font-size: 0.6875rem;
+    color: #9CA3AF;
+    margin-top: 0.25rem;
+}
+
+/* ============================================
+   Quick Action Cards
+   ============================================ */
+
+.quick-action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.875rem 0.75rem;
+    border-radius: 0.75rem;
+    border: 0.5px solid #E5E7EB;
+    background: white;
+    text-decoration: none;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #374151;
+    transition: all 150ms;
+    position: relative;
+    text-align: center;
+    cursor: pointer;
+}
+
+.dark .quick-action {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.07);
+    color: #D1D5DB;
+}
+
+.quick-action:hover {
+    border-color: var(--panel-accent, #FF6B35);
+    box-shadow: 0 0 0 2px color-mix(in srgb,
+        var(--panel-accent, #FF6B35) 15%, transparent);
+}
+
+.quick-action-icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.5rem;
+    background: color-mix(in srgb,
+        var(--panel-accent, #FF6B35) 10%, transparent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dark .quick-action-icon {
+    background: color-mix(in srgb,
+        var(--panel-accent, #FF6B35) 18%, transparent);
+}
+
+.quick-action-icon svg {
+    width: 1rem;
+    height: 1rem;
+    color: var(--panel-accent, #FF6B35);
+}
+
+.quick-action-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 8px;
+    background: #EF4444;
+    color: white;
+    font-size: 9px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ============================================
+   Inline Bar Chart (pure CSS, no JS library)
+   ============================================ */
+
+.bar-chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 52px;
+}
+
+.bar-chart-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    height: 100%;
+    justify-content: flex-end;
+}
+
+.bar-chart-bar {
+    width: 100%;
+    border-radius: 2px 2px 0 0;
+    background: color-mix(in srgb,
+        var(--panel-accent, #FF6B35) 45%, transparent);
+    min-height: 2px;
+}
+
+.bar-chart-bar.today {
+    background: var(--panel-accent, #FF6B35);
+}
+
+.bar-chart-label {
+    font-size: 9px;
+    color: #9CA3AF;
+    white-space: nowrap;
+}

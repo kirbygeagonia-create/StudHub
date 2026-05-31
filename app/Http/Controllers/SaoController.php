@@ -45,6 +45,17 @@ class SaoController extends Controller
             ->orderBy('name')
             ->get(['id', 'code', 'name']);
 
+        $chartData = collect(range(6, 0))->map(function (int $daysAgo) use ($user): array {
+            $date = now()->subDays($daysAgo);
+
+            return [
+                'label' => $date->format('D'),
+                'count' => User::where('school_id', $user->school_id)
+                    ->whereDate('last_seen_at', $date->toDateString())
+                    ->count(),
+            ];
+        })->values()->all();
+
         return view('sao.dashboard', [
             'totalUsers' => $totalUsers,
             'totalStudents' => $totalStudents,
@@ -54,6 +65,7 @@ class SaoController extends Controller
             'openReports' => $openReports,
             'unreadFeedback' => $unreadFeedback,
             'colleges' => $colleges,
+            'chartData' => $chartData,
         ]);
     }
 

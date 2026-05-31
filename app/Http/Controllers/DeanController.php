@@ -46,6 +46,17 @@ class DeanController extends Controller
 
         $college = College::find($collegeId);
 
+        $chartData = collect(range(6, 0))->map(function (int $daysAgo) use ($programIds): array {
+            $date = now()->subDays($daysAgo);
+
+            return [
+                'label' => $date->format('D'),
+                'count' => User::whereIn('program_id', $programIds)
+                    ->whereDate('last_seen_at', $date->toDateString())
+                    ->count(),
+            ];
+        })->values()->all();
+
         return view('dean.dashboard', [
             'college' => $college,
             'programs' => $programs,
@@ -54,6 +65,7 @@ class DeanController extends Controller
             'totalProgramHeads' => $totalProgramHeads,
             'unreadFeedback' => $unreadFeedback,
             'openReports' => $openReports,
+            'chartData' => $chartData,
         ]);
     }
 
