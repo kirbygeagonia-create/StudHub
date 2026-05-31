@@ -31,7 +31,7 @@ it('UserRole enum has correct labels', function () {
 
 it('UserRole enum has correct panel classes', function () {
     expect(UserRole::Student->panelClass())->toBe('');
-    expect(UserRole::Moderator->panelClass())->toBe('');
+    expect(UserRole::Moderator->panelClass())->toBe('panel-moderator');
     expect(UserRole::ProgramHead->panelClass())->toBe('panel-program-head');
     expect(UserRole::Dean->panelClass())->toBe('panel-dean');
     expect(UserRole::Sao->panelClass())->toBe('panel-sao');

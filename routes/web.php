@@ -114,6 +114,8 @@ Route::middleware(['auth', 'verified', 'onboarded', 'not_suspended'])->group(fun
 
 Route::middleware(['auth', 'verified', 'onboarded', 'role:moderator,program_head,dean,sao,super_admin'])->group(function () {
     Route::get('/moderation', [ModerationController::class, 'dashboard'])->name('moderation.dashboard');
+    Route::get('/moderation/users/search', [ModerationController::class, 'userSearch'])
+        ->name('moderation.users.search');
     Route::post('/moderation/reports/{report}/resolve', [ModerationController::class, 'resolve'])
         ->middleware('throttle:20,1')
         ->name('moderation.resolve');

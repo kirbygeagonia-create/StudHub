@@ -160,7 +160,11 @@
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(90deg, #FF6B35, #FF8C5A);
+    background: linear-gradient(
+        90deg,
+        var(--panel-accent, #FF6B35),
+        var(--panel-accent-light, #FF8C5A)
+    );
     border-radius: 3px 3px 0 0;
   }
 
@@ -345,4 +349,30 @@
 }
 .panel-super .btn-primary {
     background: linear-gradient(135deg, #374151, #1F2937);
+}
+
+/* Moderator — emerald / trusted reviewer */
+.panel-moderator {
+    --panel-accent:       #059669;
+    --panel-accent-light: #10B981;
+    --panel-accent-hover: #047857;
+    --panel-badge-bg:     #ECFDF5;
+    --panel-badge-text:   #065F46;
+}
+
+.panel-moderator .btn-primary {
+    background: linear-gradient(135deg, #059669, #047857);
+}
+
+.panel-moderator .btn-primary:hover {
+    background: linear-gradient(135deg, #047857, #065F46);
+}
+
+.dark .panel-moderator .btn-primary {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15),
+                0 0 15px rgba(5, 150, 105, 0.08);
+}
+
+.panel-moderator .stat-card {
+    border-left: 3px solid #10B981;
 }

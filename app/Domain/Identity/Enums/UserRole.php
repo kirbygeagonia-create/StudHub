@@ -51,7 +51,8 @@ enum UserRole: string
     public function panelClass(): string
     {
         return match ($this) {
-            self::Student, self::Moderator => '',
+            self::Student => '',
+            self::Moderator => 'panel-moderator',
             self::ProgramHead => 'panel-program-head',
             self::Dean => 'panel-dean',
             self::Sao => 'panel-sao',
