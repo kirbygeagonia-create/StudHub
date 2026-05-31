@@ -10,7 +10,8 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Drivers\Imagick\Driver;
+use Intervention\Image\Drivers\Gd\Driver as GdDriver;
+use Intervention\Image\Drivers\Imagick\Driver as ImagickDriver;
 use Intervention\Image\ImageManager;
 
 class WatermarkResourceFile implements ShouldQueue
@@ -158,10 +159,11 @@ class WatermarkResourceFile implements ShouldQueue
         $thumbDir = $this->ensureThumbDir();
         $thumbPath = $thumbDir . '/' . $resource->id . '.png';
 
-        try {
-            $manager = new ImageManager(
-                new Driver
-            );
+try {
+            $driver = extension_loaded('imagick')
+                ? new ImagickDriver
+                : new GdDriver;
+            $manager = new ImageManager($driver);
 
             $image = $manager->read($originalPath);
 
