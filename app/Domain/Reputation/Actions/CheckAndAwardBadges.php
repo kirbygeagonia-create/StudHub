@@ -122,7 +122,7 @@ class CheckAndAwardBadges
                     ->where('offers.offerer_user_id', $user->id)
                     ->where('offers.status', 'accepted')
                     ->where('resource_requests.urgency', 'urgent')
-                    ->whereRaw('TIMESTAMPDIFF(HOUR, resource_requests.created_at, offers.updated_at) <= 2')
+                    ->whereRaw("offers.updated_at <= datetime(resource_requests.created_at, '+2 hours')")
                     ->exists(),
 
             Badge::BridgeBuilder =>
@@ -203,7 +203,7 @@ class CheckAndAwardBadges
                     })
                     ->where('reply.sender_id', $user->id)
                     ->where('prev.sender_id', '!=', $user->id)
-                    ->whereRaw('TIMESTAMPDIFF(SECOND, prev.created_at, reply.created_at) <= 60')
+                    ->whereRaw("reply.created_at <= datetime(prev.created_at, '+60 seconds')")
                     ->whereRaw('prev.id = (
                         SELECT MAX(id) FROM chat_messages
                         WHERE chat_room_id = reply.chat_room_id AND id < reply.id
@@ -234,7 +234,8 @@ class CheckAndAwardBadges
                 // Uploaded any resource between midnight and 4 AM (by created_at hour)
                 DB::table('learning_resources')
                     ->where('owner_user_id', $user->id)
-                    ->whereRaw('HOUR(created_at) BETWEEN 0 AND 3')
+                    ->whereTime('created_at', '>=', '00:00:00')
+                    ->whereTime('created_at', '<=', '03:59:59')
                     ->exists(),
 
             Badge::Crammer =>
@@ -244,7 +245,7 @@ class CheckAndAwardBadges
                     ->whereRaw('(
                         SELECT COUNT(*) FROM learning_resources r2
                         WHERE r2.owner_user_id = r1.owner_user_id
-                          AND r2.created_at BETWEEN r1.created_at AND DATE_ADD(r1.created_at, INTERVAL 24 HOUR)
+                          AND r2.created_at BETWEEN r1.created_at AND datetime(r1.created_at, \'+24 hours\')
                     ) >= 3')
                     ->exists(),
 
@@ -257,7 +258,7 @@ class CheckAndAwardBadges
                             ->whereRaw('ke2.created_at > ke1.created_at');
                     })
                     ->where('ke1.user_id', $user->id)
-                    ->whereRaw('DATEDIFF(ke2.created_at, ke1.created_at) >= 30')
+                    ->whereRaw("ke2.created_at >= datetime(ke1.created_at, '+30 days')")
                     ->where('ke2.created_at', '>=', now()->subDays(30))
                     ->exists(),
 
@@ -362,12 +363,19 @@ class CheckAndAwardBadges
      */
     private function activeWeeksInLast(User $user, int $weeks): int
     {
-        return (int) DB::table('karma_events')
+        $dates = DB::table('karma_events')
             ->where('user_id', $user->id)
             ->where('created_at', '>=', now()->subWeeks($weeks))
-            ->selectRaw('YEARWEEK(created_at, 1) as yw')
-            ->distinct()
-            ->count();
+            ->pluck('created_at');
+
+        $weeksWithActivity = [];
+        foreach ($dates as $date) {
+            $carbonDate = $date instanceof Carbon ? $date : Carbon::parse($date);
+            $isoWeek = $carbonDate->isoWeekYear() . '-W' . str_pad($carbonDate->isoWeek(), 2, '0', STR_PAD_LEFT);
+            $weeksWithActivity[$isoWeek] = true;
+        }
+
+        return count($weeksWithActivity);
     }
 
     /**

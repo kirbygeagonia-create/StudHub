@@ -14,6 +14,7 @@ return [
 
     'school_name' => env('STUDHUB_SCHOOL_NAME', 'South East Asian Institute of Technology, Inc.'),
     'school_short' => env('STUDHUB_SCHOOL_SHORT', 'SEAIT'),
+    'school_code' => env('STUDHUB_SCHOOL_CODE', 'SEAIT'),
 
     /*
     |--------------------------------------------------------------------------

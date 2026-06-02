@@ -49,6 +49,11 @@ class SendDailyDigest implements ShouldQueue
             ->pluck('count', 'program_id');
 
         foreach ($users as $user) {
+            $prefs = $user->notification_preferences ?? [];
+            if (($prefs['digest_enabled'] ?? true) === false) {
+                continue;
+            }
+
             $programId = $user->program_id;
             $requestCount = (int) ($requestCounts[$programId] ?? 0);
             $chatActivity = (int) ($chatActivityByProgram[$programId] ?? 0);

@@ -2,6 +2,7 @@
 
 namespace App\Domain\Requests\Jobs;
 
+use App\Domain\Chat\Support\StudHubBot;
 use App\Models\Program;
 use App\Models\ResourceRequest;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -36,10 +37,12 @@ class CrossPostRequest implements ShouldQueue
         $subjectName = $request->subject?->name ?? 'Unknown subject';
         $requesterName = $request->requester?->preferredDisplayName() ?? 'Someone';
 
+        $bot = StudHubBot::user();
+
         $chatRoom->messages()->create([
-            'sender_id' => $request->requester_user_id,
+            'sender_id' => $bot->id,
             'body' => sprintf(
-                'Routed request: %s needs a **%s** for *%s*. [Open request →](%s)',
+                '🔔 **Routed request**: %s needs a **%s** for *%s*. [Open request →](%s)',
                 $requesterName,
                 str_replace('_', ' ', $request->type_wanted),
                 $subjectName,

@@ -182,6 +182,8 @@ class ModerationController extends Controller
         );
         abort_if($query->isEmpty(), 422);
 
+        abort_if($user->program_id === null, 422, 'You must be assigned to a program to search users.');
+
         $users = User::where('program_id', $user->program_id)
             ->where('role', UserRole::Student)
             ->where(function ($q) use ($query): void {

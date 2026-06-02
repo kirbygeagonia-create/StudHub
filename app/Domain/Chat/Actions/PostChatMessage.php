@@ -66,6 +66,12 @@ class PostChatMessage
                 $message->mentions()->sync($mentionedUsers->pluck('id')->all());
             }
 
+            // Increment unread count for all other room members
+            $affected = DB::table('chat_room_memberships')
+                ->where('chat_room_id', $room->id)
+                ->where('user_id', '!=', $sender->id)
+                ->update(['unread_count' => DB::raw('unread_count + 1')]);
+
             return $message->load(['sender.program', 'mentions']);
         });
 

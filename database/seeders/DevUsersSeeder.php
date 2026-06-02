@@ -33,12 +33,11 @@ class DevUsersSeeder extends Seeder
                 'display_name' => 'Test',
                 'email_verified_at' => now(),
                 'password' => $password,
-                'role' => UserRole::Student,
                 'year_level' => 2,
                 'onboarded_at' => now(),
                 'karma' => 50,
-            ],
-        );
+            ]
+        )->forceFill(['role' => UserRole::Student->value])->save();
 
         User::updateOrCreate(
             ['email' => 'mod@seait.edu.ph'],
@@ -50,12 +49,11 @@ class DevUsersSeeder extends Seeder
                 'display_name' => 'Moderator',
                 'email_verified_at' => now(),
                 'password' => $password,
-                'role' => UserRole::Moderator,
                 'year_level' => 3,
                 'onboarded_at' => now(),
                 'karma' => 120,
-            ],
-        );
+            ]
+        )->forceFill(['role' => UserRole::Moderator->value])->save();
 
         $cbgg = College::where('code', 'CBGG')->where('school_id', $school->id)->firstOrFail();
 
@@ -70,11 +68,10 @@ class DevUsersSeeder extends Seeder
                 'display_name' => 'Program Head',
                 'email_verified_at' => now(),
                 'password' => $password,
-                'role' => UserRole::ProgramHead,
                 'onboarded_at' => now(),
                 'karma' => 200,
-            ],
-        );
+            ]
+        )->forceFill(['role' => UserRole::ProgramHead->value])->save();
 
         // Dean dev account (CICT college)
         User::updateOrCreate(
@@ -86,10 +83,9 @@ class DevUsersSeeder extends Seeder
                 'display_name' => 'Dean',
                 'email_verified_at' => now(),
                 'password' => $password,
-                'role' => UserRole::Dean,
                 'onboarded_at' => now(),
-            ],
-        );
+            ]
+        )->forceFill(['role' => UserRole::Dean->value])->save();
 
         // SAO dev account (campus-wide authority)
         User::updateOrCreate(
@@ -100,10 +96,9 @@ class DevUsersSeeder extends Seeder
                 'display_name' => 'SAO',
                 'email_verified_at' => now(),
                 'password' => $password,
-                'role' => UserRole::Sao,
                 'onboarded_at' => now(),
-            ],
-        );
+            ]
+        )->forceFill(['role' => UserRole::Sao->value])->save();
 
         $this->command->info('Dev accounts created:');
         $this->command->info('  Student      → test@seait.edu.ph / password');

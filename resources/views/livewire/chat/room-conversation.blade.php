@@ -14,9 +14,20 @@
             $messages = $this->roomMessages;
         @endphp
 
+        @if ($this->hasMoreMessages)
+            <div class="flex justify-center py-4">
+                <button wire:click="loadMore"
+                        class="px-4 py-2 text-xs font-medium text-seait-600 bg-seait-50 hover:bg-seait-100 dark:text-seait-400 dark:bg-seait-900/20 dark:hover:bg-seait-900/30 rounded-full transition-colors border border-seait-200 dark:border-seait-800/40">
+                    <svg class="w-3.5 h-3.5 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+                    Load older messages
+                </button>
+            </div>
+        @endif
+
         @forelse ($messages as $index => $message)
             @php
                 $isOwn      = $message->sender_id === Auth::id();
+                $isSystem   = $message->is_system ?? false;
                 $isAdmin    = $message->sender?->isAdmin();
                 $isMod      = $message->sender?->isModerator();
                 $prev       = $messages[$index - 1] ?? null;
@@ -30,7 +41,15 @@
                      wire:key="message-{{ $message->id }}"
                      class="{{ $showHeader ? 'mt-4 first:mt-0' : 'mt-0.5' }} group">
 
-                @if ($isOwn)
+                @if ($isSystem)
+                    {{-- System message (StudHub Bot) --}}
+                    <div class="flex justify-center my-2">
+                        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 dark:bg-navy-800/50 border border-gray-200 dark:border-navy-700/30 text-xs text-gray-500 dark:text-gray-400 italic max-w-[85%]">
+                            <svg class="w-3.5 h-3.5 flex-shrink-0 text-seait-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span>{!! nl2br(e($message->body)) !!}</span>
+                        </div>
+                    </div>
+                @elseif ($isOwn)
                     {{-- ===== OWN MESSAGE (right-aligned) ===== --}}
                     @if ($showHeader)
                         <div class="flex flex-col items-end mb-1">

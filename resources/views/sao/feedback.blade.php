@@ -26,6 +26,13 @@
                             <span class="badge {{ $feedback->status === 'open' ? 'badge-amber' : ($feedback->status === 'resolved' ? 'badge-emerald' : 'badge-seait') }}">
                                 {{ $feedback->status }}
                             </span>
+                            @if ($feedback->recipient_role === 'super_admin')
+                                <span class="badge badge-purple ml-1">System</span>
+                            @endif
+                        </div>
+                            <span class="badge {{ $feedback->status === 'open' ? 'badge-amber' : ($feedback->status === 'resolved' ? 'badge-emerald' : 'badge-seait') }}">
+                                {{ $feedback->status }}
+                            </span>
                         </div>
                         <p class="text-sm text-gray-600 dark:text-gray-300">{{ $feedback->body }}</p>
                         @if ($feedback->status === 'open')
@@ -38,7 +45,7 @@
                 </div>
             </div>
         @empty
-            <p class="text-center text-gray-400 py-8">No escalated feedback yet.</p>
+            <p class="text-center text-gray-400 py-8">No feedback yet.</p>
         @endforelse
         <div class="mt-4">
             {{ $feedbacks->links() }}

@@ -36,6 +36,9 @@ class DownloadResourceFile
             throw new NotFoundHttpException('The file no longer exists on the server.');
         }
 
+        // Track download count
+        $resource->increment('download_count');
+
         $extension = pathinfo($resource->file_url, PATHINFO_EXTENSION);
         $safeTitle = preg_replace('/[^a-zA-Z0-9_-]/', '_', $resource->title);
         $downloadName = $safeTitle . '_' . $resource->id . '.' . $extension;

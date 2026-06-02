@@ -9,25 +9,13 @@ Broadcast::channel('App.Models.User.{id}', function (User $user, int $id) {
 });
 
 Broadcast::channel('chat-room.{roomId}', function (User $user, int $roomId): array|bool {
-    if ($user->isSuspended()) {
-        return false;
-    }
-
     $room = ChatRoom::find($roomId);
 
     if (! $room) {
         return false;
     }
 
-    if (! $user->hasCompletedOnboarding()) {
-        return false;
-    }
-
-    if ($room->program_id !== null && $user->program_id !== $room->program_id) {
-        return false;
-    }
-
-    if ($room->year_level !== null && $user->year_level !== $room->year_level) {
+    if (! $user->can('view', $room)) {
         return false;
     }
 

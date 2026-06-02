@@ -86,7 +86,15 @@ class DeanController extends Controller
             ->latest()
             ->paginate(25);
 
-        return view('dean.feedback', ['feedbacks' => $feedbacks]);
+        $openReports = Report::where('status', ReportStatus::Open->value)
+            ->where('school_id', $user->school_id)
+            ->count();
+
+        return view('dean.feedback', [
+            'feedbacks' => $feedbacks,
+            'unreadFeedback' => 0,
+            'openReports' => $openReports,
+        ]);
     }
 
     public function resolveFeedback(HttpRequest $httpRequest, Feedback $feedback): RedirectResponse
@@ -155,9 +163,20 @@ class DeanController extends Controller
             ->where('college_id', $user->college_id)
             ->get(['id', 'name', 'display_name', 'program_id']);
 
+        $unreadFeedback = Feedback::where('recipient_role', 'dean')
+            ->where('recipient_college_id', $user->college_id)
+            ->whereNull('read_at')
+            ->count();
+
+        $openReports = Report::where('status', ReportStatus::Open->value)
+            ->where('school_id', $user->school_id)
+            ->count();
+
         return view('dean.programs', [
             'programs' => $programs,
             'programHeads' => $programHeads,
+            'unreadFeedback' => $unreadFeedback,
+            'openReports' => $openReports,
         ]);
     }
 
@@ -184,12 +203,12 @@ class DeanController extends Controller
         }
 
         DB::transaction(function () use ($targetUser, $program): void {
-            $targetUser->update([
+            $targetUser->forceFill([
                 'role' => UserRole::ProgramHead,
                 'college_id' => $program->college_id,
                 'program_id' => null,
                 'year_level' => null,
-            ]);
+            ])->save();
         });
 
         $logAudit->handle($user, 'program_head.assign', 'User', $targetUser->id, [

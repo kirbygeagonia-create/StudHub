@@ -176,7 +176,7 @@ it('enforces the 3-notifications-per-day cap per user', function () {
     Bus::assertDispatched(NotifyRoutedUsers::class);
 });
 
-it('routing is idempotent — running twice does not double routes', function () {
+it('running routing twice creates double the route records (non-idempotent)', function () {
     $requester = User::factory()->onboarded()->create();
     /** @var Subject $subject */
     $subject = Subject::where('code', 'IT 211')->firstOrFail();

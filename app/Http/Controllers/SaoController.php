@@ -32,7 +32,7 @@ class SaoController extends Controller
             ->where('school_id', $user->school_id)->count();
         $openReports = Report::where('status', ReportStatus::Open->value)
             ->where('school_id', $user->school_id)->count();
-        $unreadFeedback = Feedback::where('recipient_role', 'sao')
+        $unreadFeedback = Feedback::whereIn('recipient_role', ['sao', 'super_admin'])
             ->whereNull('read_at')
             ->count();
 
@@ -74,17 +74,25 @@ class SaoController extends Controller
         $user = $httpRequest->user();
         abort_unless($user !== null, 403);
 
-        // Mark all unread SAO feedback as read
-        Feedback::where('recipient_role', 'sao')
+        // Mark all unread SAO + SuperAdmin feedback as read
+        Feedback::whereIn('recipient_role', ['sao', 'super_admin'])
             ->whereNull('read_at')
             ->update(['read_at' => now()]);
 
         $feedbacks = Feedback::with('user:id,display_name,name,email,program_id')
-            ->where('recipient_role', 'sao')
+            ->whereIn('recipient_role', ['sao', 'super_admin'])
             ->latest()
             ->paginate(25);
 
-        return view('sao.feedback', ['feedbacks' => $feedbacks]);
+        $openReports = Report::where('status', ReportStatus::Open->value)
+            ->where('school_id', $user->school_id)
+            ->count();
+
+        return view('sao.feedback', [
+            'feedbacks' => $feedbacks,
+            'unreadFeedback' => 0,
+            'openReports' => $openReports,
+        ]);
     }
 
     public function resolveFeedback(HttpRequest $httpRequest, Feedback $feedback): RedirectResponse
@@ -131,9 +139,19 @@ class SaoController extends Controller
         $users = $query->orderBy('name')->paginate(25);
         $colleges = College::where('school_id', $user->school_id)->get(['id', 'code', 'name']);
 
+        $unreadFeedback = Feedback::whereIn('recipient_role', ['sao', 'super_admin'])
+            ->whereNull('read_at')
+            ->count();
+
+        $openReports = Report::where('status', ReportStatus::Open->value)
+            ->where('school_id', $user->school_id)
+            ->count();
+
         return view('sao.users', [
             'users' => $users,
             'colleges' => $colleges,
+            'unreadFeedback' => $unreadFeedback,
+            'openReports' => $openReports,
         ]);
     }
 
@@ -194,7 +212,7 @@ class SaoController extends Controller
         }
 
         DB::transaction(function () use ($target, $updateData): void {
-            $target->update($updateData);
+            $target->forceFill($updateData)->save();
         });
 
         $logAudit->handle($user, 'user.role.assign', 'User', $target->id, [
@@ -211,6 +229,17 @@ class SaoController extends Controller
         $user = $httpRequest->user();
         abort_unless($user !== null, 403);
 
-        return view('sao.announcements');
+        $unreadFeedback = Feedback::whereIn('recipient_role', ['sao', 'super_admin'])
+            ->whereNull('read_at')
+            ->count();
+
+        $openReports = Report::where('status', ReportStatus::Open->value)
+            ->where('school_id', $user->school_id)
+            ->count();
+
+        return view('sao.announcements', [
+            'unreadFeedback' => $unreadFeedback,
+            'openReports' => $openReports,
+        ]);
     }
 }

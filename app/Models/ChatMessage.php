@@ -18,11 +18,11 @@ class ChatMessage extends Model
         'chat_room_id',
         'sender_id',
         'body',
+        'is_system',
         'attachment_url',
         'attachment_mime',
         'attachment_size',
         'attachment_name',
-        'pinned_at',
         'reply_to_message_id',
         'is_helpful',
         'marked_helpful_by_user_id',
@@ -34,9 +34,9 @@ class ChatMessage extends Model
     protected function casts(): array
     {
         return [
-            'pinned_at' => 'datetime',
             'attachment_size' => 'integer',
             'is_helpful' => 'boolean',
+            'is_system' => 'boolean',
         ];
     }
 

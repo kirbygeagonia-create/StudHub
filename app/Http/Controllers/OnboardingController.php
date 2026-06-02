@@ -19,10 +19,11 @@ class OnboardingController extends Controller
             return redirect()->route('dashboard');
         }
 
-        $school = School::where('code', 'SEAIT')->first();
+        $schoolCode = config('studhub.school_code', 'SEAIT');
+        $school = School::where('code', $schoolCode)->firstOrFail();
 
         $programs = Program::query()
-            ->when($school, fn ($q) => $q->where('school_id', $school->id))
+            ->where('school_id', $school->id)
             ->where('is_active', true)
             ->with('college')
             ->orderBy('code')

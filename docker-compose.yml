@@ -12,7 +12,8 @@
 #   - redis    Redis 7
 #   - mailpit  Local mail catcher (SMTP on 1025, web UI on 8025)
 #
-# We do NOT containerize Reverb yet; it lands in Week 3.
+# Reverb runs natively (not containerized) for local dev — it connects to
+# the host's Redis and the app container's MySQL.
 
 services:
   app:

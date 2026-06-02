@@ -5,8 +5,11 @@ namespace App\Livewire\Chat;
 use App\Domain\Chat\Actions\PostChatMessage;
 use App\Models\ChatMessage;
 use App\Models\ChatRoom;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
+use InvalidArgumentException;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Validate;
@@ -20,6 +23,11 @@ class RoomConversation extends Component
     use WithFileUploads;
 
     public ChatRoom $room;
+
+    /** @var Collection<int, ChatMessage> */
+    public Collection $broadcastMessages;
+
+    public int $messagePage = 1;
 
     #[Validate('required_without:attachment|string|max:4000')]
     public string $body = '';
@@ -35,23 +43,22 @@ class RoomConversation extends Component
             throw new AccessDeniedHttpException('You must be logged in to view this chat room.');
         }
 
-        if ($user->isSuspended()) {
-            throw new AccessDeniedHttpException('Your account is currently suspended.');
-        }
-
-        if ($room->school_id !== $user->school_id) {
-            throw new AccessDeniedHttpException('You cannot view this chat room.');
-        }
-
-        if ($room->program_id !== null && $room->program_id !== $user->program_id) {
-            throw new AccessDeniedHttpException('You cannot view this chat room.');
-        }
-
-        if ($room->year_level !== null && $room->year_level !== $user->year_level) {
+        if (! $user->can('view', $room)) {
             throw new AccessDeniedHttpException('You cannot view this chat room.');
         }
 
         $this->room = $room;
+        $this->broadcastMessages = collect();
+
+        // Track membership — upsert so it's safe on repeat visits
+        $user = auth()->user();
+        $user->chatRooms()->syncWithoutDetaching([
+            $room->id => [
+                'joined_at' => now(),
+                'last_read_at' => now(),
+                'unread_count' => 0,
+            ],
+        ]);
     }
 
     /**
@@ -60,11 +67,36 @@ class RoomConversation extends Component
     #[Computed]
     public function roomMessages(): Collection
     {
-        return $this->room->messages()
+        $persisted = $this->room->messages()
             ->with('sender.program')
-            ->orderBy('created_at', 'asc')
-            ->limit(50)
-            ->get();
+            ->orderBy('created_at', 'desc')
+            ->take($this->messagePage * 50)
+            ->get()
+            ->reverse();
+
+        // Merge broadcast messages that arrived after the last fetch
+        $allMessages = $persisted->merge($this->broadcastMessages)
+            ->unique('id')
+            ->sortBy('created_at')
+            ->values();
+
+        return $allMessages;
+    }
+
+    #[Computed]
+    public function hasMoreMessages(): bool
+    {
+        $totalMessages = $this->room->messages()->count();
+
+        return $totalMessages > ($this->messagePage * 50);
+    }
+
+    public function loadMore(): void
+    {
+        $this->messagePage++;
+        unset($this->roomMessages);
+        // Clear broadcast messages when loading more to avoid duplicates
+        $this->broadcastMessages = collect();
     }
 
     public function send(PostChatMessage $action): void
@@ -73,7 +105,7 @@ class RoomConversation extends Component
 
         $this->validate([
             'body' => ['required_without:attachment', 'nullable', 'string', 'max:4000'],
-            'attachment' => ['nullable', 'file', 'max:25600', 'mimetypes:image/jpeg,image/png,image/webp,image/gif,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,text/plain'],
+            'attachment' => ['nullable', 'file', 'max:25600', 'mimetypes:image/jpeg,image/png,image/webp,image/gif,application/pdf'],
         ]);
 
         $user = auth()->user();
@@ -91,20 +123,48 @@ class RoomConversation extends Component
             ];
         }
 
-        $action->handle($this->room, $user, $this->body, $attachmentPayload);
+        try {
+            $action->handle($this->room, $user, $this->body, $attachmentPayload);
+        } catch (InvalidArgumentException $e) {
+            session()->flash('error', $e->getMessage());
+
+            return;
+        }
 
         $this->body = '';
         $this->attachment = null;
 
-        unset($this->roomMessages);
+        // Clear broadcast messages since we'll get the broadcast event
+        $this->broadcastMessages = collect();
 
         $this->dispatch('message-sent');
     }
 
+    /** @param array<string, mixed> $payload */
     #[On('echo-private:chat-room.{room.id},chat.message.posted')]
-    public function onMessageBroadcast(): void
+    public function onMessageBroadcast(array $payload): void
     {
-        unset($this->roomMessages);
+        // Only append if we're at the bottom (latest messages)
+        // Create a lightweight message-like object from the payload
+        $message = new ChatMessage;
+        $message->id = $payload['id'];
+        $message->chat_room_id = $payload['chat_room_id'];
+        $message->body = $payload['body'] ?? '';
+        $message->attachment_url = $payload['attachment_url'] ?? null;
+        $message->attachment_mime = $payload['attachment_mime'] ?? null;
+        $message->created_at = isset($payload['created_at']) ? Carbon::parse($payload['created_at']) : now();
+        $message->sender_id = $payload['sender']['id'] ?? null;
+        $message->is_system = $payload['is_system'] ?? false;
+
+        // Set up sender relationship manually
+        if (isset($payload['sender'])) {
+            $sender = new User;
+            $sender->id = $payload['sender']['id'];
+            $sender->display_name = $payload['sender']['display_name'];
+            $message->setRelation('sender', $sender);
+        }
+
+        $this->broadcastMessages->push($message);
     }
 
     public function render(): View

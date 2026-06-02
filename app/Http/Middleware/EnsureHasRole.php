@@ -30,7 +30,23 @@ class EnsureHasRole
             ? $user->role->value
             : (string) $user->role;
 
-        if (! in_array($roleValue, $roles, true)) {
+        // Check if user's role is in the inherited roles of any required role
+        $hasRole = false;
+        foreach ($roles as $requiredRole) {
+            $requiredEnum = UserRole::tryFrom($requiredRole);
+            if ($requiredEnum !== null) {
+                $inherited = $requiredEnum->inheritedRoles();
+                if (in_array($roleValue, $inherited, true)) {
+                    $hasRole = true;
+                    break;
+                }
+            } elseif ($roleValue === $requiredRole) {
+                $hasRole = true;
+                break;
+            }
+        }
+
+        if (! $hasRole) {
             if ($request->expectsJson()) {
                 abort(403, 'Insufficient role.');
             }

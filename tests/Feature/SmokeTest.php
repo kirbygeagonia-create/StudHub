@@ -57,8 +57,8 @@ it('rate limits excessive POST requests', function () {
     }
 
     $i = 0;
-    while ($i < 6) {
-        $this->actingAs($user)
+    while ($i < 11) {
+        $response = $this->actingAs($user)
             ->post('/requests', [
                 'subject_id' => $subject->id,
                 'type_wanted' => 'reviewer',
@@ -67,14 +67,11 @@ it('rate limits excessive POST requests', function () {
         $i++;
     }
 
-    $this->actingAs($user)
-        ->post('/requests', [
-            'subject_id' => $subject->id,
-            'type_wanted' => 'reviewer',
-            'urgency' => 'normal',
-        ])
-        ->assertStatus(429);
-})->skip('Throttle middleware returns 302 redirect in test environment — rate limiting verified at route level via throttle middleware declarations.');
+    // After exceeding the throttle limit (10 per minute), the next request
+    // should be throttled. Laravel's throttle middleware returns a redirect
+    // in test environment rather than a 429 status.
+    $response->assertStatus(429);
+})->group('throttle');
 
 it('returns 200 from the up healthcheck endpoint', function () {
     $this->get('/up')->assertOk();

@@ -26,6 +26,9 @@ class ChatController extends Controller
                             ->where('year_level', $user->year_level);
                     });
             })
+            ->with(['members' => function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            }])
             ->orderBy('kind')
             ->orderBy('year_level')
             ->get();
@@ -35,27 +38,15 @@ class ChatController extends Controller
 
     public function show(Request $request, ChatRoom $room): View
     {
-        $this->authorizeRoom($request, $room);
+        $user = $request->user();
+        abort_unless($user !== null, 403);
+
+        if (! $user->can('view', $room)) {
+            throw new AccessDeniedHttpException('You cannot view this chat room.');
+        }
 
         return view('chat.show', [
             'room' => $room->load('program.college'),
         ]);
-    }
-
-    private function authorizeRoom(Request $request, ChatRoom $room): void
-    {
-        $user = $request->user();
-
-        if ($user === null || $room->school_id !== $user->school_id) {
-            throw new AccessDeniedHttpException('You cannot view this chat room.');
-        }
-
-        if ($room->program_id !== null && $room->program_id !== $user->program_id) {
-            throw new AccessDeniedHttpException('You cannot view this chat room.');
-        }
-
-        if ($room->year_level !== null && $room->year_level !== $user->year_level) {
-            throw new AccessDeniedHttpException('You cannot view this chat room.');
-        }
     }
 }

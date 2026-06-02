@@ -43,6 +43,7 @@ class LearningResource extends Model
         'save_count',
         'lend_count',
         'helpful_count',
+        'download_count',
         'published_at',
     ];
 
@@ -61,6 +62,7 @@ class LearningResource extends Model
             'save_count' => 'integer',
             'lend_count' => 'integer',
             'helpful_count' => 'integer',
+            'download_count' => 'integer',
             'is_watermarked' => 'boolean',
             'published_at' => 'datetime',
         ];

@@ -48,8 +48,7 @@ class SearchGlobal
                 $q->where('school_id', $user->school_id);
             })
             ->where(function ($q) use ($query) {
-                $q->where('title', 'like', '%' . $query . '%')
-                    ->orWhere('description', 'like', '%' . $query . '%');
+                $q->where('description', 'like', '%' . $query . '%');
             })
             ->orderByDesc('created_at')
             ->limit($limit)

@@ -40,6 +40,9 @@ class RouteRequest
 
     private const GLOBAL_USER_CAP = 25;
 
+    /** @var array<int, float> */
+    private array $fulfillmentCache = [];
+
     public function handle(ResourceRequest $request): void
     {
         $subject = $request->subject;
@@ -62,6 +65,11 @@ class RouteRequest
 
         $scoredPrograms = collect();
 
+        // Pre-compute the total resource count to avoid multiple queries
+        $totalResourceCount = LearningResource::where('subject_id', $subject->id)
+            ->where('availability', '!=', 'archived')
+            ->count();
+
         foreach ($programs as $program) {
             $firstSubject = $program->subjects->first();
             /** @var Pivot|null $pivot */
@@ -72,7 +80,7 @@ class RouteRequest
             $typicalYear = $pivot?->typical_year_level ?? 1;
 
             $score = self::W_EDGE * $edgeWeight
-                + self::W_RESOURCE * $this->normalizedResourceCount($program, $subject)
+                + self::W_RESOURCE * $this->normalizedResourceCount($program, $subject, $totalResourceCount)
                 + self::W_HISTORY * $this->historicalFulfillmentRate($program, $subject)
                 + self::W_PROXIMITY * $this->yearProximityBonus($typicalYear, $requester->year_level)
                 + self::W_URGENCY * $this->urgencyMultiplier(
@@ -180,13 +188,9 @@ class RouteRequest
         }
     }
 
-    private function normalizedResourceCount(Program $program, Subject $subject): float
+    private function normalizedResourceCount(Program $program, Subject $subject, int $totalCount): float
     {
-        $max = LearningResource::where('subject_id', $subject->id)
-            ->where('availability', '!=', 'archived')
-            ->count();
-
-        if ($max === 0) {
+        if ($totalCount === 0) {
             return 0.0;
         }
 
@@ -195,17 +199,15 @@ class RouteRequest
             ->where('availability', '!=', 'archived')
             ->count();
 
-        return $max > 0 ? $programCount / $max : 0.0;
+        return $programCount / $totalCount;
     }
 
     private function historicalFulfillmentRate(Program $program, Subject $subject): float
     {
-        static $cache = [];
-
         $programId = $program->id;
 
-        if (array_key_exists($programId, $cache)) {
-            return $cache[$programId];
+        if (array_key_exists($programId, $this->fulfillmentCache)) {
+            return $this->fulfillmentCache[$programId];
         }
 
         $totalRouted = DB::table('request_routes')
@@ -213,7 +215,7 @@ class RouteRequest
             ->count();
 
         if ($totalRouted === 0) {
-            return $cache[$programId] = 0.0;
+            return $this->fulfillmentCache[$programId] = 0.0;
         }
 
         $fulfilled = DB::table('request_routes')
@@ -227,7 +229,7 @@ class RouteRequest
             ->distinct('request_routes.request_id')
             ->count('request_routes.request_id');
 
-        return $cache[$programId] = $fulfilled / $totalRouted;
+        return $this->fulfillmentCache[$programId] = $fulfilled / $totalRouted;
     }
 
     private function yearProximityBonus(int $typicalYear, ?int $requesterYearLevel): float

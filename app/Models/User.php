@@ -33,7 +33,6 @@ class User extends Authenticatable implements MustVerifyEmail
         'avatar_url',
         'email',
         'password',
-        'role',
         'karma',
         'last_seen_at',
         'onboarded_at',
@@ -98,7 +97,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function chatRooms(): BelongsToMany
     {
         return $this->belongsToMany(ChatRoom::class, 'chat_room_memberships')
-            ->withPivot(['joined_at', 'last_read_at', 'is_muted'])
+            ->withPivot(['joined_at', 'last_read_at', 'is_muted', 'unread_count'])
             ->withTimestamps();
     }
 

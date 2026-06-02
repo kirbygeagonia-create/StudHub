@@ -23,6 +23,7 @@ class ChatMessageFactory extends Factory
             'chat_room_id' => ChatRoom::factory(),
             'sender_id' => User::factory(),
             'body' => fake()->sentence(),
+            'is_system' => false,
         ];
     }
 }

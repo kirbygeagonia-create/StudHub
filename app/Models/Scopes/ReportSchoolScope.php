@@ -23,8 +23,6 @@ class ReportSchoolScope implements Scope
             return;
         }
 
-        $builder->whereHas('reporter', function (Builder $query) use ($user): void {
-            $query->where('school_id', $user->school_id);
-        });
+        $builder->where('school_id', $user->school_id);
     }
 }

@@ -43,17 +43,19 @@ class RegisteredUserController extends Controller
             'student_number' => ['nullable', 'string', 'max:20'],
         ]);
 
-        $school = School::where('code', 'SEAIT')->first();
+        $schoolCode = config('studhub.school_code', 'SEAIT');
+        $school = School::where('code', $schoolCode)->firstOrFail();
 
         $user = User::create([
-            'school_id' => $school?->id,
+            'school_id' => $school->id,
             'name' => $validated['name'],
             'email' => $validated['email'],
             'email_verified_at' => now(),
             'password' => Hash::make($validated['password']),
-            'role' => UserRole::Student->value,
             'student_number' => $validated['student_number'] ?? null,
         ]);
+
+        $user->forceFill(['role' => UserRole::Student->value])->save();
 
         event(new Registered($user));
 

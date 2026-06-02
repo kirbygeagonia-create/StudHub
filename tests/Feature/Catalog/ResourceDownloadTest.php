@@ -84,6 +84,32 @@ it('redirects unauthenticated users from download route', function () {
         ->assertRedirect(route('login'));
 });
 
+it('increments download_count when a resource is downloaded', function () {
+    $user = User::factory()->onboarded()->create();
+    $subject = Subject::where('code', 'IT 211')->firstOrFail();
+    Storage::fake('public');
+
+    $file = UploadedFile::fake()->create('reviewer.pdf', 200, 'application/pdf');
+    $resource = (new CreateResource)->handle($user, [
+        'subject_id' => $subject->id,
+        'type' => ResourceType::Reviewer->value,
+        'title' => 'DSA reviewer',
+    ], $file);
+
+    // Refresh the resource to get the current download_count value
+    $resource = $resource->fresh();
+    expect($resource->download_count)->toBe(0);
+
+    // Download the resource
+    $this->actingAs($user)
+        ->get(route('resources.download', $resource))
+        ->assertOk();
+
+    // Refresh the resource and check if download count was incremented
+    $resource = $resource->fresh();
+    expect($resource->download_count)->toBe(1);
+});
+
 it('increments save_count when a resource is saved via the route', function () {
     $user = User::factory()->onboarded()->create();
     $subject = Subject::where('code', 'IT 211')->firstOrFail();

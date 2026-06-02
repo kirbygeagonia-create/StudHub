@@ -37,6 +37,11 @@
                                     <span class="text-[10px] font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 dark:bg-navy-700 dark:text-gray-400 uppercase tracking-wide">
                                         {{ $room->kind->label() }}
                                     </span>
+                                    @if ($room->members->isNotEmpty() && $room->members->first()->pivot->unread_count > 0)
+                                        <span class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 text-[10px] font-bold text-white bg-red-500 rounded-full">
+                                            {{ $room->members->first()->pivot->unread_count }}
+                                        </span>
+                                    @endif
                                 </div>
                                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">{{ $room->title }}</p>
                             </div>

@@ -8,12 +8,12 @@ use App\Domain\Catalog\Actions\ToggleShelfItem;
 use App\Domain\Catalog\Enums\ResourceType;
 use App\Models\LearningResource;
 use App\Models\Program;
+use App\Models\ResourceHelpfulVote;
 use App\Models\Subject;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Session;
 use Illuminate\View\View;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -175,16 +175,22 @@ class ResourceController extends Controller
             throw new NotFoundHttpException;
         }
 
-        $key = 'helpful-vote-' . $resource->id . '-' . $user->id;
-        if (Session::has($key)) {
+        $alreadyVoted = ResourceHelpfulVote::where('resource_id', $resource->id)
+            ->where('user_id', $user->id)
+            ->exists();
+
+        if ($alreadyVoted) {
             session()->flash('status', 'You already marked this as helpful!');
 
             return redirect()->back();
         }
 
-        DB::transaction(function () use ($resource, $key): void {
+        DB::transaction(function () use ($resource, $user): void {
+            ResourceHelpfulVote::create([
+                'resource_id' => $resource->id,
+                'user_id' => $user->id,
+            ]);
             $resource->increment('helpful_count');
-            Session::put($key, true);
         });
 
         session()->flash('status', 'Marked as helpful!');
