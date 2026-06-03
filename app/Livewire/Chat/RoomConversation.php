@@ -27,7 +27,9 @@ class RoomConversation extends Component
     /** @var Collection<int, ChatMessage> */
     public Collection $broadcastMessages;
 
-    public int $messagePage = 1;
+    public ?int $oldestMessageId = null;
+
+    public int $messagePage = 0;
 
     #[Validate('required_without:attachment|string|max:4000')]
     public string $body = '';

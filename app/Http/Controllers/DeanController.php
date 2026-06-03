@@ -4,11 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Domain\Identity\Enums\UserRole;
 use App\Domain\Moderation\Actions\LogAudit;
-use App\Domain\Moderation\Enums\ReportStatus;
 use App\Models\College;
 use App\Models\Feedback;
 use App\Models\Program;
-use App\Models\Report;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request as HttpRequest;
@@ -36,14 +34,6 @@ class DeanController extends Controller
         $totalProgramHeads = User::where('role', UserRole::ProgramHead->value)
             ->where('college_id', $collegeId)
             ->count();
-        $unreadFeedback = Feedback::where('recipient_role', 'dean')
-            ->where('recipient_college_id', $collegeId)
-            ->whereNull('read_at')
-            ->count();
-        $openReports = Report::where('status', ReportStatus::Open->value)
-            ->where('school_id', $user->school_id)
-            ->count();
-
         $college = College::find($collegeId);
 
         $chartData = collect(range(6, 0))->map(function (int $daysAgo) use ($programIds): array {
@@ -63,8 +53,6 @@ class DeanController extends Controller
             'totalStudents' => $totalStudents,
             'totalModerators' => $totalModerators,
             'totalProgramHeads' => $totalProgramHeads,
-            'unreadFeedback' => $unreadFeedback,
-            'openReports' => $openReports,
             'chartData' => $chartData,
         ]);
     }
@@ -86,14 +74,9 @@ class DeanController extends Controller
             ->latest()
             ->paginate(25);
 
-        $openReports = Report::where('status', ReportStatus::Open->value)
-            ->where('school_id', $user->school_id)
-            ->count();
-
         return view('dean.feedback', [
             'feedbacks' => $feedbacks,
             'unreadFeedback' => 0,
-            'openReports' => $openReports,
         ]);
     }
 
@@ -163,20 +146,9 @@ class DeanController extends Controller
             ->where('college_id', $user->college_id)
             ->get(['id', 'name', 'display_name', 'program_id']);
 
-        $unreadFeedback = Feedback::where('recipient_role', 'dean')
-            ->where('recipient_college_id', $user->college_id)
-            ->whereNull('read_at')
-            ->count();
-
-        $openReports = Report::where('status', ReportStatus::Open->value)
-            ->where('school_id', $user->school_id)
-            ->count();
-
         return view('dean.programs', [
             'programs' => $programs,
             'programHeads' => $programHeads,
-            'unreadFeedback' => $unreadFeedback,
-            'openReports' => $openReports,
         ]);
     }
 

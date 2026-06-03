@@ -3,10 +3,10 @@
         <div class="flex items-center justify-between">
             <div>
                 <h2 class="text-2xl font-bold text-gray-900 tracking-tight dark:text-gray-100">
-                    Welcome back, {{ explode(' ', Auth::user()?->preferredDisplayName() ?? '')[0] }}
+                    Welcome back, {{ explode(' ', $user->preferredDisplayName() ?? '')[0] }}
                 </h2>
                 <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                    {{ Auth::user()?->program?->code ?? '' }}{{ Auth::user()?->year_level ? ' · Year ' . Auth::user()->year_level : '' }}
+                    {{ $user->program?->code ?? '' }}{{ $user->year_level ? ' · Year ' . $user->year_level : '' }}
                 </p>
             </div>
         </div>
@@ -25,7 +25,7 @@
                         </div>
                         <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">Karma</span>
                     </div>
-                    <p class="text-3xl font-bold text-gray-900 dark:text-gray-100">{{ number_format(Auth::user()?->karma ?? 0) }}</p>
+                    <p class="text-3xl font-bold text-gray-900 dark:text-gray-100">{{ number_format($karma) }}</p>
                     <p class="text-xs text-gray-400 mt-1 dark:text-gray-500">points earned</p>
                 </div>
 
@@ -36,7 +36,7 @@
                         </div>
                         <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">Badge</span>
                     </div>
-                    @php $badge = \App\Domain\Reputation\Enums\BadgeTier::fromKarmaOrNull(Auth::user()?->karma ?? 0); @endphp
+                    @php $badge = \App\Domain\Reputation\Enums\BadgeTier::fromKarmaOrNull($karma); @endphp
                     <p class="text-xl font-bold {{ $badge ? 'text-amber-600 dark:text-amber-400' : 'text-gray-400' }}">
                         {{ $badge?->label() ?? '—' }}
                     </p>
@@ -50,8 +50,8 @@
                         </div>
                         <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">Program</span>
                     </div>
-                    <p class="text-xl font-bold text-gray-900 dark:text-gray-100">{{ Auth::user()?->program?->code ?? '—' }}</p>
-                    <p class="text-xs text-gray-400 mt-1 dark:text-gray-500">{{ Auth::user()?->program?->college?->code ?? '' }}</p>
+                    <p class="text-xl font-bold text-gray-900 dark:text-gray-100">{{ $user->program?->code ?? '—' }}</p>
+                    <p class="text-xs text-gray-400 mt-1 dark:text-gray-500">{{ $user->program?->college?->code ?? '' }}</p>
                 </div>
 
                 <div class="stat-card animate-fade-in" style="animation-delay: 300ms">
@@ -61,9 +61,9 @@
                         </div>
                         <span class="text-xs font-semibold text-gray-500 uppercase tracking-wider dark:text-gray-400">Year Level</span>
                     </div>
-                    <p class="text-3xl font-bold text-gray-900 dark:text-gray-100">{{ Auth::user()?->year_level ?? '—' }}</p>
+                    <p class="text-3xl font-bold text-gray-900 dark:text-gray-100">{{ $user->year_level ?? '—' }}</p>
                     <p class="text-xs text-gray-400 mt-1 dark:text-gray-500">
-                        {{ Auth::user()?->year_level ? (match(Auth::user()->year_level) { 1 => '1st', 2 => '2nd', 3 => '3rd', default => Auth::user()->year_level . 'th' }) . ' Year' : '' }}
+                        {{ $user->year_level ? (match($user->year_level) { 1 => '1st', 2 => '2nd', 3 => '3rd', default => $user->year_level . 'th' }) . ' Year' : '' }}
                     </p>
                 </div>
             </div>

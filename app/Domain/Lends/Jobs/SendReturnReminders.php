@@ -12,6 +12,12 @@ class SendReturnReminders implements ShouldQueue
 {
     use Queueable;
 
+    public int $tries = 1;
+
+    public int $backoff = 60;
+
+    public int $timeout = 120;
+
     public function handle(): void
     {
         $dueWindow = (int) config('lends.reminder_days_before', 2);

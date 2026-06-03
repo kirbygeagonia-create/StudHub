@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Domain\Lends\Enums\LendCondition;
+use App\Domain\Lends\Notifications\LendEscalated;
 use Database\Factories\LendFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -128,6 +129,10 @@ class Lend extends Model
         if ($this->needsEscalation()) {
             $this->escalated_at = now();
             $this->save();
+
+            if ($this->toUser !== null) {
+                $this->toUser->notify(new LendEscalated($this));
+            }
         }
     }
 

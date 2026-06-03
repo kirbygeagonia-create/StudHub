@@ -5,12 +5,10 @@ namespace App\Http\Controllers;
 use App\Domain\Identity\Enums\UserRole;
 use App\Domain\Moderation\Actions\LogAudit;
 use App\Domain\Moderation\Actions\SuspendUser;
-use App\Domain\Moderation\Enums\ReportStatus;
 use App\Models\Feedback;
 use App\Models\LearningResource;
 use App\Models\Program;
 use App\Models\ProgramModerator;
-use App\Models\Report;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request as HttpRequest;
@@ -28,10 +26,6 @@ class ProgramHeadController extends Controller
 
         // All programs under this college (for resource counts etc.)
         $programIds = Program::where('college_id', $collegeId)->pluck('id');
-
-        $openReports = Report::where('status', ReportStatus::Open->value)
-            ->where('school_id', $user->school_id)
-            ->count();
 
         $totalModerators = User::where('role', UserRole::Moderator->value)
             ->where('college_id', $collegeId)
@@ -54,11 +48,6 @@ class ProgramHeadController extends Controller
             ->latest()
             ->paginate(50);
 
-        $unreadFeedback = Feedback::where('recipient_role', 'program_head')
-            ->where('recipient_college_id', $collegeId)
-            ->whereNull('read_at')
-            ->count();
-
         // 7-day active-user bar chart for this college
         $chartData = collect(range(6, 0))->map(function (int $daysAgo) use ($collegeId): array {
             $date = now()->subDays($daysAgo);
@@ -72,12 +61,10 @@ class ProgramHeadController extends Controller
         })->values()->all();
 
         return view('program-head.dashboard', [
-            'openReports' => $openReports,
             'totalModerators' => $totalModerators,
             'activeUsers' => $activeUsers,
             'totalResources' => $totalResources,
             'moderators' => $moderators,
-            'unreadFeedback' => $unreadFeedback,
             'chartData' => $chartData,
         ]);
     }

@@ -17,6 +17,12 @@ class SendDailyDigest implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public int $tries = 1;
+
+    public int $backoff = 60;
+
+    public int $timeout = 120;
+
     public function handle(): void
     {
         $programsWithRoutes = RequestRoute::query()

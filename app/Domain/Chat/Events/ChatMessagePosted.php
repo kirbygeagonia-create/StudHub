@@ -46,6 +46,7 @@ class ChatMessagePosted implements ShouldBroadcastNow
             'body' => $this->message->body,
             'attachment_url' => $this->message->attachment_url,
             'attachment_mime' => $this->message->attachment_mime,
+            'is_system' => $this->message->is_system,
             'created_at' => $this->message->created_at?->toIso8601String(),
             'sender' => [
                 'id' => $sender?->id,

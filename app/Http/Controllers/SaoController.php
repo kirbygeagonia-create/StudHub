@@ -4,10 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Domain\Identity\Enums\UserRole;
 use App\Domain\Moderation\Actions\LogAudit;
-use App\Domain\Moderation\Enums\ReportStatus;
 use App\Models\College;
 use App\Models\Feedback;
-use App\Models\Report;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request as HttpRequest;
@@ -30,12 +28,6 @@ class SaoController extends Controller
             ->where('school_id', $user->school_id)->count();
         $totalDeans = User::where('role', UserRole::Dean->value)
             ->where('school_id', $user->school_id)->count();
-        $openReports = Report::where('status', ReportStatus::Open->value)
-            ->where('school_id', $user->school_id)->count();
-        $unreadFeedback = Feedback::whereIn('recipient_role', ['sao', 'super_admin'])
-            ->whereNull('read_at')
-            ->count();
-
         $colleges = College::withCount([
             'programs as program_count',
             'users as active_user_count' => function ($q): void {
@@ -62,8 +54,6 @@ class SaoController extends Controller
             'totalModerators' => $totalModerators,
             'totalProgramHeads' => $totalProgramHeads,
             'totalDeans' => $totalDeans,
-            'openReports' => $openReports,
-            'unreadFeedback' => $unreadFeedback,
             'colleges' => $colleges,
             'chartData' => $chartData,
         ]);
@@ -84,14 +74,9 @@ class SaoController extends Controller
             ->latest()
             ->paginate(25);
 
-        $openReports = Report::where('status', ReportStatus::Open->value)
-            ->where('school_id', $user->school_id)
-            ->count();
-
         return view('sao.feedback', [
             'feedbacks' => $feedbacks,
             'unreadFeedback' => 0,
-            'openReports' => $openReports,
         ]);
     }
 
@@ -139,19 +124,9 @@ class SaoController extends Controller
         $users = $query->orderBy('name')->paginate(25);
         $colleges = College::where('school_id', $user->school_id)->get(['id', 'code', 'name']);
 
-        $unreadFeedback = Feedback::whereIn('recipient_role', ['sao', 'super_admin'])
-            ->whereNull('read_at')
-            ->count();
-
-        $openReports = Report::where('status', ReportStatus::Open->value)
-            ->where('school_id', $user->school_id)
-            ->count();
-
         return view('sao.users', [
             'users' => $users,
             'colleges' => $colleges,
-            'unreadFeedback' => $unreadFeedback,
-            'openReports' => $openReports,
         ]);
     }
 
@@ -229,17 +204,6 @@ class SaoController extends Controller
         $user = $httpRequest->user();
         abort_unless($user !== null, 403);
 
-        $unreadFeedback = Feedback::whereIn('recipient_role', ['sao', 'super_admin'])
-            ->whereNull('read_at')
-            ->count();
-
-        $openReports = Report::where('status', ReportStatus::Open->value)
-            ->where('school_id', $user->school_id)
-            ->count();
-
-        return view('sao.announcements', [
-            'unreadFeedback' => $unreadFeedback,
-            'openReports' => $openReports,
-        ]);
+        return view('sao.announcements');
     }
 }

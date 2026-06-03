@@ -4,6 +4,7 @@ namespace App\Domain\Catalog\Jobs;
 
 use App\Models\LearningResource;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -15,9 +16,15 @@ use Intervention\Image\Drivers\Gd\Driver as GdDriver;
 use Intervention\Image\Drivers\Imagick\Driver as ImagickDriver;
 use Intervention\Image\ImageManager;
 
-class WatermarkResourceFile implements ShouldQueue
+class WatermarkResourceFile implements ShouldBeUnique, ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    public int $tries = 2;
+
+    public int $backoff = 30;
+
+    public int $timeout = 60;
 
     public function __construct(public readonly int $resourceId) {}
 
@@ -241,8 +248,22 @@ class WatermarkResourceFile implements ShouldQueue
 
         $configured = config('services.ghostscript.path', 'gs');
 
-        if ($configured && $configured !== 'gs') {
-            return $binary = $configured;
+        // Allowlist of valid Ghostscript binary paths
+        $allowed = ['gs', 'gswin64c', 'gswin32c', '/usr/bin/gs', '/usr/local/bin/gs', '/opt/homebrew/bin/gs'];
+
+        if ($configured !== 'gs' && ! in_array($configured, $allowed, true)) {
+            Log::warning('Ghostscript binary path not in allowlist, falling back to PATH detection', [
+                'configured' => $configured,
+            ]);
+            // Fall through to PATH detection
+        } elseif ($configured && $configured !== 'gs') {
+            // Config path is in allowlist — verify it exists
+            $output = [];
+            $exitCode = 0;
+            exec(escapeshellcmd($configured) . ' --version 2>&1', $output, $exitCode);
+            if ($exitCode === 0) {
+                return $binary = $configured;
+            }
         }
 
         $candidates = [
@@ -301,5 +322,10 @@ class WatermarkResourceFile implements ShouldQueue
   ' . $titleSvg . '
   <text x="100" y="' . ($y + 2) . '" font-family="sans-serif" font-size="7" fill="#adb5bd" text-anchor="middle">' . $pages . ' page' . ($pages > 1 ? 's' : '') . '</text>
 </svg>';
+    }
+
+    public function uniqueId(): string
+    {
+        return (string) $this->resourceId;
     }
 }
