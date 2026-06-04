@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Domain\Identity\Enums\UserRole;
 use App\Domain\Moderation\Enums\ReportStatus;
 use App\Models\ChatMessage;
 use App\Models\Feedback;
@@ -53,7 +54,7 @@ class AppServiceProvider extends ServiceProvider
                 return;
             }
 
-            $role = $user->role instanceof \App\Domain\Identity\Enums\UserRole ? $user->role->value : null;
+            $role = $user->role instanceof UserRole ? $user->role->value : null;
 
             // Open reports — same scope for all admin roles
             $openReports = Report::where('status', ReportStatus::Open->value)

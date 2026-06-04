@@ -2,6 +2,7 @@
 
 namespace App\Domain\Requests\Jobs;
 
+use App\Domain\Requests\Enums\RequestUrgency;
 use App\Domain\Requests\Notifications\RequestRoutedNotification;
 use App\Models\ResourceRequest;
 use App\Models\User;
@@ -41,7 +42,7 @@ class NotifyRoutedUsers implements ShouldQueue
 
             // Respect only_urgent preference
             $urgency = $request->urgency;
-            if (($prefs['only_urgent'] ?? false) && $urgency instanceof \App\Domain\Requests\Enums\RequestUrgency && $urgency->value !== 'urgent') {
+            if (($prefs['only_urgent'] ?? false) && $urgency instanceof RequestUrgency && $urgency->value !== 'urgent') {
                 continue;
             }
 
