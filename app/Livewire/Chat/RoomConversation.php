@@ -18,6 +18,10 @@ use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
+/**
+ * @property-read Collection<int, ChatMessage> $roomMessages
+ * @property-read bool $hasMoreMessages
+ */
 class RoomConversation extends Component
 {
     use WithFileUploads;
@@ -28,8 +32,6 @@ class RoomConversation extends Component
     public Collection $broadcastMessages;
 
     public ?int $oldestMessageId = null;
-
-    public int $messagePage = 0;
 
     #[Validate('required_without:attachment|string|max:4000')]
     public string $body = '';
@@ -69,12 +71,15 @@ class RoomConversation extends Component
     #[Computed]
     public function roomMessages(): Collection
     {
-        $persisted = $this->room->messages()
+        $query = $this->room->messages()
             ->with('sender.program')
-            ->orderBy('created_at', 'desc')
-            ->take($this->messagePage * 50)
-            ->get()
-            ->reverse();
+            ->orderBy('created_at', 'desc');
+
+        if ($this->oldestMessageId !== null) {
+            $query->where('id', '<', $this->oldestMessageId);
+        }
+
+        $persisted = $query->limit(50)->get()->reverse();
 
         // Merge broadcast messages that arrived after the last fetch
         $allMessages = $persisted->merge($this->broadcastMessages)
@@ -88,14 +93,24 @@ class RoomConversation extends Component
     #[Computed]
     public function hasMoreMessages(): bool
     {
-        $totalMessages = $this->room->messages()->count();
+        $messages = $this->roomMessages;
+        if ($messages->isEmpty()) {
+            return false;
+        }
 
-        return $totalMessages > ($this->messagePage * 50);
+        $oldestLoadedId = $messages->first()->id;
+
+        return $this->room->messages()
+            ->where('id', '<', $oldestLoadedId)
+            ->exists();
     }
 
     public function loadMore(): void
     {
-        $this->messagePage++;
+        $messages = $this->roomMessages;
+        if ($messages->isNotEmpty()) {
+            $this->oldestMessageId = $messages->first()->id;
+        }
         unset($this->roomMessages);
         // Clear broadcast messages when loading more to avoid duplicates
         $this->broadcastMessages = collect();

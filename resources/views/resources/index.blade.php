@@ -124,9 +124,18 @@
                                     };
                                 @endphp
                                 <div class="card card-hover p-5 flex items-start gap-4" data-testid="resource-item">
-                                    <!-- Type Icon -->
-                                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-seait-100 to-seait-200 dark:from-seait-900/30 dark:to-seait-800/20 flex items-center justify-center flex-shrink-0">
-                                        {!! $typeIcon !!}
+                                    <!-- Thumbnail or Type Icon -->
+                                    <div class="w-12 h-12 rounded-xl flex-shrink-0 overflow-hidden">
+                                        @if ($resource->thumbnail_url)
+                                            <img src="{{ Storage::disk('public')->url($resource->thumbnail_url) }}"
+                                                 alt="{{ $resource->title }}"
+                                                 class="w-full h-full object-cover rounded-xl"
+                                                 loading="lazy">
+                                        @else
+                                            <div class="w-full h-full bg-gradient-to-br from-seait-100 to-seait-200 dark:from-seait-900/30 dark:to-seait-800/20 flex items-center justify-center">
+                                                {!! $typeIcon !!}
+                                            </div>
+                                        @endif
                                     </div>
                                     <!-- Content -->
                                     <div class="flex-1 min-w-0">
