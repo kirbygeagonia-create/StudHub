@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Notifications\DatabaseNotification;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
@@ -27,7 +28,8 @@ class NotificationController extends Controller
         $unreadCount = $user->unreadNotifications->count(); // @phpstan-ignore-line — magic relation from Notifiable trait
 
         // Group notifications by type for collapsible sections
-        $grouped = $notifications->groupBy(function ($notification) {
+        /** @var LengthAwarePaginator<DatabaseNotification> $notifications */
+        $grouped = collect($notifications->items())->groupBy(function (DatabaseNotification $notification): string {
             $data = $notification->data;
 
             return $data['type'] ?? 'other';

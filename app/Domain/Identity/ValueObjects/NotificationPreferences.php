@@ -4,6 +4,7 @@ namespace App\Domain\Identity\ValueObjects;
 
 use Illuminate\Contracts\Support\Arrayable;
 
+/** @implements Arrayable<string, mixed> */
 class NotificationPreferences implements Arrayable
 {
     /**

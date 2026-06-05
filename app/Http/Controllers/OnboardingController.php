@@ -65,6 +65,7 @@ class OnboardingController extends Controller
                 'display_name' => ['required', 'string', 'min:2', 'max:120'],
             ])->validate();
 
+            /** @var Program $program */
             $program = Program::with('college')->findOrFail($validated['program_id']);
 
             $user->forceFill([
@@ -84,6 +85,7 @@ class OnboardingController extends Controller
             'display_name' => ['required', 'string', 'min:2', 'max:120'],
         ])->validate();
 
+        /** @var Program $program */
         $program = Program::with('college')->findOrFail($validated['program_id']);
 
         $user->forceFill([

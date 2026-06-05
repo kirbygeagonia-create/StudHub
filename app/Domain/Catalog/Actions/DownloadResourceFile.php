@@ -210,7 +210,11 @@ class DownloadResourceFile
     private function stampPdfWithFpdi(string $sourcePath, string $stampText): string
     {
         try {
-            $pageCount = $this->countPdfPages(file_get_contents($sourcePath));
+            $rawContent = file_get_contents($sourcePath);
+            if ($rawContent === false) {
+                throw new \RuntimeException('Failed to read source file: ' . $sourcePath);
+            }
+            $pageCount = $this->countPdfPages($rawContent);
 
             $pdf = new Fpdi;
             $pdf->setSourceFile($sourcePath);
@@ -218,6 +222,7 @@ class DownloadResourceFile
             for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
                 $tplIdx = $pdf->importPage($pageNo);
                 $size = $pdf->getTemplateSize($tplIdx);
+                /** @var array{width: float, height: float, orientation: string} $size */
                 $pageWidth = $size['width'];
                 $pageHeight = $size['height'];
 
@@ -249,6 +254,9 @@ class DownloadResourceFile
             ]);
 
             $pdfContent = file_get_contents($sourcePath);
+            if ($pdfContent === false) {
+                throw new \RuntimeException('Failed to read source file for fallback stamp: ' . $sourcePath);
+            }
 
             return $this->stampPdfFallback($pdfContent, $stampText);
         }

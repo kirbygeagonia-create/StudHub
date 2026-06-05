@@ -79,7 +79,14 @@ class BackupDatabase extends Command
                 return self::FAILURE;
             }
 
-            $stored = Storage::disk('backups')->put($filename, fopen($tempPath, 'r'));
+            $handle = fopen($tempPath, 'r');
+            if ($handle === false) {
+                $this->error('Failed to open backup file for reading.');
+                Log::error('Database backup: failed to open file', ['path' => $tempPath]);
+
+                return self::FAILURE;
+            }
+            $stored = Storage::disk('backups')->put($filename, $handle);
             unlink($tempPath);
 
             if ($stored) {

@@ -363,14 +363,18 @@ class SeaitSubjectsSeeder extends Seeder
                 ],
             );
 
-            foreach ($row['aliases'] ?? [] as $alias) {
+            /** @var array<int, string> $aliases */
+            $aliases = $row['aliases'] ?? [];
+            foreach ($aliases as $alias) {
                 SubjectAlias::updateOrCreate(
                     ['subject_id' => $subject->id, 'alias' => $alias],
                     [],
                 );
             }
 
-            foreach ($row['programs'] ?? [] as $programCode => $meta) {
+            /** @var array<string, array{year?: int, weight?: float}> $programs */
+            $programs = $row['programs'] ?? [];
+            foreach ($programs as $programCode => $meta) {
                 if (! isset($programIds[$programCode])) {
                     continue;
                 }

@@ -56,7 +56,10 @@ class SendDailyDigest implements ShouldQueue
             ->pluck('count', 'program_id');
 
         foreach ($users as $user) {
-            $prefs = NotificationPreferences::fromArray($user->notification_preferences ?? []);
+            $rawPrefs = $user->notification_preferences;
+            /** @var array<string, mixed> $prefsArray */
+            $prefsArray = is_array($rawPrefs) ? $rawPrefs : [];
+            $prefs = NotificationPreferences::fromArray($prefsArray);
             if (! $prefs->digestEnabled) {
                 continue;
             }

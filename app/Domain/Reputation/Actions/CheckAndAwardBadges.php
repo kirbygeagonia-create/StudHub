@@ -371,7 +371,7 @@ class CheckAndAwardBadges
         $weeksWithActivity = [];
         foreach ($dates as $date) {
             $carbonDate = $date instanceof Carbon ? $date : Carbon::parse($date);
-            $isoWeek = $carbonDate->isoWeekYear() . '-W' . str_pad($carbonDate->isoWeek(), 2, '0', STR_PAD_LEFT);
+            $isoWeek = $carbonDate->isoWeekYear() . '-W' . str_pad((string) $carbonDate->isoWeek(), 2, '0', STR_PAD_LEFT);
             $weeksWithActivity[$isoWeek] = true;
         }
 

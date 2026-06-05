@@ -99,8 +99,8 @@ class ResolveReport
         }
 
         return match ($reportedType) {
-            ReportedType::Message => $reported?->sender,
-            ReportedType::Resource => $reported?->owner,
+            ReportedType::Message => $reported instanceof ChatMessage ? $reported->sender()->first() : null,
+            ReportedType::Resource => $reported instanceof LearningResource ? $reported->owner()->first() : null,
             ReportedType::User => User::find($report->reported_id),
         };
     }

@@ -39,7 +39,10 @@ class NotifyRoutedUsers implements ShouldQueue
         $users = User::whereIn('id', $this->userIds)->get();
 
         foreach ($users as $user) {
-            $prefs = NotificationPreferences::fromArray($user->notification_preferences ?? []);
+            $rawPrefs = $user->notification_preferences;
+            /** @var array<string, mixed> $prefsArray */
+            $prefsArray = is_array($rawPrefs) ? $rawPrefs : [];
+            $prefs = NotificationPreferences::fromArray($prefsArray);
 
             // Respect only_urgent preference
             $urgency = $request->urgency;
