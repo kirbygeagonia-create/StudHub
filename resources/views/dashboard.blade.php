@@ -16,6 +16,24 @@
 
     <div class="py-6">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+
+            @if ($announcements->isNotEmpty())
+                <div class="space-y-3">
+                    @foreach ($announcements as $announcement)
+                        <div class="bg-gradient-to-r from-seait-50 to-amber-50 dark:from-seait-900/20 dark:to-amber-900/10 border border-seait-200 dark:border-seait-800/40 rounded-xl p-4 flex items-start gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-seait-100 dark:bg-seait-800/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <svg class="w-4 h-4 text-seait-600 dark:text-seait-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"/></svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-bold text-gray-900 dark:text-gray-100">{{ $announcement->title }}</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400 mt-0.5 whitespace-pre-line">{{ $announcement->body }}</p>
+                                <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">{{ $announcement->published_at?->diffForHumans() }}</p>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+
             <!-- Stats row -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div class="stat-card animate-fade-in" style="animation-delay: 0ms">

@@ -197,9 +197,17 @@
         <div class="lg:col-span-2 card p-5 flex flex-col">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="section-title">Campus Activity</h3>
-                <span class="text-xs text-gray-400 dark:text-gray-500">
-                    Active users / day
-                </span>
+                <div class="flex items-center gap-2">
+                    <form method="GET" action="{{ route('sao.dashboard') }}" class="flex items-center gap-1">
+                        <select name="range" onchange="this.form.submit()"
+                                class="text-xs rounded-lg border-gray-200 dark:border-navy-700 bg-gray-50 dark:bg-navy-800 py-1 px-2 focus:ring-seait-400 focus:border-seait-400">
+                            <option value="7" {{ ($selectedRange ?? '7') === '7' ? 'selected' : '' }}>Last 7 days</option>
+                            <option value="30" {{ ($selectedRange ?? '') === '30' ? 'selected' : '' }}>Last 30 days</option>
+                            <option value="semester" {{ ($selectedRange ?? '') === 'semester' ? 'selected' : '' }}>This semester</option>
+                        </select>
+                        <noscript><button type="submit" class="btn-primary text-xs !px-2 !py-1">Go</button></noscript>
+                    </form>
+                </div>
             </div>
 
             <div class="bar-chart">

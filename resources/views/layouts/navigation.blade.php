@@ -1,3 +1,4 @@
+@php $authUser = $authUser ?? Auth::user(); @endphp
 <div x-data="{ open: false, scrolled: false, logoutOpen: false }">
 <nav @scroll.window="scrolled = window.scrollY > 10" :class="{'shadow-md': scrolled}" class="sticky top-0 z-40 bg-white/95 dark:bg-navy-900/95 backdrop-blur-xl border-b border-gray-200/50 dark:border-navy-700/30" role="navigation" aria-label="Main navigation">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -54,31 +55,31 @@
                         <x-icon name="lends" class="w-4 h-4 mr-1.5" />
                         Lends
                     </x-nav-link>
-                    @if (Auth::user()?->isModerator() || Auth::user()?->isProgramHead() || Auth::user()?->isDean() || Auth::user()?->isSao() || Auth::user()?->isSuperAdmin())
+                    @if ($authUser?->isModerator() || $authUser?->isProgramHead() || $authUser?->isDean() || $authUser?->isSao() || $authUser?->isSuperAdmin())
                         <x-nav-link :href="route('moderation.dashboard')" :active="request()->routeIs('moderation.*')">
                             <x-icon name="moderation" class="w-4 h-4 mr-1.5" />
                             Moderation
                         </x-nav-link>
                     @endif
-                    @if (Auth::user()?->isProgramHead())
+                    @if ($authUser?->isProgramHead())
                         <x-nav-link :href="route('program_head.dashboard')" :active="request()->routeIs('program_head.*')">
                             <x-icon name="admin" class="w-4 h-4 mr-1.5" />
                             Program Head
                         </x-nav-link>
                     @endif
-                    @if (Auth::user()?->isDean())
+                    @if ($authUser?->isDean())
                         <x-nav-link :href="route('dean.dashboard')" :active="request()->routeIs('dean.*')">
                             <x-icon name="admin" class="w-4 h-4 mr-1.5" />
                             Dean Panel
                         </x-nav-link>
                     @endif
-                    @if (Auth::user()?->isSao())
+                    @if ($authUser?->isSao())
                         <x-nav-link :href="route('sao.dashboard')" :active="request()->routeIs('sao.*')">
                             <x-icon name="admin" class="w-4 h-4 mr-1.5" />
                             SAO Panel
                         </x-nav-link>
                     @endif
-                    @if (Auth::user()?->isSuperAdmin())
+                    @if ($authUser?->isSuperAdmin())
                         <x-nav-link :href="route('sao.dashboard')" :active="request()->routeIs('sao.*')">
                             <x-icon name="admin" class="w-4 h-4 mr-1.5" />
                             System
@@ -88,13 +89,26 @@
             </div>
 
             <div class="hidden sm:flex sm:items-center sm:gap-2">
-                <form method="GET" action="{{ route('search') }}" role="search" class="relative">
+                <form method="GET" action="{{ route('search') }}" role="search" class="relative"
+          x-data="{ q: '{{ request('q') }}', searching: false }"
+          x-init="$watch('q', val => {
+              if (val.length >= 3) {
+                  searching = true;
+                  clearTimeout(window._searchTimer);
+                  window._searchTimer = setTimeout(() => { $el.submit(); }, 500);
+              }
+          })">
                     <label for="nav-search" class="sr-only">Search resources</label>
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <x-icon name="search" class="h-4 w-4 text-gray-400" />
+                        <template x-if="!searching">
+                            <x-icon name="search" class="h-4 w-4 text-gray-400" />
+                        </template>
+                        <template x-if="searching">
+                            <svg class="h-4 w-4 text-seait-500 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                        </template>
                     </div>
-                    <input type="text" id="nav-search" name="q" value="{{ request('q') }}"
-                           placeholder="Search resources…"
+                    <input type="text" id="nav-search" name="q" x-model="q"
+                           placeholder="Search resources… (min 3 chars)"
                            class="w-48 pl-10 pr-3 py-2 text-sm rounded-xl border-gray-200 bg-gray-50/80 focus:bg-white focus:border-seait-400 focus:ring-2 focus:ring-seait-100 transition-all placeholder:text-gray-400 dark:bg-navy-800/60 dark:border-navy-700/50 dark:text-gray-200 dark:placeholder:text-gray-500 dark:focus:border-seait-500 dark:focus:ring-seait-800/30">
                 </form>
 
@@ -183,17 +197,17 @@
                     <x-slot name="trigger">
                         <button class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-50/80 dark:hover:bg-navy-800/60 transition-all duration-200">
                             <div class="w-8 h-8 rounded-full bg-gradient-to-br from-seait-400 to-seait-600 flex items-center justify-center text-white text-xs font-bold ring-2 ring-seait-100 dark:ring-seait-800/40 shadow-sm">
-                                {{ strtoupper(substr(Auth::user()?->preferredDisplayName() ?? '?', 0, 2)) }}
+                                {{ strtoupper(substr($authUser?->preferredDisplayName() ?? '?', 0, 2)) }}
                             </div>
-                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300 hidden lg:block">{{ Auth::user()?->preferredDisplayName() ?? 'Guest' }}</span>
+                            <span class="text-sm font-medium text-gray-700 dark:text-gray-300 hidden lg:block">{{ $authUser?->preferredDisplayName() ?? 'Guest' }}</span>
                             <x-icon name="chevron-down" class="h-4 w-4 text-gray-400" />
                         </button>
                     </x-slot>
 
                     <x-slot name="content">
                         <div class="px-3 py-2.5 border-b border-gray-100 dark:border-navy-700/50">
-                            <p class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ Auth::user()?->name }}</p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ Auth::user()?->email }}</p>
+                            <p class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ $authUser?->name }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ $authUser?->email }}</p>
                         </div>
                         <div class="py-1">
                             <x-dropdown-link :href="route('profile.show')">
@@ -212,17 +226,17 @@
                                 <x-icon name="notifications" class="w-4 h-4 mr-2 flex-shrink-0" />
                                 Notifications
                             </x-dropdown-link>
-                            @if (Auth::user()?->isProgramHead())
+                            @if ($authUser?->isProgramHead())
                                 <x-dropdown-link :href="route('program_head.feedback')">
                                     <x-icon name="feedback" class="w-4 h-4 mr-2 flex-shrink-0" />
                                     View Feedback
                                 </x-dropdown-link>
-                            @elseif (Auth::user()?->isDean())
+                            @elseif ($authUser?->isDean())
                                 <x-dropdown-link :href="route('dean.feedback')">
                                     <x-icon name="feedback" class="w-4 h-4 mr-2 flex-shrink-0" />
                                     View Feedback
                                 </x-dropdown-link>
-                            @elseif (Auth::user()?->isSao() || Auth::user()?->isSuperAdmin())
+                            @elseif ($authUser?->isSao() || $authUser?->isSuperAdmin())
                                 <x-dropdown-link :href="route('sao.feedback')">
                                     <x-icon name="feedback" class="w-4 h-4 mr-2 flex-shrink-0" />
                                     View Feedback
@@ -284,36 +298,36 @@
                 <x-responsive-nav-link :href="route('leaderboard')" :active="request()->routeIs('leaderboard')">Leaderboard</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('requests.index')" :active="request()->routeIs('requests.*')">Requests</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('lends.index')" :active="request()->routeIs('lends.*')">Lends</x-responsive-nav-link>
-                @if (Auth::user()?->isModerator() || Auth::user()?->isProgramHead() || Auth::user()?->isDean() || Auth::user()?->isSao() || Auth::user()?->isSuperAdmin())
+                @if ($authUser?->isModerator() || $authUser?->isProgramHead() || $authUser?->isDean() || $authUser?->isSao() || $authUser?->isSuperAdmin())
                     <x-responsive-nav-link :href="route('moderation.dashboard')" :active="request()->routeIs('moderation.*')">Moderation</x-responsive-nav-link>
                 @endif
-                @if (Auth::user()?->isProgramHead())
+                @if ($authUser?->isProgramHead())
                     <x-responsive-nav-link :href="route('program_head.dashboard')" :active="request()->routeIs('program_head.*')">Program Head</x-responsive-nav-link>
                 @endif
-                @if (Auth::user()?->isDean())
+                @if ($authUser?->isDean())
                     <x-responsive-nav-link :href="route('dean.dashboard')" :active="request()->routeIs('dean.*')">Dean Panel</x-responsive-nav-link>
                 @endif
-                @if (Auth::user()?->isSao())
+                @if ($authUser?->isSao())
                     <x-responsive-nav-link :href="route('sao.dashboard')" :active="request()->routeIs('sao.*')">SAO Panel</x-responsive-nav-link>
                 @endif
-                @if (Auth::user()?->isSuperAdmin())
+                @if ($authUser?->isSuperAdmin())
                     <x-responsive-nav-link :href="route('sao.dashboard')" :active="request()->routeIs('sao.*')">System</x-responsive-nav-link>
                 @endif
             </div>
             <div class="border-t border-gray-100 dark:border-navy-700/50 px-3 py-3 space-y-1">
                 <div class="px-3 pb-2">
-                    <p class="font-medium text-sm text-gray-900 dark:text-gray-100">{{ Auth::user()?->name ?? 'Guest' }}</p>
-                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ Auth::user()?->email ?? '' }}</p>
+                    <p class="font-medium text-sm text-gray-900 dark:text-gray-100">{{ $authUser?->name ?? 'Guest' }}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">{{ $authUser?->email ?? '' }}</p>
                 </div>
                 <x-responsive-nav-link :href="route('profile.show')">Profile</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('resources.shelf')">My Shelf</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('requests.index')">My Requests</x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('notifications.index')">Notifications</x-responsive-nav-link>
-                @if (Auth::user()?->isProgramHead())
+                @if ($authUser?->isProgramHead())
                     <x-responsive-nav-link :href="route('program_head.feedback')">View Feedback</x-responsive-nav-link>
-                @elseif (Auth::user()?->isDean())
+                @elseif ($authUser?->isDean())
                     <x-responsive-nav-link :href="route('dean.feedback')">View Feedback</x-responsive-nav-link>
-                @elseif (Auth::user()?->isSao() || Auth::user()?->isSuperAdmin())
+                @elseif ($authUser?->isSao() || $authUser?->isSuperAdmin())
                     <x-responsive-nav-link :href="route('sao.feedback')">View Feedback</x-responsive-nav-link>
                 @else
                     <x-responsive-nav-link :href="route('feedback.create')">Feedback</x-responsive-nav-link>
@@ -382,6 +396,32 @@
                 Yes, log out
             </button>
         </div>
+    </div>
+</div>
+
+{{-- Mobile bottom tab bar --}}
+<div class="fixed bottom-0 inset-x-0 z-50 sm:hidden bg-white/95 dark:bg-navy-900/95 backdrop-blur-xl border-t border-gray-200/50 dark:border-navy-700/30">
+    <div class="flex items-center justify-around py-1.5">
+        <a href="{{ route('dashboard') }}" class="flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg {{ request()->routeIs('dashboard') ? 'text-seait-500' : 'text-gray-400 dark:text-gray-500' }}" aria-label="Home">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+            <span class="text-[10px] font-medium">Home</span>
+        </a>
+        <a href="{{ route('chat.index') }}" class="flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg {{ request()->routeIs('chat.*') ? 'text-seait-500' : 'text-gray-400 dark:text-gray-500' }}" aria-label="Chat">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+            <span class="text-[10px] font-medium">Chat</span>
+        </a>
+        <a href="{{ route('resources.index') }}" class="flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg {{ request()->routeIs('resources.*') ? 'text-seait-500' : 'text-gray-400 dark:text-gray-500' }}" aria-label="Resources">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+            <span class="text-[10px] font-medium">Resources</span>
+        </a>
+        <a href="{{ route('requests.index') }}" class="flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg {{ request()->routeIs('requests.*') ? 'text-seait-500' : 'text-gray-400 dark:text-gray-500' }}" aria-label="Requests">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <span class="text-[10px] font-medium">Requests</span>
+        </a>
+        <a href="{{ route('lends.index') }}" class="flex flex-col items-center gap-0.5 px-3 py-1 rounded-lg {{ request()->routeIs('lends.*') ? 'text-seait-500' : 'text-gray-400 dark:text-gray-500' }}" aria-label="Lends">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            <span class="text-[10px] font-medium">Lends</span>
+        </a>
     </div>
 </div>
 </div>

@@ -12,6 +12,7 @@ use App\Models\Offer;
 use App\Models\Report;
 use App\Models\Subject;
 use App\Models\User;
+use App\Observers\UserObserver;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
@@ -32,6 +33,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Register observer for user deletion — archives resources before cascade
+        User::observe(UserObserver::class);
+
         Relation::enforceMorphMap([
             'resource' => LearningResource::class,
             'message' => ChatMessage::class,
@@ -41,6 +45,15 @@ class AppServiceProvider extends ServiceProvider
             'offer' => Offer::class,
             'lend' => Lend::class,
         ]);
+
+        // Share the authenticated user with the app layout so Blade views
+        // don't call Auth::user() repeatedly.
+        View::composer('layouts.app', function ($view): void {
+            $user = Auth::user();
+            if ($user !== null) {
+                $view->with('authUser', $user);
+            }
+        });
 
         // Share admin sidebar badge counts via View Composer
         // so every admin controller method doesn't re-query them.

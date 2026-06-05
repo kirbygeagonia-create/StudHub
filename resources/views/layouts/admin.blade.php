@@ -57,7 +57,7 @@
                         {{ session('status') ?? session('success') }}
                     </span>
                     <button @click="show = false"
-                            class="ml-auto text-emerald-500 hover:text-emerald-700">
+                            class="ml-auto text-emerald-500 hover:text-emerald-700" aria-label="Dismiss notification">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor"
                              viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -85,7 +85,7 @@
                     </svg>
                     <span class="flex-1">{{ session('error') }}</span>
                     <button @click="show = false"
-                            class="ml-auto text-red-500 hover:text-red-700">
+                            class="ml-auto text-red-500 hover:text-red-700" aria-label="Dismiss notification">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor"
                              viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round"
@@ -117,7 +117,7 @@
                         @endforeach
                     </ul>
                     <button @click="show = false"
-                            class="ml-auto text-red-500 hover:text-red-700">
+                            class="ml-auto text-red-500 hover:text-red-700" aria-label="Dismiss notification">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor"
                              viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round"

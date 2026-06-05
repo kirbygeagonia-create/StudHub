@@ -84,7 +84,7 @@
                                 @csrf
                                 <button type="submit"
                                         class="p-2 rounded-xl text-gray-300 hover:text-red-500 hover:bg-red-50 dark:text-gray-600 dark:hover:text-red-400 dark:hover:bg-red-900/10 transition-colors"
-                                        title="Remove from shelf">
+                                        title="Remove from shelf" aria-label="Remove from shelf">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/></svg>
                                 </button>
                             </form>

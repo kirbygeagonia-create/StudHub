@@ -36,11 +36,18 @@ class DeanController extends Controller
             ->count();
         $college = College::find($collegeId);
 
-        $chartData = collect(range(6, 0))->map(function (int $daysAgo) use ($programIds): array {
+        $selectedRange = $httpRequest->get('range', '7');
+        $days = match ($selectedRange) {
+            '30' => 30,
+            'semester' => 120,
+            default => 7,
+        };
+
+        $chartData = collect(range($days - 1, 0))->map(function (int $daysAgo) use ($programIds): array {
             $date = now()->subDays($daysAgo);
 
             return [
-                'label' => $date->format('D'),
+                'label' => $daysAgo === 0 ? 'Today' : $date->format('D'),
                 'count' => User::whereIn('program_id', $programIds)
                     ->whereDate('last_seen_at', $date->toDateString())
                     ->count(),
@@ -54,6 +61,7 @@ class DeanController extends Controller
             'totalModerators' => $totalModerators,
             'totalProgramHeads' => $totalProgramHeads,
             'chartData' => $chartData,
+            'selectedRange' => $selectedRange,
         ]);
     }
 

@@ -118,6 +118,14 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * @return HasMany<LearningResource, $this>
+     */
+    public function resources(): HasMany
+    {
+        return $this->hasMany(LearningResource::class, 'owner_user_id');
+    }
+
+    /**
      * @return HasMany<ResourceRequest, $this>
      */
     public function requests(): HasMany
@@ -233,6 +241,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isSuperAdmin(): bool
     {
         return $this->role === UserRole::SuperAdmin;
+    }
+
+    public function isSystem(): bool
+    {
+        return $this->role === UserRole::System;
     }
 
     /**

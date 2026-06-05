@@ -2,6 +2,7 @@
 
 namespace App\Domain\Search\Jobs;
 
+use App\Domain\Identity\ValueObjects\NotificationPreferences;
 use App\Mail\DailyDigest;
 use App\Models\RequestRoute;
 use App\Models\User;
@@ -55,8 +56,8 @@ class SendDailyDigest implements ShouldQueue
             ->pluck('count', 'program_id');
 
         foreach ($users as $user) {
-            $prefs = $user->notification_preferences ?? [];
-            if (($prefs['digest_enabled'] ?? true) === false) {
+            $prefs = NotificationPreferences::fromArray($user->notification_preferences ?? []);
+            if (! $prefs->digestEnabled) {
                 continue;
             }
 

@@ -17,7 +17,7 @@ it('defaults new users to the Student role', function () {
 });
 
 it('exposes a flat list of role values for validation rules', function () {
-    expect(UserRole::values())->toEqualCanonicalizing(['student', 'moderator', 'program_head', 'dean', 'sao', 'super_admin']);
+    expect(UserRole::values())->toEqualCanonicalizing(['student', 'moderator', 'program_head', 'dean', 'sao', 'super_admin', 'system']);
 });
 
 it('UserRole enum has correct labels', function () {

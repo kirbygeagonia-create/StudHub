@@ -50,3 +50,9 @@ ci: ## Run the full CI pipeline locally (lint + analyse + test)
 
 fresh: ## Reset the local database (migrate:fresh --seed)
 	php artisan migrate:fresh --seed
+
+reverb: ## Start the Reverb WebSocket server (runs natively, not containerized)
+	php artisan reverb:start --host=0.0.0.0 --port=8080
+
+reverb-docker: ## Start Reverb inside docker compose (containerized)
+	$(DC) up -d reverb

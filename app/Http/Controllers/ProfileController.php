@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\Identity\ValueObjects\NotificationPreferences;
 use App\Domain\Reputation\Enums\BadgeTier;
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\LearningResource;
@@ -156,13 +157,13 @@ class ProfileController extends Controller
             'digest_enabled' => ['nullable', 'boolean'],
         ]);
 
-        $prefs = [
-            'only_urgent' => (bool) ($validated['only_urgent'] ?? false),
-            'muted_programs' => $validated['muted_programs'] ?? [],
-            'digest_enabled' => (bool) ($validated['digest_enabled'] ?? true),
-        ];
+        $prefs = new NotificationPreferences(
+            onlyUrgent: (bool) ($validated['only_urgent'] ?? false),
+            mutedPrograms: $validated['muted_programs'] ?? [],
+            digestEnabled: (bool) ($validated['digest_enabled'] ?? true),
+        );
 
-        $user->fill(['notification_preferences' => $prefs])->save();
+        $user->fill(['notification_preferences' => $prefs->toArray()])->save();
 
         session()->flash('status', 'Notification preferences updated.');
 

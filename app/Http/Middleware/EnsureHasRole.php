@@ -21,6 +21,11 @@ class EnsureHasRole
             abort(403);
         }
 
+        // System role (StudHub Bot) should never pass role checks
+        if ($user->role === UserRole::System) {
+            abort(403, 'System users cannot perform this action.');
+        }
+
         // SuperAdmin and SAO inherit all roles — they pass any role check
         if ($user->isSuperAdmin() || $user->isSao()) {
             return $next($request);

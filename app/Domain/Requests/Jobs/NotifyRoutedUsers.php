@@ -2,6 +2,7 @@
 
 namespace App\Domain\Requests\Jobs;
 
+use App\Domain\Identity\ValueObjects\NotificationPreferences;
 use App\Domain\Requests\Enums\RequestUrgency;
 use App\Domain\Requests\Notifications\RequestRoutedNotification;
 use App\Models\ResourceRequest;
@@ -38,17 +39,16 @@ class NotifyRoutedUsers implements ShouldQueue
         $users = User::whereIn('id', $this->userIds)->get();
 
         foreach ($users as $user) {
-            $prefs = $user->notification_preferences ?? [];
+            $prefs = NotificationPreferences::fromArray($user->notification_preferences ?? []);
 
             // Respect only_urgent preference
             $urgency = $request->urgency;
-            if (($prefs['only_urgent'] ?? false) && $urgency instanceof RequestUrgency && $urgency->value !== 'urgent') {
+            if ($prefs->onlyUrgent && $urgency instanceof RequestUrgency && $urgency->value !== 'urgent') {
                 continue;
             }
 
             // Respect muted_programs preference
-            $muted = $prefs['muted_programs'] ?? [];
-            if (in_array($user->program_id, $muted, true)) {
+            if ($user->program_id !== null && $prefs->isProgramMuted($user->program_id)) {
                 continue;
             }
 

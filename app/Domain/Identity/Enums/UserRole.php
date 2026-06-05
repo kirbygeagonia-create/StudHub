@@ -10,6 +10,7 @@ enum UserRole: string
     case Dean = 'dean';
     case Sao = 'sao';
     case SuperAdmin = 'super_admin';
+    case System = 'system';
 
     public function label(): string
     {
@@ -20,6 +21,7 @@ enum UserRole: string
             self::Dean => 'College Dean',
             self::Sao => 'Administrator',
             self::SuperAdmin => 'System Administrator',
+            self::System => 'System',
         };
     }
 
@@ -45,6 +47,7 @@ enum UserRole: string
             self::ProgramHead => ['program_head', 'moderator'],
             self::Moderator => ['moderator'],
             self::Student => ['student'],
+            self::System => [],
         };
     }
 
@@ -57,6 +60,7 @@ enum UserRole: string
             self::Dean => 'panel-dean',
             self::Sao => 'panel-sao',
             self::SuperAdmin => 'panel-super',
+            self::System => '',
         };
     }
 
@@ -66,6 +70,6 @@ enum UserRole: string
      */
     public function isSchoolRole(): bool
     {
-        return $this !== self::SuperAdmin;
+        return ! in_array($this, [self::SuperAdmin, self::System], true);
     }
 }

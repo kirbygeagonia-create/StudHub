@@ -21,11 +21,19 @@ class NotificationController extends Controller
 
         $notifications = $user
             ->notifications()
-            ->paginate(20);
+            ->latest()
+            ->paginate(50);
 
         $unreadCount = $user->unreadNotifications->count(); // @phpstan-ignore-line — magic relation from Notifiable trait
 
-        return view('notifications.index', compact('notifications', 'unreadCount'));
+        // Group notifications by type for collapsible sections
+        $grouped = $notifications->groupBy(function ($notification) {
+            $data = $notification->data;
+
+            return $data['type'] ?? 'other';
+        })->sortKeys();
+
+        return view('notifications.index', compact('notifications', 'unreadCount', 'grouped'));
     }
 
     /**

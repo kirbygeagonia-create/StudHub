@@ -12,8 +12,10 @@
 #   - redis    Redis 7
 #   - mailpit  Local mail catcher (SMTP on 1025, web UI on 8025)
 #
-# Reverb runs natively (not containerized) for local dev — it connects to
-# the host's Redis and the app container's MySQL.
+# Reverb — WebSocket server for real-time chat.
+# Uses the same PHP image as the app service.
+# Connects to the Redis and MySQL containers.
+# Run: docker compose up -d reverb
 
 services:
   app:
@@ -79,6 +81,23 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
+
+  reverb:
+    image: studhub/app:dev
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    command: php artisan reverb:start --host=0.0.0.0 --port=8080
+    ports:
+      - "${REVERB_PORT:-8080}:8080"
+    depends_on:
+      - app
+      - redis
+    environment:
+      DB_HOST: db
+      REDIS_HOST: redis
+      REVERB_HOST: 0.0.0.0
+      REVERB_PORT: 8080
 
   mailpit:
     image: axllent/mailpit:latest

@@ -23,9 +23,13 @@
                     <div>
                         <dt class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Posted by</dt>
                         <dd class="text-gray-900 dark:text-gray-100">
-                            {{ $resource->owner?->display_name ?: $resource->owner?->name ?: 'Unknown' }}
-                            @if ($resource->program)
-                                · {{ $resource->program->code }}
+                            @if ($resource->owner_user_id === null)
+                                <span class="text-gray-400 italic">Original uploader's account has been deleted</span>
+                            @else
+                                {{ $resource->owner?->display_name ?: $resource->owner?->name ?: 'Unknown' }}
+                                @if ($resource->program)
+                                    · {{ $resource->program->code }}
+                                @endif
                             @endif
                         </dd>
                     </div>
@@ -50,7 +54,7 @@
                     @if ($resource->condition)
                         <div>
                             <dt class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Condition</dt>
-                            <dd class="text-gray-900 dark:text-gray-100">{{ ucfirst(str_replace('_', ' ', $resource->condition)) }}</dd>
+                            <dd class="text-gray-900 dark:text-gray-100">{{ \App\Domain\Lends\Enums\LendCondition::tryFrom($resource->condition)?->label() ?? $resource->condition }}</dd>
                         </div>
                     @endif
                 </dl>

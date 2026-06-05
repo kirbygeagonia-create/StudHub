@@ -33,6 +33,9 @@ class RoomConversation extends Component
 
     public ?int $oldestMessageId = null;
 
+    /** Tracks whether more messages exist beyond the current loaded set. */
+    public bool $moreMessagesAvailable = false;
+
     #[Validate('required_without:attachment|string|max:4000')]
     public string $body = '';
 
@@ -79,7 +82,15 @@ class RoomConversation extends Component
             $query->where('id', '<', $this->oldestMessageId);
         }
 
-        $persisted = $query->limit(50)->get()->reverse();
+        // Fetch 51 rows — if we get 51, there are more messages available
+        $persisted = $query->limit(51)->get();
+
+        $this->moreMessagesAvailable = $persisted->count() > 50;
+        if ($this->moreMessagesAvailable) {
+            $persisted = $persisted->take(50);
+        }
+
+        $persisted = $persisted->reverse();
 
         // Merge broadcast messages that arrived after the last fetch
         $allMessages = $persisted->merge($this->broadcastMessages)
@@ -93,16 +104,7 @@ class RoomConversation extends Component
     #[Computed]
     public function hasMoreMessages(): bool
     {
-        $messages = $this->roomMessages;
-        if ($messages->isEmpty()) {
-            return false;
-        }
-
-        $oldestLoadedId = $messages->first()->id;
-
-        return $this->room->messages()
-            ->where('id', '<', $oldestLoadedId)
-            ->exists();
+        return $this->moreMessagesAvailable;
     }
 
     public function loadMore(): void
@@ -112,6 +114,8 @@ class RoomConversation extends Component
             $this->oldestMessageId = $messages->first()->id;
         }
         unset($this->roomMessages);
+        // Reset the flag so the next fetch re-evaluates
+        $this->moreMessagesAvailable = false;
         // Clear broadcast messages when loading more to avoid duplicates
         $this->broadcastMessages = collect();
     }

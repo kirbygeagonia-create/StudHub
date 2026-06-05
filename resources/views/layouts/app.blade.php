@@ -20,7 +20,7 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @livewireStyles
     </head>
-    <body class="font-sans antialiased text-gray-900 dark:text-gray-100 {{ auth()->user()?->panelClass() }}">
+    <body class="font-sans antialiased text-gray-900 dark:text-gray-100 {{ ($authUser ?? Auth::user())?->panelClass() }}">
         <div class="min-h-screen">
             @auth
                 <x-role-context-banner />
@@ -89,7 +89,7 @@
                          class="flash-success pointer-events-auto w-full max-w-md">
                         <svg class="w-5 h-5 flex-shrink-0 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         <span class="flex-1">{{ session('status') ?? session('success') }}</span>
-                        <button @click="show = false" class="ml-auto flex-shrink-0 text-emerald-500 hover:text-emerald-700 dark:hover:text-emerald-300">
+                        <button @click="show = false" class="ml-auto flex-shrink-0 text-emerald-500 hover:text-emerald-700 dark:hover:text-emerald-300" aria-label="Dismiss notification">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </div>
@@ -107,7 +107,7 @@
                          class="flash-error pointer-events-auto w-full max-w-md">
                         <svg class="w-5 h-5 flex-shrink-0 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         <span class="flex-1">{{ session('error') }}</span>
-                        <button @click="show = false" class="ml-auto flex-shrink-0 text-red-500 hover:text-red-700 dark:hover:text-red-300">
+                        <button @click="show = false" class="ml-auto flex-shrink-0 text-red-500 hover:text-red-700 dark:hover:text-red-300" aria-label="Dismiss notification">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </div>
@@ -125,7 +125,7 @@
                          class="flash-warning pointer-events-auto w-full max-w-md">
                         <svg class="w-5 h-5 flex-shrink-0 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.054 0 1.502-1.275.722-1.845l-6.928-5.013c-.752-.545-1.792-.545-2.544 0L5.094 17.155c-.78.57-.332 1.845.722 1.845z"/></svg>
                         <span class="flex-1">{{ session('warning') }}</span>
-                        <button @click="show = false" class="ml-auto flex-shrink-0 text-amber-500 hover:text-amber-700 dark:hover:text-amber-300">
+                        <button @click="show = false" class="ml-auto flex-shrink-0 text-amber-500 hover:text-amber-700 dark:hover:text-amber-300" aria-label="Dismiss notification">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </div>
@@ -143,7 +143,7 @@
                          class="flash-info pointer-events-auto w-full max-w-md">
                         <svg class="w-5 h-5 flex-shrink-0 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         <span class="flex-1">{{ session('info') }}</span>
-                        <button @click="show = false" class="ml-auto flex-shrink-0 text-blue-500 hover:text-blue-700 dark:hover:text-blue-300">
+                        <button @click="show = false" class="ml-auto flex-shrink-0 text-blue-500 hover:text-blue-700 dark:hover:text-blue-300" aria-label="Dismiss notification">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </div>
@@ -165,7 +165,7 @@
                                 <li>{{ $error }}</li>
                             @endforeach
                         </ul>
-                        <button @click="show = false" class="ml-auto flex-shrink-0 text-red-500 hover:text-red-700 dark:hover:text-red-300">
+                        <button @click="show = false" class="ml-auto flex-shrink-0 text-red-500 hover:text-red-700 dark:hover:text-red-300" aria-label="Dismiss notification">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                         </button>
                     </div>
@@ -194,7 +194,7 @@
             <div class="flex items-center gap-2 flex-shrink-0">
                 <button onclick="installPwa()" class="btn-primary text-xs !px-4 !py-2">Install</button>
                 <button onclick="document.getElementById('pwa-install-banner').classList.add('hidden')"
-                        class="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                        class="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" aria-label="Dismiss install banner">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>

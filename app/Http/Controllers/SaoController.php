@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Domain\Identity\Enums\UserRole;
 use App\Domain\Moderation\Actions\LogAudit;
+use App\Models\Announcement;
 use App\Models\College;
 use App\Models\Feedback;
 use App\Models\User;
@@ -37,11 +38,19 @@ class SaoController extends Controller
             ->orderBy('name')
             ->get(['id', 'code', 'name']);
 
-        $chartData = collect(range(6, 0))->map(function (int $daysAgo) use ($user): array {
+        // Time-range selector: 7 days (default), 30 days, or this semester
+        $range = $httpRequest->input('range', '7');
+        $days = match ($range) {
+            '30' => 30,
+            'semester' => 120,
+            default => 7,
+        };
+
+        $chartData = collect(range($days - 1, 0))->map(function (int $daysAgo) use ($user): array {
             $date = now()->subDays($daysAgo);
 
             return [
-                'label' => $date->format('D'),
+                'label' => $daysAgo === 0 ? 'Today' : $date->format('D'),
                 'count' => User::where('school_id', $user->school_id)
                     ->whereDate('last_seen_at', $date->toDateString())
                     ->count(),
@@ -56,6 +65,7 @@ class SaoController extends Controller
             'totalDeans' => $totalDeans,
             'colleges' => $colleges,
             'chartData' => $chartData,
+            'selectedRange' => $range,
         ]);
     }
 
@@ -204,6 +214,38 @@ class SaoController extends Controller
         $user = $httpRequest->user();
         abort_unless($user !== null, 403);
 
-        return view('sao.announcements');
+        $announcements = Announcement::where('school_id', $user->school_id)
+            ->latest()
+            ->paginate(25);
+
+        return view('sao.announcements', [
+            'announcements' => $announcements,
+        ]);
+    }
+
+    public function storeAnnouncement(HttpRequest $httpRequest): RedirectResponse
+    {
+        $user = $httpRequest->user();
+        abort_unless($user !== null, 403);
+
+        $validated = $httpRequest->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'body' => ['required', 'string', 'max:5000'],
+            'is_published' => ['nullable', 'boolean'],
+        ]);
+
+        $isPublished = (bool) ($validated['is_published'] ?? false);
+
+        Announcement::create([
+            'school_id' => $user->school_id,
+            'title' => $validated['title'],
+            'body' => $validated['body'],
+            'is_published' => $isPublished,
+            'published_at' => $isPublished ? now() : null,
+        ]);
+
+        session()->flash('status', 'Announcement created.');
+
+        return redirect()->route('sao.announcements');
     }
 }

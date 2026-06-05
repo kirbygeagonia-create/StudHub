@@ -56,7 +56,7 @@
                     </div>
                     <div>
                         <dt class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Type wanted</dt>
-                        <dd class="text-gray-900 dark:text-gray-100">{{ ucfirst(str_replace('_', ' ', $request->type_wanted)) }}</dd>
+                        <dd class="text-gray-900 dark:text-gray-100">{{ \App\Domain\Catalog\Enums\ResourceType::tryFrom($request->type_wanted)?->label() ?? $request->type_wanted }}</dd>
                     </div>
                     <div>
                         <dt class="text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400">Urgency</dt>
@@ -149,6 +149,9 @@
                             <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
                                 The offer from <strong>{{ $acceptedOffer->offerer->display_name ?: $acceptedOffer->offerer->name }}</strong> has been accepted.
                                 Record the resource "{{ $acceptedOffer->resource->title }}" as lent.
+                                <a href="{{ route('resources.show', $acceptedOffer->resource) }}" class="text-xs text-seait-600 hover:text-seait-700 ml-1">
+                                    See the resource →
+                                </a>
                             </p>
                             <form method="POST" action="{{ route('lends.record', [$request, $acceptedOffer]) }}" class="space-y-3">
                                 @csrf
@@ -164,6 +167,32 @@
                                     Record Lend
                                 </button>
                             </form>
+                        </div>
+                    @endif
+                @endif
+
+                @if ($request->status?->value === 'fulfilled' && $request->fulfilled_offer_id)
+                    @php
+                        $fulfilledOffer = $request->offers->firstWhere('id', $request->fulfilled_offer_id);
+                    @endphp
+                    @if ($fulfilledOffer && $fulfilledOffer->resource)
+                        <div class="border-t border-gray-100 dark:border-navy-700 pt-4 mt-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                </div>
+                                <div>
+                                    <p class="text-sm font-semibold text-gray-900 dark:text-gray-100">Request fulfilled</p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                                        Fulfilled by {{ $fulfilledOffer->offerer->display_name ?: $fulfilledOffer->offerer->name }}
+                                        with "{{ $fulfilledOffer->resource->title }}"
+                                    </p>
+                                </div>
+                                <a href="{{ route('resources.show', $fulfilledOffer->resource) }}"
+                                   class="ml-auto btn-primary text-xs !px-3 !py-1.5">
+                                    See the resource →
+                                </a>
+                            </div>
                         </div>
                     @endif
                 @endif

@@ -76,22 +76,22 @@ class CheckAndAwardBadges
 
             Badge::VaultKeeper => $this->resourceCount($user) >= 50,
 
-            Badge::ModuleMaster => DB::table('learning_resources')
+            Badge::ModuleMaster => DB::table('resources')
                 ->where('owner_user_id', $user->id)
                 ->where('type', ResourceType::EModule->value)
                 ->count() >= 10,
 
-            Badge::ReviewerRoyale => DB::table('learning_resources')
+            Badge::ReviewerRoyale => DB::table('resources')
                 ->where('owner_user_id', $user->id)
                 ->where('type', ResourceType::Reviewer->value)
                 ->count() >= 10,
 
-            Badge::ContentMill => DB::table('learning_resources')
+            Badge::ContentMill => DB::table('resources')
                 ->where('owner_user_id', $user->id)
                 ->where('created_at', '>=', now()->subDays(7))
                 ->count() >= 10,
 
-            Badge::CrossPollinator => DB::table('learning_resources')
+            Badge::CrossPollinator => DB::table('resources')
                 ->where('owner_user_id', $user->id)
                 ->where('program_id', '!=', $user->program_id)
                 ->whereNotNull('program_id')
@@ -99,7 +99,7 @@ class CheckAndAwardBadges
 
             Badge::LegacyHolder =>
                 // Resource was published 30+ days ago and has at least one save
-                DB::table('learning_resources')
+                DB::table('resources')
                     ->where('owner_user_id', $user->id)
                     ->where('published_at', '<=', now()->subDays(30))
                     ->where('save_count', '>', 0)
@@ -118,18 +118,18 @@ class CheckAndAwardBadges
             Badge::SignalBoost =>
                 // Fulfilled an urgent request within 2 hours of it being posted
                 DB::table('offers')
-                    ->join('resource_requests', 'offers.request_id', '=', 'resource_requests.id')
+                    ->join('requests', 'offers.request_id', '=', 'requests.id')
                     ->where('offers.offerer_user_id', $user->id)
                     ->where('offers.status', 'accepted')
-                    ->where('resource_requests.urgency', 'urgent')
-                    ->whereRaw("offers.updated_at <= datetime(resource_requests.created_at, '+2 hours')")
+                    ->where('requests.urgency', 'urgent')
+                    ->whereRaw("offers.updated_at <= datetime(requests.created_at, '+2 hours')")
                     ->exists(),
 
             Badge::BridgeBuilder =>
                 // Fulfilled requests from 3+ different programs
                 DB::table('offers')
-                    ->join('resource_requests', 'offers.request_id', '=', 'resource_requests.id')
-                    ->join('users as requesters', 'resource_requests.requester_user_id', '=', 'requesters.id')
+                    ->join('requests', 'offers.request_id', '=', 'requests.id')
+                    ->join('users as requesters', 'requests.requester_user_id', '=', 'requesters.id')
                     ->where('offers.offerer_user_id', $user->id)
                     ->where('offers.status', 'accepted')
                     ->whereNotNull('requesters.program_id')
@@ -226,13 +226,13 @@ class CheckAndAwardBadges
             Badge::TheCompletePackage =>
                 // Has uploaded, made a request, lent, and chatted
                 $this->resourceCount($user) >= 1
-                    && DB::table('resource_requests')->where('requester_user_id', $user->id)->exists()
+                    && DB::table('requests')->where('requester_user_id', $user->id)->exists()
                     && $this->lendCount($user) >= 1
                     && DB::table('chat_messages')->where('sender_id', $user->id)->exists(),
 
             Badge::NightShift =>
                 // Uploaded any resource between midnight and 4 AM (by created_at hour)
-                DB::table('learning_resources')
+                DB::table('resources')
                     ->where('owner_user_id', $user->id)
                     ->whereTime('created_at', '>=', '00:00:00')
                     ->whereTime('created_at', '<=', '03:59:59')
@@ -240,10 +240,10 @@ class CheckAndAwardBadges
 
             Badge::Crammer =>
                 // 3+ uploads within any single 24-hour rolling window
-                DB::table('learning_resources as r1')
+                DB::table('resources as r1')
                     ->where('r1.owner_user_id', $user->id)
                     ->whereRaw('(
-                        SELECT COUNT(*) FROM learning_resources r2
+                        SELECT COUNT(*) FROM resources r2
                         WHERE r2.owner_user_id = r1.owner_user_id
                           AND r2.created_at BETWEEN r1.created_at AND datetime(r1.created_at, \'+24 hours\')
                     ) >= 3')
@@ -302,7 +302,7 @@ class CheckAndAwardBadges
 
     private function resourceCount(User $user): int
     {
-        return (int) DB::table('learning_resources')
+        return (int) DB::table('resources')
             ->where('owner_user_id', $user->id)
             ->count();
     }

@@ -159,10 +159,18 @@
         {{-- Activity chart + role breakdown (2/5) --}}
         <div class="lg:col-span-2 card p-5 flex flex-col">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="section-title">7-Day Activity</h3>
-                <span class="text-xs text-gray-400 dark:text-gray-500">
-                    Students / day
-                </span>
+                <h3 class="section-title">
+                    {{ $selectedRange === 'semester' ? 'Semester' : ($selectedRange === '30' ? '30-Day' : '7-Day') }} Activity
+                </h3>
+                <form method="GET" action="{{ route('dean.dashboard') }}" class="flex items-center gap-2">
+                    <select name="range" onchange="this.form.submit()"
+                            class="text-xs border-gray-200 dark:border-navy-700 rounded-lg bg-gray-50 dark:bg-navy-800 text-gray-600 dark:text-gray-300 px-2 py-1">
+                        <option value="7" {{ $selectedRange === '7' ? 'selected' : '' }}>Last 7 days</option>
+                        <option value="30" {{ $selectedRange === '30' ? 'selected' : '' }}>Last 30 days</option>
+                        <option value="semester" {{ $selectedRange === 'semester' ? 'selected' : '' }}>This semester</option>
+                    </select>
+                    <noscript><button type="submit" class="btn-primary text-xs !px-2 !py-1">Go</button></noscript>
+                </form>
             </div>
 
             <div class="bar-chart">

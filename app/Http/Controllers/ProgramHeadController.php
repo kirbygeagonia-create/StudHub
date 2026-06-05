@@ -48,12 +48,19 @@ class ProgramHeadController extends Controller
             ->latest()
             ->paginate(50);
 
-        // 7-day active-user bar chart for this college
-        $chartData = collect(range(6, 0))->map(function (int $daysAgo) use ($collegeId): array {
+        $selectedRange = $httpRequest->get('range', '7');
+        $days = match ($selectedRange) {
+            '30' => 30,
+            'semester' => 120,
+            default => 7,
+        };
+
+        // Active-user bar chart for this college
+        $chartData = collect(range($days - 1, 0))->map(function (int $daysAgo) use ($collegeId): array {
             $date = now()->subDays($daysAgo);
 
             return [
-                'label' => $date->format('D'),
+                'label' => $daysAgo === 0 ? 'Today' : $date->format('D'),
                 'count' => User::where('college_id', $collegeId)
                     ->whereDate('last_seen_at', $date->toDateString())
                     ->count(),
@@ -66,6 +73,7 @@ class ProgramHeadController extends Controller
             'totalResources' => $totalResources,
             'moderators' => $moderators,
             'chartData' => $chartData,
+            'selectedRange' => $selectedRange,
         ]);
     }
 

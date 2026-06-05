@@ -15,7 +15,7 @@ return new class extends Migration
                 'name' => 'StudHub Bot',
                 'display_name' => 'StudHub Bot',
                 'password' => bcrypt('nologin-' . bin2hex(random_bytes(16))),
-                'role' => UserRole::SuperAdmin->value,
+                'role' => UserRole::System->value,
                 'email_verified_at' => now(),
                 'onboarded_at' => now(),
                 'created_at' => now(),

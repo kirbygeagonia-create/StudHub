@@ -152,7 +152,7 @@
                             </div>
                             <div class="opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 mt-0.5">
                                 <button type="button" onclick="document.getElementById('rf-{{ $message->id }}').classList.toggle('hidden')"
-                                        class="p-1 rounded text-gray-300 hover:text-red-400 dark:text-gray-600 dark:hover:text-red-400 transition-colors" title="Report">
+                                        class="p-1 rounded text-gray-300 hover:text-red-400 dark:text-gray-600 dark:hover:text-red-400 transition-colors" title="Report" aria-label="Report this message">
                                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"/></svg>
                                 </button>
                             </div>
@@ -277,13 +277,22 @@
                     <input type="file" wire:model="attachment" accept="image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,text/plain" class="hidden"
                            @change="const f = $event.target.files[0]; if (f) { fileName = f.name; fileSize = f.size; hasFile = true; }">
                 </label>
-                <div class="flex-1 relative">
+                <div class="flex-1 relative" x-data="{ charCount: 0 }">
                     <label for="chat-body" class="sr-only">Message</label>
                     <textarea id="chat-body" wire:model="body" rows="1"
                               class="input-field resize-none w-full max-h-32 overflow-y-auto !py-2.5 rounded-2xl"
                               placeholder="Send a message… @name to mention"
                               @keydown.enter.prevent="if(!$event.shiftKey){$wire.send()}else{$event.target.value+='\n'}"
-                              oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,128)+'px'"></textarea>
+                              oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,128)+'px'"
+                              @input="charCount = $event.target.value.length"></textarea>
+                    <div class="text-xs mt-1 text-right"
+                         :class="{
+                             'text-gray-400 dark:text-gray-500': charCount <= 3600,
+                             'text-amber-500': charCount > 3600 && charCount <= 4000,
+                             'text-red-500': charCount > 4000
+                         }">
+                        <span x-text="charCount"></span> / 4000
+                    </div>
                 </div>
                 <button type="submit" wire:loading.attr="disabled"
                         class="flex-shrink-0 p-2 rounded-xl bg-seait-500 hover:bg-seait-600 text-white transition-colors disabled:opacity-50 shadow-sm hover:shadow-md">

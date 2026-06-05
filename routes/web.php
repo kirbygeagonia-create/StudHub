@@ -92,7 +92,7 @@ Route::middleware(['auth', 'verified', 'onboarded', 'not_suspended'])->group(fun
         ->name('profile.destroy');
 
     Route::get('/search', [SearchController::class, 'index'])
-        ->middleware('throttle:30,1')
+        ->middleware('throttle:10,1')
         ->name('search');
 
     Route::post('/reports', [ReportController::class, 'store'])
@@ -178,6 +178,9 @@ Route::middleware(['auth', 'verified', 'onboarded', 'role:sao,super_admin'])->gr
         ->middleware('throttle:20,1')
         ->name('sao.users.assign-role');
     Route::get('/sao/announcements', [SaoController::class, 'announcements'])->name('sao.announcements');
+    Route::post('/sao/announcements', [SaoController::class, 'storeAnnouncement'])
+        ->middleware('throttle:10,1')
+        ->name('sao.announcements.store');
 });
 
 // Legacy /admin routes — redirect to new program_head routes for backwards compat
@@ -185,6 +188,15 @@ Route::middleware(['auth', 'verified', 'onboarded'])->group(function () {
     Route::redirect('/admin', '/program-head')->name('admin.dashboard');
     Route::redirect('/admin/feedback', '/program-head/feedback')->name('admin.feedback');
     Route::redirect('/admin/super', '/sao')->name('admin.super');
+});
+
+// ── Dev / component preview (local only) ─────────────────────────────────
+Route::middleware(['web'])->group(function () {
+    Route::get('/dev/components', function () {
+        abort_unless(app()->environment('local'), 404);
+
+        return view('dev.components');
+    })->name('dev.components');
 });
 
 require __DIR__ . '/auth.php';

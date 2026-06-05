@@ -18,6 +18,10 @@ class SearchController extends Controller
 
         if ($httpRequest->has('q')) {
             $query = trim((string) $httpRequest->get('q'));
+            // Reject single/double character queries to prevent scraping
+            if ($query !== '' && mb_strlen($query) < 3) {
+                $query = '';
+            }
             if ($query !== '') {
                 $results = $searchGlobal->handle($user, $query);
             }

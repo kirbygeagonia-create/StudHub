@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Domain\Identity\Rules\AllowedSchoolEmailDomain;
 use App\Models\User;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -25,6 +26,7 @@ class ProfileUpdateRequest extends FormRequest
                 'email',
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
+                new AllowedSchoolEmailDomain,
             ],
             'student_number' => ['nullable', 'string', 'max:20'],
         ];
