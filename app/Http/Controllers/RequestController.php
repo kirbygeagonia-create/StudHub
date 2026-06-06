@@ -106,8 +106,12 @@ class RequestController extends Controller
     {
         $user = $httpRequest->user();
         abort_unless($user !== null, 403);
+        assert($user !== null);
 
-        if ($request->requester->school_id !== $user->school_id) {
+        $requester = $request->requester;
+        abort_unless($requester !== null, 404);
+
+        if ($requester->school_id !== $user->school_id) {
             abort(404);
         }
 

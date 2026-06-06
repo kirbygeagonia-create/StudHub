@@ -144,7 +144,7 @@ class ProgramHeadController extends Controller
             }
         });
 
-        $logAudit->handle($user, 'moderator.remove', 'User', $userId, []);
+        $logAudit->handle($user, 'moderator.remove', 'User', (int) $userId, []);
 
         session()->flash('status', 'Moderator removed from program.');
 

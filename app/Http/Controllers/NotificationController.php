@@ -19,7 +19,9 @@ class NotificationController extends Controller
     public function index(): View
     {
         $user = Auth::user();
+        assert($user !== null);
 
+        /** @var LengthAwarePaginator<DatabaseNotification> $notifications */
         $notifications = $user
             ->notifications()
             ->latest()
@@ -44,6 +46,7 @@ class NotificationController extends Controller
     public function fetch(): JsonResponse
     {
         $user = Auth::user();
+        assert($user !== null);
 
         $notifications = $user->notifications()
             ->take(10)
@@ -56,7 +59,7 @@ class NotificationController extends Controller
                     'id' => $notification->id,
                     'type' => $type,
                     'title' => $data['badge_label'] ?? $data['title'] ?? $data['message'] ?? 'Notification',
-                    'time' => $notification->created_at->diffForHumans(),
+                    'time' => $notification->created_at?->diffForHumans(),
                     'read' => $notification->read_at !== null,
                     'link' => $this->notificationLink($type, $data),
                     'icon' => $this->notificationIcon($type),

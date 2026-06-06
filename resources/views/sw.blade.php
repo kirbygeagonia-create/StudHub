@@ -1,5 +1,5 @@
-// Bump this version when deploying to force cache refresh
-const CACHE_VERSION = '2';
+// Auto-generated from Vite manifest hash
+const CACHE_VERSION = '{{ $version }}';
 const CACHE_NAME = 'studhub-v' + CACHE_VERSION;
 const CACHE_MAX_ENTRIES = 100;
 

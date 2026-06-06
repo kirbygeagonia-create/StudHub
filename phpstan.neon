@@ -13,7 +13,7 @@ parameters:
     # Tests are intentionally excluded — Pest's DSL is not understood
     # by vanilla PHPStan and needs a dedicated plugin we'll add later.
 
-    level: 7
+    level: 8
 
     excludePaths:
         - bootstrap/cache/*

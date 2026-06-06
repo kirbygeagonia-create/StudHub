@@ -89,28 +89,104 @@
             </div>
 
             <div class="hidden sm:flex sm:items-center sm:gap-2">
-                <form method="GET" action="{{ route('search') }}" role="search" class="relative"
-          x-data="{ q: '{{ request('q') }}', searching: false }"
-          x-init="$watch('q', val => {
-              if (val.length >= 3) {
-                  searching = true;
-                  clearTimeout(window._searchTimer);
-                  window._searchTimer = setTimeout(() => { $el.submit(); }, 500);
-              }
-          })">
-                    <label for="nav-search" class="sr-only">Search resources</label>
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <template x-if="!searching">
-                            <x-icon name="search" class="h-4 w-4 text-gray-400" />
-                        </template>
-                        <template x-if="searching">
-                            <svg class="h-4 w-4 text-seait-500 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                        </template>
-                    </div>
-                    <input type="text" id="nav-search" name="q" x-model="q"
-                           placeholder="Search resources… (min 3 chars)"
-                           class="w-48 pl-10 pr-3 py-2 text-sm rounded-xl border-gray-200 bg-gray-50/80 focus:bg-white focus:border-seait-400 focus:ring-2 focus:ring-seait-100 transition-all placeholder:text-gray-400 dark:bg-navy-800/60 dark:border-navy-700/50 dark:text-gray-200 dark:placeholder:text-gray-500 dark:focus:border-seait-500 dark:focus:ring-seait-800/30">
-                </form>
+                <div class="relative" x-data="{
+    q: '{{ request('q') }}',
+    results: null,
+    searching: false,
+    open: false,
+    search(val) {
+        if (val.length < 3) { this.results = null; this.open = false; return; }
+        this.searching = true;
+        clearTimeout(this._t);
+        this._t = setTimeout(() => {
+            fetch('/search/inline?q=' + encodeURIComponent(val), {
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
+                credentials: 'same-origin',
+            })
+            .then(r => r.ok ? r.json() : Promise.reject(r.status))
+            .then(data => { this.results = data; this.open = true; this.searching = false; })
+            .catch(() => { this.searching = false; });
+        }, 350);
+    },
+    close() {
+        this.open = false;
+        setTimeout(() => { this.results = null; }, 200);
+    }
+}" role="search">
+    <label for="nav-search" class="sr-only">Search resources, requests, messages</label>
+    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <template x-if="!searching">
+            <x-icon name="search" class="h-4 w-4 text-gray-400" />
+        </template>
+        <template x-if="searching">
+            <svg class="h-4 w-4 text-seait-500 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        </template>
+    </div>
+    <input type="text" id="nav-search" name="q" x-model="q"
+           @input.debounce="search(q)"
+           @keydown.escape.window="close()"
+           @click.outside="close()"
+           @keydown.enter="if (q.length >= 3) window.location.href = '/search?q=' + encodeURIComponent(q)"
+           placeholder="Search… (min 3 chars)"
+           class="w-48 pl-10 pr-3 py-2 text-sm rounded-xl border-gray-200 bg-gray-50/80 focus:bg-white focus:border-seait-400 focus:ring-2 focus:ring-seait-100 transition-all placeholder:text-gray-400 dark:bg-navy-800/60 dark:border-navy-700/50 dark:text-gray-200 dark:placeholder:text-gray-500 dark:focus:border-seait-500 dark:focus:ring-seait-800/30">
+    
+    <!-- Dropdown -->
+    <div x-show="open && results"
+         x-transition:enter="transition ease-out duration-1500"
+         x-transition:enter-start="opacity-0 scale-95"
+         x-transition:enter-end="opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-100"
+         x-transition:leave-start="opacity-100 scale-100"
+         x-transition:leave-end="opacity-0 scale-95"
+         class="absolute right-0 mt-2 w-96 bg-white dark:bg-navy-800 rounded-2xl shadow-xl border border-gray-100 dark:border-navy-700/50 z-50 overflow-hidden"
+         x-cloak>
+        <div class="max-h-96 overflow-y-auto divide-y divide-gray-100 dark:divide-navy-700/30">
+            <!-- Resources -->
+            <div x-show="results.resources.length > 0" class="p-2">
+                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-2 py-1">Resources</p>
+                <template x-for="r in results.resources" :key="'r' + r.id">
+                    <a :href="r.url" class="flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-gray-50 dark:hover:bg-navy-700/50 transition-colors">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate" x-text="r.title"></p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400" x-text="r.type"></p>
+                        </div>
+                    </a>
+                </template>
+            </div>
+            <!-- Requests -->
+            <div x-show="results.requests.length > 0" class="p-2">
+                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-2 py-1">Requests</p>
+                <template x-for="r in results.requests" :key="'req' + r.id">
+                    <a :href="r.url" class="flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-gray-50 dark:hover:bg-navy-700/50 transition-colors">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate" x-text="r.description"></p>
+                        </div>
+                    </a>
+                </template>
+            </div>
+            <!-- Messages -->
+            <div x-show="results.messages.length > 0" class="p-2">
+                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-2 py-1">Messages</p>
+                <template x-for="m in results.messages" :key="'m' + m.id">
+                    <a :href="m.url" class="flex items-center gap-3 px-2 py-2 rounded-xl hover:bg-gray-50 dark:hover:bg-navy-700/50 transition-colors">
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate" x-text="m.body"></p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400" x-text="'in ' + m.room"></p>
+                        </div>
+                    </a>
+                </template>
+            </div>
+            <!-- No results -->
+            <div x-show="results.resources.length === 0 && results.requests.length === 0 && results.messages.length === 0" class="px-4 py-8 text-center">
+                <p class="text-sm text-gray-400 dark:text-gray-500">No results found</p>
+            </div>
+        </div>
+        <div class="px-4 py-2.5 border-t border-gray-100 dark:border-navy-700/50 bg-gray-50/50 dark:bg-navy-800/50">
+            <a :href="'/search?q=' + encodeURIComponent(q)" class="text-xs font-medium text-seait-600 hover:text-seait-700 dark:text-seait-400 dark:hover:text-seait-300 transition-colors">See all results →</a>
+        </div>
+    </div>
+</div>
+                </div>
 
                 <!-- Notifications Bell -->
                 <div class="relative" x-data="{

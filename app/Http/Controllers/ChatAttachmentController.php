@@ -24,7 +24,7 @@ class ChatAttachmentController extends Controller
         abort_unless($message->hasAttachment(), 404, 'No attachment found.');
 
         // Extract the relative path from the URL
-        $path = str_replace('/storage/', '', $message->attachment_url);
+        $path = str_replace('/storage/', '', (string) $message->attachment_url);
 
         // Verify file exists
         abort_unless(Storage::disk('public')->exists($path), 404, 'File not found.');

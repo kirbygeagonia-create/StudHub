@@ -24,7 +24,7 @@ class ProfileController extends Controller
         $user = $request->user();
         abort_unless($user !== null, 403);
 
-        $programId = $request->integer('program_id', $user->program_id);
+        $programId = $request->integer('program_id', (int) ($user->program_id ?? 0));
 
         $programs = Program::where('school_id', $user->school_id)
             ->where('is_active', true)
@@ -117,13 +117,15 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        assert($user !== null);
+        $user->fill($request->validated());
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
         }
 
-        $request->user()->save();
+        $user->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
@@ -180,6 +182,7 @@ class ProfileController extends Controller
         ]);
 
         $user = $request->user();
+        assert($user !== null);
 
         Auth::logout();
 

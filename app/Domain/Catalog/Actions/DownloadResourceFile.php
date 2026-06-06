@@ -32,14 +32,17 @@ class DownloadResourceFile
             throw new NotFoundHttpException('This resource has no file attached.');
         }
 
-        if (! Storage::disk('public')->exists($resource->file_url)) {
+        /** @var string $fileUrl */
+        $fileUrl = $resource->file_url;
+
+        if (! Storage::disk('public')->exists($fileUrl)) {
             throw new NotFoundHttpException('The file no longer exists on the server.');
         }
 
         // Track download count
         $resource->increment('download_count');
 
-        $extension = pathinfo($resource->file_url, PATHINFO_EXTENSION);
+        $extension = pathinfo($fileUrl, PATHINFO_EXTENSION);
         $safeTitle = preg_replace('/[^a-zA-Z0-9_-]/', '_', $resource->title);
         $downloadName = $safeTitle . '_' . $resource->id . '.' . $extension;
 
@@ -75,7 +78,7 @@ class DownloadResourceFile
             }
         }
 
-        return Storage::disk('public')->download($resource->file_url, $downloadName);
+        return Storage::disk('public')->download($fileUrl, $downloadName);
     }
 
     private function watermarkedPdfCachePath(User $user, LearningResource $resource): string
@@ -103,7 +106,9 @@ class DownloadResourceFile
 
     private function generateWatermarkedPdf(User $user, LearningResource $resource, string $cachePath): void
     {
-        $originalPath = Storage::disk('public')->path($resource->file_url);
+        /** @var string $fileUrl */
+        $fileUrl = $resource->file_url;
+        $originalPath = Storage::disk('public')->path($fileUrl);
 
         if (! file_exists($originalPath)) {
             throw new NotFoundHttpException('Original file not found.');
@@ -136,7 +141,9 @@ class DownloadResourceFile
 
     private function generateWatermarkedImage(User $user, LearningResource $resource, string $cachePath): void
     {
-        $originalPath = Storage::disk('public')->path($resource->file_url);
+        /** @var string $fileUrl */
+        $fileUrl = $resource->file_url;
+        $originalPath = Storage::disk('public')->path($fileUrl);
 
         if (! file_exists($originalPath)) {
             throw new NotFoundHttpException('Original file not found.');

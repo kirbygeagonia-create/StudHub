@@ -13,7 +13,6 @@ use App\Models\ResourceRequest;
 use App\Models\Subject;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -45,14 +44,17 @@ class RouteRequest
 
     public function handle(ResourceRequest $request): void
     {
+        // Assert that subject and requester exist as they are required for routing
+        assert($request->subject !== null, 'Request subject is required for routing');
+        assert($request->requester !== null, 'Request requester is required for routing');
+
         $subject = $request->subject;
         $requester = $request->requester;
 
         $programs = Program::whereHas('subjects', function (Builder $q) use ($subject): void {
             $q->where('subject_id', $subject->id);
         })
-            /** @phpstan-ignore-next-line */
-            ->with(['subjects' => function (BelongsToMany $q) use ($subject): void {
+            ->with(['subjects' => function ($q) use ($subject): void {
                 $q->where('subject_id', $subject->id)
                     ->withPivot(['typical_year_level', 'weight']);
             }])->get();
@@ -82,14 +84,14 @@ class RouteRequest
             $score = self::W_EDGE * $edgeWeight
                 + self::W_RESOURCE * $this->normalizedResourceCount($program, $subject, $totalResourceCount)
                 + self::W_HISTORY * $this->historicalFulfillmentRate($program, $subject)
-                + self::W_PROXIMITY * $this->yearProximityBonus($typicalYear, $requester->year_level)
+                + self::W_PROXIMITY * $this->yearProximityBonus($typicalYear, $requester->year_level ?? null)
                 + self::W_URGENCY * $this->urgencyMultiplier(
                     $request->urgency instanceof RequestUrgency
                         ? $request->urgency->value
                         : ($request->urgency ?? 'normal')
                 );
 
-            if ($program->id === $requester->program_id) {
+            if ($requester->program_id !== null && $program->id === $requester->program_id) {
                 $score -= self::PENALTY_SELF;
             }
 
@@ -166,6 +168,10 @@ class RouteRequest
 
     private function routeToOwnProgramOnly(ResourceRequest $request, Subject $subject): void
     {
+        // Assert that requester and their program exist
+        assert($request->requester !== null, 'Requester is required');
+        assert($request->requester->program !== null, 'Requester program is required');
+
         $ownProgram = $request->requester->program;
 
         if ($ownProgram === null) {

@@ -59,6 +59,7 @@ class RoomConversation extends Component
 
         // Track membership — upsert so it's safe on repeat visits
         $user = auth()->user();
+        assert($user !== null);
         $user->chatRooms()->syncWithoutDetaching([
             $room->id => [
                 'joined_at' => now(),

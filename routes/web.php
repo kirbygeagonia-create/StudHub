@@ -25,6 +25,31 @@ Route::get('/', function () {
 Route::get('/help', fn () => redirect('/?open=help'))->name('help');
 Route::get('/aup', fn () => redirect('/?open=aup'))->name('aup');
 
+Route::get('/sw.js', function () {
+    $hash = cache()->remember('vite_manifest_hash', 3600, function () {
+        $manifestPath = public_path('build/manifest.json');
+        if (! file_exists($manifestPath)) {
+            return 'dev';
+        }
+        $manifestContents = file_get_contents($manifestPath);
+        if ($manifestContents === false) {
+            return 'dev';
+        }
+        $manifest = json_decode($manifestContents, true);
+        $encoded = json_encode($manifest);
+        if ($encoded === false) {
+            return 'dev';
+        }
+
+        return substr(md5($encoded), 0, 8);
+    });
+
+    return response()
+        ->view('sw', ['version' => $hash])
+        ->header('Content-Type', 'application/javascript')
+        ->header('Cache-Control', 'no-store');
+})->name('sw');
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/onboarding', [OnboardingController::class, 'show'])->name('onboarding.show');
     Route::post('/onboarding', [OnboardingController::class, 'store'])->name('onboarding.store');
@@ -94,6 +119,10 @@ Route::middleware(['auth', 'verified', 'onboarded', 'not_suspended'])->group(fun
     Route::get('/search', [SearchController::class, 'index'])
         ->middleware('throttle:10,1')
         ->name('search');
+
+    Route::get('/search/inline', [SearchController::class, 'inline'])
+        ->middleware('throttle:20,1')
+        ->name('search.inline');
 
     Route::post('/reports', [ReportController::class, 'store'])
         ->middleware('throttle:10,1')
